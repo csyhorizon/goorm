@@ -1,0 +1,57 @@
+html {
+    text-align: left;
+    font-size: 25px;
+}
+
+header {
+    background-color: blue;
+    line-height: 150%;
+}
+
+nav {
+    background-color: red;
+    width: 20%;
+    height: 600px;
+    float: left;
+}
+
+section {
+    background-color: green;
+
+    width: 60%;
+    height: 600px;
+    float: left;
+}
+
+section .article_1 {
+    background-color: greenyellow;
+    height: 25%;
+    margin: 0 10%;
+}
+
+section .article_2 {
+    background-color: lightpink;
+    height: 25%;
+    margin: 0 10%;
+}
+
+section .article_3 {
+    background-color: lightblue;
+    height: 25%;
+    margin: 0 10%;
+}
+
+aside {
+    background-color: lemonchiffon;
+    height: 600px;
+
+    float: right;
+    width: 20%;
+}
+
+footer {
+    background-color: purple;
+    font-size: 25px;
+    line-height: 150%;
+    width: 100%;
+}
