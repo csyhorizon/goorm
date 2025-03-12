@@ -5,6 +5,12 @@ class HelloThread extends Thread {
     public void run() {
         for (int i = 0; i < 3; i++) {
             System.out.println("hello " + i);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.fillInStackTrace();
+            }
         }
     }
 }
@@ -14,6 +20,11 @@ class ByeThread extends Thread {
     public void run() {
         for (int i = 0; i < 3; i++) {
             System.out.println("bye " + i);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.fillInStackTrace();
+            }
         }
     }
 }
