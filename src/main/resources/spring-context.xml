@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="messageType" class="org.chinoel.goorm_missions.service.impl.MessageType">
+        <property name="name" value="INFO"/>
+    </bean>
+
+    <bean id="message" class="org.chinoel.goorm_missions.service.impl.Message">
+        <property name="content" value="XML From Test"/>
+        <property name="type" ref="messageType"/>
+    </bean>
+
+    <bean id="messageService" class="org.chinoel.goorm_missions.service.MessageServiceImpl">
+        <property name="message" ref="message"/>
+    </bean>
+
+    <bean id="messagePrinter" class="org.chinoel.goorm_missions.service.MessagePrinter">
+        <property name="messageService" ref="messageService"/>
+    </bean>
+</beans>
