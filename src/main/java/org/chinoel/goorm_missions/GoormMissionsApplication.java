@@ -16,6 +16,7 @@ public class GoormMissionsApplication {
         DeviceService computer = context.getBean("computerService", DeviceService.class);
         System.out.println(computer);
 
+        computer.destroy();
         System.out.println("==== 컨텍스트 종료 ====");
         context.close();
     }
