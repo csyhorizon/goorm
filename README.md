@@ -1,9 +1,11 @@
 # Goorm mission
 
-> 같은 타입의 여러 빈이 있을 때 @Primary를 사용하여 기본적으로 주입될 빈을 설정하는 방법을 구현하고 실행 결과 스크린샷을 제출합니다.
+> application.properties 또는 application.yml을 활용하여 설정 값을 주입합니다. 실행 결과를 통해 주입된 값이 올바르게 동작하는 지 확인하고 실행 결과 스크린샷을 제출합니다.
+
+- 너무 재활용한 거 같아서 5번 부터는 새로 만들어서 하겠습니다.
 
 ### 진행 순서
-- [x] 차량 경적 소리 모델 제작
-- [x] 두 차량의 소리 부분 제작
-- [x] Bean 생성할 AppConfig
-- [x] Primary 지정 후 테스트
+- [x] application.properties 작성
+- [x] service 작성
+- [x] PropertySource로 지정 및 Value 연결
+- [x] 테스트

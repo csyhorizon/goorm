@@ -2,10 +2,14 @@ package com.ohgiraffers.bean.service.impl;
 
 import com.ohgiraffers.bean.service.CarService;
 
-public class BrokenCarServiceImpl implements CarService {
+public class BrokenCarServiceImpl extends CarService {
+
+    public BrokenCarServiceImpl(String name, int price) {
+        super(name, price);
+    }
 
     @Override
-    public void playSound() {
-        System.out.println("끼리..끼리리리릭...뿌루루");
+    public String toString() {
+        return super.toString();
     }
 }
