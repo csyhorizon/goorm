@@ -18,13 +18,21 @@
 
 - - -
 ## DB 구성
+
+
+
+README.md 파일에서는 다이어그램 코드를 백틱(```) 세 개로 감싸고 mermaid 키워드를 추가해야 합니다.
+
+아래처럼 작성하세요:
+
+```mermaid
 erDiagram
-USERS ||--o{ POSTS : writes
-USERS ||--o{ COMMENTS : writes
-POSTS ||--o{ COMMENTS : has
-POSTS ||--o{ POST_CATEGORY : belongs_to
-ROLES ||--o{ USER_ROLES : has
-USERS ||--o{ USER_ROLES : has
+    USERS ||--o{ POSTS : writes
+    USERS ||--o{ COMMENTS : writes
+    POSTS ||--o{ COMMENTS : has
+    POSTS ||--o{ POST_CATEGORY : belongs_to
+    ROLES ||--o{ USER_ROLES : has
+    USERS ||--o{ USER_ROLES : has
 
     USERS {
         bigint id PK
@@ -76,6 +84,7 @@ USERS ||--o{ USER_ROLES : has
         bigint user_id FK
         bigint role_id FK
     }
+```
 
 #### 작업 순서를 변경해야 원활히 진행할 수 있으므로 순서를 변경했습니다.
 - - -
