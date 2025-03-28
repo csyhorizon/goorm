@@ -19,12 +19,6 @@
 - - -
 ## DB 구성
 
-
-
-README.md 파일에서는 다이어그램 코드를 백틱(```) 세 개로 감싸고 mermaid 키워드를 추가해야 합니다.
-
-아래처럼 작성하세요:
-
 ```mermaid
 erDiagram
     USERS ||--o{ POSTS : writes
