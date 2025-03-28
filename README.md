@@ -1,15 +1,81 @@
 # Goorm Mission
 ## Spring 프레임워크 고급
-> Spring 프레임워크를 사용해 Spring Security 등 다양한 고급 기능을 학습하고 구현합니다.<br>
-Spring Boot와 Spring MVC를 활용하여 웹 애플리케이션을 개발하는 방법을 학습합니다.
+> Spring 프레임워크를 사용해 Spring Security 등 다양한 고급 기능을 학습하고 구현합니다.
+ Spring Boot와 Spring MVC를 활용하여 웹 애플리케이션을 개발하는 방법을 학습합니다.
 
-### 부분적으로 진행하기보다 큰 미션이라는 틀을 가지고 프로젝트 형태로 진행하겠습니다.
+### 부분적으로 하는 것보다 큰 미션이라는 틀을 가지고 프로젝트 형태로 진행했습니다.
 #### 아마 시간은 더 걸리겠지만, 이 부분이 학습면에서 좋을 거 같았습니다. 이번 미션은 문서를 살리는 방향으로 학습했습니다.
 - - -
 ## 프로젝트 목표 [커뮤니티 웹 사이트]
 - 사용자들이 대화를 진행할 수 있는 커뮤니티 제작을 목표로 하는 사이트를 제작합니다.
 - 사용자는 회원 가입을 통해 게시글을 쓰거나 댓글을 남길 수 있습니다.
+- 특정 게시글은 특정 사용자만 접근할 수 있도록 해야합니다.
 - 서버 구성은 Spring Boot, MySQL로 진행합니다.
+
+- - -
+## 프로젝트 사진
+<img src="">
+
+- - -
+## DB 구성
+erDiagram
+USERS ||--o{ POSTS : writes
+USERS ||--o{ COMMENTS : writes
+POSTS ||--o{ COMMENTS : has
+POSTS ||--o{ POST_CATEGORY : belongs_to
+ROLES ||--o{ USER_ROLES : has
+USERS ||--o{ USER_ROLES : has
+
+    USERS {
+        bigint id PK
+        varchar username UK
+        varchar password
+        varchar email UK
+        varchar nickname
+        datetime created_at
+        datetime updated_at
+        boolean is_active
+    }
+
+    POSTS {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        text content
+        int view_count
+        datetime created_at
+        datetime updated_at
+        boolean is_deleted
+        varchar access_level
+    }
+
+    COMMENTS {
+        bigint id PK
+        bigint post_id FK
+        bigint user_id FK
+        text content
+        datetime created_at
+        datetime updated_at
+        boolean is_deleted
+        bigint parent_id FK
+    }
+
+    POST_CATEGORY {
+        bigint id PK
+        varchar name
+        varchar description
+    }
+
+    ROLES {
+        bigint id PK
+        varchar name
+        varchar description
+    }
+
+    USER_ROLES {
+        bigint user_id FK
+        bigint role_id FK
+    }
 
 #### 작업 순서를 변경해야 원활히 진행할 수 있으므로 순서를 변경했습니다.
 - - -
@@ -124,23 +190,10 @@ Spring Boot와 Spring MVC를 활용하여 웹 애플리케이션을 개발하는
   - [ ] 서버에서 데이터를 Thymeleaf 템플릿으로 전달, HTML 페이지에 동적으로 반영하는 방법 구현
 - - -
 ### Navigation
-> 다이어그램 테스트
-```mermaid
-classDiagram
-    class User {
-        +Long id
-        +String username
-        +String password
-        +String email
-    }
-    class Board {
-        +Long id
-        +String title
-        +String content
-        +User writer
-    }
-    Board --> User
-```
+#### 페이지 경로 안내
+
+
+
 - - -
 ## 후기
 > 
