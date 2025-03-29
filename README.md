@@ -143,16 +143,15 @@ erDiagram
     - Spring Data JPA
   - [x] github 연동
   - [x] 요구사항 작성하기 (README.md)
-  - [ ] Database 기본 설정 (개인 서버 MySQL 연동)
-- [ ] 스프링 부트와 스프링 MVC를 활용하여 웹 애플리케이션 개발하기
-    - [ ] 계층 구조 구현
-        - Entity
-        - Repository
-        - Service
-        - Controller
-        - View
-        - DTO
-        - Config
+  - [x] Database 기본 설정 (개인 서버 MySQL 연동)
+- [x] 스프링 부트와 스프링 MVC를 활용하여 웹 애플리케이션 개발하기
+    - [x] 계층 구조 구현
+        - Entity : Database Table Mapping
+        - Repository : Database 접근 interface
+        - Service : 비즈니스 로직 처리
+        - Controller : 클라이어트 요청 처리 및 응답 반환
+        - DTO : 계층 간 데이터 전송을 위한 객체
+        - Config : 보안, 데이터베이스, 웹 설정 등
 - [ ] 스프링 시큐리티 기본 설정하기
   - [ ] 웹 애플리케이션의 기본 보안 설정 구성
   - [ ] 기본 로그인 페이지와 사용자 인증 설정
