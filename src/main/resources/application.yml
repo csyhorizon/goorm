@@ -22,7 +22,15 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
 
+
+
 server:
   port: 8080
   servlet:
     context-path: /
+
+logging:
+  level:
+    org:
+      chinoel:
+        goormspring: DEBUG

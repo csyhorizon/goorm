@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
 <div>
-    <div th:if="${param.error}" style="color:red">
-        아이디 또는 비밀번호가 일치하지 않습니다.
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
     </div>
     <form action="/auth/login" method="post">
         <input type="text" name="username" placeholder="아이디">
