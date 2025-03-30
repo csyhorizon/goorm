@@ -5,6 +5,9 @@
 </head>
 <body>
 <h2>회원가입</h2>
+<div th:if="${errorMessage}" class="alert alert-danger">
+    <p th:text="${errorMessage}"></p>
+</div>
 <form th:action="@{/auth/signup}" method="post">
     <div>
         <label>사용자명:</label>

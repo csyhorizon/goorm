@@ -5,6 +5,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.chinoel.goormspring.dto.request.SignUpRequest;
 import org.chinoel.goormspring.entity.User;
+import org.chinoel.goormspring.exception.EmailAlreadyExistsException;
+import org.chinoel.goormspring.exception.UsernameAlreadyExistsException;
 import org.chinoel.goormspring.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,10 @@ public class UserService {
 
     public void signup(SignUpRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new UsernameAlreadyExistsException("이미 존재하는 사용자입니다.");
+        }
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("이미 사용중인 이메일입니다.");
         }
 
         User user = User.createUser(request, passwordEncoder);
