@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
-public class indexController {
+public class IndexController {
 
     @GetMapping(value = "/")
     public String indexPageReturn() {
@@ -26,4 +26,16 @@ public class indexController {
         }
         return "auth/login";
     }
+
+    @GetMapping(value = "/admin")
+    public String adminPageReturn() {
+        return "admin/test";
+    }
+
+
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "error/define";
+    }
+
 }

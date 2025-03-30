@@ -18,13 +18,13 @@ public class CustomUserDetails implements UserDetails, Serializable {
     private Long seq;
     private String loginId;
     private String password;
-    private Collection<GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
 
 
     // 사용자의 권한 목록 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     // 사용자 비밀번호 반환
