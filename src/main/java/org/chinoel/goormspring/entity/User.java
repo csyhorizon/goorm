@@ -7,13 +7,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.chinoel.goormspring.dto.request.SignUpRequest;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Table(name="USERS")
 public class User {
 
@@ -46,4 +53,15 @@ public class User {
     @Column(name = "IS_ACTIVE")
     private Boolean isActive;
 
+    public static User createUser(SignUpRequest request, PasswordEncoder passwordEncoder) {
+        return User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .isActive(true)
+                .build();
+    }
 }
