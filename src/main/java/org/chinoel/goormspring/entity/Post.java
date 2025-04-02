@@ -1,5 +1,6 @@
 package org.chinoel.goormspring.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,14 +14,20 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.chinoel.goormspring.dto.request.PostAddDto;
 import org.hibernate.annotations.ColumnDefault;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "POSTS", schema = "goorm")
+@Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(name = "POSTS")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,4 +68,16 @@ public class Post {
     @Column(name = "ACCESS_LEVEL", length = 50)
     private String accessLevel;
 
+    public static Post addPost(PostAddDto post, User user) {
+        return Post.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .user(user)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .isDeleted(false)
+                .viewCount(0)
+                .accessLevel(post.isSecret() ? "PRIVATE" : "PUBLIC")
+                .build();
+    }
 }

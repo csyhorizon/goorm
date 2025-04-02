@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +23,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "COMMENTS")
 public class Comments {
@@ -59,4 +63,14 @@ public class Comments {
     @JoinColumn(name = "PARENT_ID")
     private Comments parent;
 
+    public static Comments addComment(Post post, User user, String content) {
+        return Comments.builder()
+                .post(post)
+                .user(user)
+                .content(content)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .isDeleted(false)
+                .build();
+    }
 }

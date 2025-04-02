@@ -26,16 +26,4 @@ public class IndexController {
         }
         return "auth/login";
     }
-
-    @GetMapping(value = "/admin")
-    public String adminPageReturn() {
-        return "admin/test";
-    }
-
-
-    @GetMapping("/access-denied")
-    public String accessDenied() {
-        return "error/define";
-    }
-
 }

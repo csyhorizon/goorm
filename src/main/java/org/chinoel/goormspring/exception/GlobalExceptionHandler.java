@@ -12,6 +12,6 @@ public class GlobalExceptionHandler {
     public String IllegalArgumentException(IllegalArgumentException e, Model model, HttpServletRequest request) {
         model.addAttribute("errorMessage", e.getMessage());
 
-        return request.getRequestURI();
+        return "error/error";
     }
 }

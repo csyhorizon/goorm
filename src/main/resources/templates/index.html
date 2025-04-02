@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en"
-  xmlns:th="http://www.thymeleaf.org"
->
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
-  <meta charset="UTF-8">
-  <title>커뮤니티</title>
+    <meta charset="UTF-8">
+    <title>커뮤니티</title>
 </head>
 <body>
-  <div th:replace="~{fragments/header :: header}"></div>
-  <div class="posts">
-    <h1>메인 페이지</h1>
-  </div>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="posts">
+    <h1>게시판</h1>
+    <div sec:authorize="isAuthenticated()">
+        <a th:href="@{/post}">게시글 목록</a>
+    </div>
+</div>
 </body>
 </html>

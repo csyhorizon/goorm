@@ -29,4 +29,9 @@ public class AuthController {
         userService.signup(request);
         return "redirect:/login";
     }
+
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "error/define";
+    }
 }

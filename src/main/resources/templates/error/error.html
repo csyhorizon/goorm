@@ -7,8 +7,7 @@
 <body>
     <div class="error-page">
         <h1>에러가 발생했습니다.</h1>
-        <p>Error Code : <span th:text="${status}"></span></p>
-        <p>Error Message : <span th:text="${error}"></span></p>
+        <p>Error Message : <span th:text="${errorMessage}"></span></p>
         <a th:href="@{/}">홈으로 돌아가기</a>
     </div>
 </body>
