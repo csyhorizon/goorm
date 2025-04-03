@@ -6,15 +6,24 @@
 ### 스프링 프레임워크 고급 미션에 해당하는 내용을 한번에 진행했습니다. 
 #### 이번 미션은 문서를 살리는 방향으로 학습했습니다.
 - - -
-## 프로젝트 목표 [커뮤니티 웹 사이트]
-- 사용자들이 대화를 진행할 수 있는 커뮤니티 제작을 목표로 하는 사이트를 제작합니다.
+## 프로젝트 초안 [커뮤니티 사이트]
+- 사용자들의 커뮤니티 제작을 목표로 하는 사이트를 제작합니다.
 - 사용자는 회원 가입을 통해 게시글을 쓰거나 댓글을 남길 수 있습니다.
 - 특정 게시글은 특정 사용자만 접근할 수 있도록 해야합니다.
 - 서버 구성은 Spring Boot, MySQL로 진행합니다.
+- 자료는 재활용할 수 있도록 확장성에 염두하여 프로그래밍을 진행합니다.
+- 디자인은 요구 조건에 없었으므로 생각하지 않습니다.
+- /admin 페이지는 관리자 권한이 없으면 접근을 제한하며, 회원가입 시 사용자는 기본 권한을 Default로 합니다.
 
 - - -
 ## 프로젝트 사진
-<img src="">
+![스크린샷 2025-04-04 004135](https://github.com/user-attachments/assets/08bf68a8-48fb-4660-8072-2a5b6596e512)
+![스크린샷 2025-04-04 004128](https://github.com/user-attachments/assets/5399c60f-22eb-4078-b54a-52892b514df8)
+![스크린샷 2025-04-04 004123](https://github.com/user-attachments/assets/880b2777-ba18-4c80-acbd-6da855ad7a23)
+![스크린샷 2025-04-04 004148](https://github.com/user-attachments/assets/d7f9301b-745e-4272-b567-41ce8c325403)
+![스크린샷 2025-04-04 004143](https://github.com/user-attachments/assets/e74c3fd4-d1d5-48ef-90ca-39ed9f905984)
+![스크린샷 2025-04-04 004139](https://github.com/user-attachments/assets/275bdaa7-abde-4bd8-9a8c-6df1b9836f83)
+
 
 - - -
 ## DB 구성
@@ -196,7 +205,8 @@ erDiagram
   - [x] 서버에서 데이터를 Thymeleaf 템플릿으로 전달, HTML 페이지에 동적으로 반영하는 방법 구현
 - - -
 ### Navigation
-#### 페이지 경로 안내
+#### 페이지 다이어그램
+![main](https://github.com/user-attachments/assets/69aa5df1-50e4-44c7-8c43-d1e50f7e44b5)
 
 
 
