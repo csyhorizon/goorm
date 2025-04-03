@@ -3,8 +3,8 @@
 > Spring 프레임워크를 사용해 Spring Security 등 다양한 고급 기능을 학습하고 구현합니다.
  Spring Boot와 Spring MVC를 활용하여 웹 애플리케이션을 개발하는 방법을 학습합니다.
 
-### 부분적으로 하는 것보다 큰 미션이라는 틀을 가지고 프로젝트 형태로 진행했습니다.
-#### 아마 시간은 더 걸리겠지만, 이 부분이 학습면에서 좋을 거 같았습니다. 이번 미션은 문서를 살리는 방향으로 학습했습니다.
+### 스프링 프레임워크 고급 미션에 해당하는 내용을 한번에 진행했습니다. 
+#### 이번 미션은 문서를 살리는 방향으로 학습했습니다.
 - - -
 ## 프로젝트 목표 [커뮤니티 웹 사이트]
 - 사용자들이 대화를 진행할 수 있는 커뮤니티 제작을 목표로 하는 사이트를 제작합니다.
@@ -24,7 +24,6 @@ erDiagram
     USERS ||--o{ POSTS : writes
     USERS ||--o{ COMMENTS : writes
     POSTS ||--o{ COMMENTS : has
-    POSTS ||--o{ POST_CATEGORY : belongs_to
     ROLES ||--o{ USER_ROLES : has
     USERS ||--o{ USER_ROLES : has
 
@@ -60,12 +59,6 @@ erDiagram
         datetime updated_at
         boolean is_deleted
         bigint parent_id FK
-    }
-
-    POST_CATEGORY {
-        bigint id PK
-        varchar name
-        varchar description
     }
 
     ROLES {
@@ -176,7 +169,6 @@ erDiagram
   - [x] 게시판 페이지
     - [x] Table 형태로 제작
   - [x] 게시판 작성 페이지
-    - [x] 카테고리
     - [x] 제목
     - [x] 내용
     - [x] 취소, 등록
@@ -190,18 +182,18 @@ erDiagram
 - [x] Spring MVC에서 유효성 검사 및 예외 처리
   - [x] @Valid와 @ExceptionHandler를 사용하여 유효성 검사
   - [x] 예외 처리 로직을 추가
-- [ ] Spring MVC에서 인터셉터 구현하기
-  - [ ] 인터셉터를 구현하여 요청과 응답을 가로채고, 처리 전후로 특정 작업을 수행
-- [ ] Spring MVC에서 요청 파라미터 처리하기
-  - [ ] Spring MVC에서 @RequestParam을 사용하여 URL 쿼리 파라미터나 폼 데이터 처리
-  - [ ] 이를 모델에 전달하는 것 구현
-- [ ] Spring MVC에서 모델과 뷰 처리
-  - [ ] Model을 사용하여 데이터를 뷰로 전달하고, 이를 HTML에서 표시하는 방법 구현
-  - [ ] @ModelAttribute와 @RequestMapping을 활용하여 데이터 바인딩을 처리하고 뷰에 전달
-- [ ] Spring MVC에서 템플릿 엔진 사용 (Thymeleaf)
-  - [ ] Srping MVC에서 Thymeleaf 템플릿 엔진 사용
-  - [ ] 동적 웹 페이지 구현
-  - [ ] 서버에서 데이터를 Thymeleaf 템플릿으로 전달, HTML 페이지에 동적으로 반영하는 방법 구현
+- [x] Spring MVC에서 인터셉터 구현하기
+  - [x] 인터셉터를 구현하여 요청과 응답을 가로채고, 처리 전후로 특정 작업을 수행
+- [x] Spring MVC에서 요청 파라미터 처리하기
+  - [x] Spring MVC에서 @RequestParam을 사용하여 URL 쿼리 파라미터나 폼 데이터 처리
+  - [x] 이를 모델에 전달하는 것 구현
+- [x] Spring MVC에서 모델과 뷰 처리
+  - [x] Model을 사용하여 데이터를 뷰로 전달하고, 이를 HTML에서 표시하는 방법 구현
+  - [x] @ModelAttribute와 @RequestMapping을 활용하여 데이터 바인딩을 처리하고 뷰에 전달
+- [x] Spring MVC에서 템플릿 엔진 사용 (Thymeleaf)
+  - [x] Srping MVC에서 Thymeleaf 템플릿 엔진 사용
+  - [x] 동적 웹 페이지 구현
+  - [x] 서버에서 데이터를 Thymeleaf 템플릿으로 전달, HTML 페이지에 동적으로 반영하는 방법 구현
 - - -
 ### Navigation
 #### 페이지 경로 안내
@@ -211,4 +203,5 @@ erDiagram
 - - -
 ## 후기
 > 진짜 어려웠습니다.. Next.js로는 뚝딱 만들어지던게 오류가 사방으로 터지니까 웃음이 절로 나오더군요..
-> 좀더 강해지도록 하겠습니다.
+> 좀더 강해지도록 하겠습니다. 테스트 코드도 적극 활용해야하는데 문서로 쭉 나열하면서 하려니 손이 안가서 못했습니다..
+> 계속 인지하면서 열심히 하겠습니다.

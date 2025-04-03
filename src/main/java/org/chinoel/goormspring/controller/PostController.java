@@ -37,14 +37,6 @@ public class PostController {
                           Model model,
                           @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.getPost(id);
-
-        if(post.getAccessLevel().equals("PRIVATE") &&
-        !post.getUser().getUsername().equals(userDetails.getUsername())) {
-            model.addAttribute("secret", true);
-            model.addAttribute("posts", postService.getAllPosts());
-            return "post/list";
-        }
-
         List<Comments> comments = commentService.getCommentsByPostId(id);
 
         model.addAttribute("post", post);
@@ -54,7 +46,12 @@ public class PostController {
     }
 
     @GetMapping("/post")
-    public String getPostList(Model model) {
+    public String getPostList(@RequestParam(value = "error", required = false, defaultValue = "") String error,
+                              Model model) {
+        if ("private".equals(error)) {
+            model.addAttribute("secret", true);
+        }
+
         List<Post> posts = postService.getAllPosts();
         model.addAttribute("posts", posts);
         return "post/list";
