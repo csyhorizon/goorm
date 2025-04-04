@@ -148,12 +148,16 @@ erDiagram
   - [x] Database 기본 설정 (개인 서버 MySQL 연동)
 - [x] 스프링 부트와 스프링 MVC를 활용하여 웹 애플리케이션 개발하기
     - [x] 계층 구조 구현
-        - Entity : Database Table Mapping
-        - Repository : Database 접근 interface
-        - Service : 비즈니스 로직 처리
+        - Aspect : 에스팩트
+        - Config : 보안, 데이터베이스, 웹 설정 등
         - Controller : 클라이어트 요청 처리 및 응답 반환
         - DTO : 계층 간 데이터 전송을 위한 객체
-        - Config : 보안, 데이터베이스, 웹 설정 등
+        - Entity : Database Table Mapping
+        - Exception : 예외처리
+        - Interceptor : 인터셉터
+        - Repository : Database 접근 interface
+        - Security : 보안 인증 처리
+        - Service : 비즈니스 로직 처리
 - [x] 스프링 시큐리티 기본 설정하기
   - [x] 웹 애플리케이션의 기본 보안 설정 구성
   - [x] 기본 로그인 페이지와 사용자 인증 설정
@@ -212,6 +216,6 @@ erDiagram
 
 - - -
 ## 후기
-> 진짜 어려웠습니다.. Next.js로는 뚝딱 만들어지던게 오류가 사방으로 터지니까 웃음이 절로 나오더군요..
+> 진짜 힘들었습니다.. Next.js로는 뚝딱 만들어지던게 오류가 사방으로 터지니까 웃음이 절로 나오더군요..
 > 좀더 강해지도록 하겠습니다. 테스트 코드도 적극 활용해야하는데 문서로 쭉 나열하면서 하려니 손이 안가서 못했습니다..
-> 계속 인지하면서 열심히 하겠습니다.
+> 계속 인지하면서 열심히 하겠습니다. 에스팩트를 사용한 건 테스트 케이스로 DB 날리는 거 막히는 지 궁금해서 넣어봤습니다.
