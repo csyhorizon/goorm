@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class 학점_예측하기 {
+public class 학점_예측하기_SUCC {
 
     static int MOD = 1_000_000;
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
+
+        long startTime = System.nanoTime();
 
         // 학점은 A, B, C 중 하나
         // B 학점을 받은 과목은 최대 하나 / B는 0또는 1이어야함
@@ -74,5 +76,8 @@ public class 학점_예측하기 {
         }
 
         System.out.println(result);
+
+        long endTime = System.nanoTime();
+        System.out.println("실행 시간: " + (endTime - startTime) / 1_000_000.0 + "ms");
     }
 }
