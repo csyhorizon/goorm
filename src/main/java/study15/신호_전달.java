@@ -3,124 +3,128 @@ package study15;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class 신호_전달 {
-
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-
-    // 8방향
-    static int[][] dd = {{1, 0, -1, 0, 1, -1, 1, -1}, {0, 1, 0, -1, 1, -1, -1, 1}};
-
     static int N, M;
-    static char[][] arr;
-    static int[][] visited;
+    static final int INF = Integer.MAX_VALUE;
 
-    static int[] start;
-    static int[] end;
+    static int[][] map;
+    static int[][][] dist;
+    static int[] start = new int[2];
+    static int[] end = new int[2];
 
-    static class Node implements Comparable<Node> {
-        int x;
-        int y;
-        int size;
-        int pos;
-
-        public Node(int x, int y, int size, int pos) {
-            this.x = x;
-            this.y = y;
-            this.size = size;
-            this.pos = pos;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return Integer.compare(this.size, o.size);
-        }
-    }
-
+    // 8방향 (4방향 문제가 좋은데..)
+    static int[][] dir = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
     public static void main(String[] args) throws IOException {
-        // 나라 행 = N, 열 = M
-        /*
-          - 1 ~ 9 : 빈 땅                 (각 숫자는 저항력)
-          - . : 여덟 방향 중 한 방향으로 보냄   (저항력 : 1)
-          - S : 본사 > 신호를 생성하여 한 방향으로 보냄 (저항력 : 1)
-          - E : 지사 > 본사나 안테나가 보낸 신호를 받을 수 있음 (저항력 : 1)
-          - # : 경쟁사 > 신호가 지나갈 수 없음
-          - 목표 : 본사 -> 지사로 갈수 있는 신호 중 최솟값 찾기 (도달 불가시 -1)
-          */
-
         st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        visited = new int[N][M];
+        map = new int[N][M];
+        dist = new int[N][M][8];
 
-        arr = new char[N][M];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                Arrays.fill(dist[i][j], INF);
+            }
+        }
+
+        // 시작, 끝, 안테나 = 0 (어차피 8방향), 방해하는 회사 = -1, 이외 = c - 0'
         for (int i = 0; i < N; i++) {
             String s = br.readLine();
             for (int j = 0; j < M; j++) {
-                // 일단 만들어두고 생각
-                if (s.charAt(j) == 'S') {
-                    start = new int[] {i, j};
+                char c = s.charAt(j);
+                if (c == 'S') {
+                    start[0] = i;
+                    start[1] = j;
+                    map[i][j] = 0;
+                } else if (c == 'E') {
+                    end[0] = i;
+                    end[1] = j;
+                    map[i][j] = 0;
+                } else if (c == '.') {
+                    map[i][j] = 0;
+                } else if (c == '#') {
+                    map[i][j] = -1;
+                } else {
+                    map[i][j] = c - '0';
                 }
-                else if (s.charAt(j) == 'E') {
-                    end = new int[] {i, j};
-                }
-
-                arr[i][j] = s.charAt(j);
             }
         }
 
-        // 최소 간선 찾기 (처음에는 모든 방향 뿌림)
-        PriorityQueue<Node> q = new PriorityQueue<>();
-        for(int i = 0; i < 8; i++) {
-            int x = start[0] + dd[i][0];
-            int y = start[1] + dd[i][1];
+        PriorityQueue<Node> pq = new PriorityQueue<>();
 
-            if(x >= 0 && y >= 0 && x < N && y < M) {
-                // 벽은 추가 X (처음엔 어찌되었든 모든 방향으로 가야함)
-                if (arr[x][y] == '#') continue;
-                q.add(new Node(x, y, 1, i));
-                visited[x][y] = 1;
-            }
+        for (int k = 0; k < 8; k++) {
+            dist[start[0]][start[1]][k] = 0;
+            pq.offer(new Node(start[0], start[1], k, 0));
         }
 
-        while (!q.isEmpty()) {
-            Node node = q.poll();
-            int x = node.x, y = node.y, size = node.size, pos = node.pos;
-            char ck = arr[x][y];
+        while (!pq.isEmpty()) {
+            Node cur = pq.poll();
 
-            if (ck == '#' || ck == 'S') {
-                // 방문 제외
-                continue;
-            }
-            if (ck == 'E') {
-                if (visited[x][y] == 0) {
-                    visited[x][y] = size;
-                }
-                else {
-                    visited[x][y] = Math.min(visited[x][y], size);
-                }
-            }
-            else if(ck == '.') {
-                // 다시 8방향으로..
+            if (dist[cur.x][cur.y][cur.dir] < cur.cost) continue;
 
-            }
-            else {
-                // 그 방향 그대로
-                int dx = x + dd[pos][0];
-                int dy = y + dd[pos][1];
+            if (map[cur.x][cur.y] > 0) {
+                int nx = cur.x + dir[cur.dir][0];
+                int ny = cur.y + dir[cur.dir][1];
 
-                if (dx >= 0 && dy >= 0 && dx < N && dy < M) {
-                    char cks = arr[dx][dy];
-                    if (cks != '#') {
-
+                if (isValid(nx, ny) && map[nx][ny] != -1) {
+                    int nCost = cur.cost + map[cur.x][cur.y];
+                    if (dist[nx][ny][cur.dir] > nCost) {
+                        dist[nx][ny][cur.dir] = nCost;
+                        pq.offer(new Node(nx, ny, cur.dir, nCost));
                     }
                 }
             }
+
+
+            else if (map[cur.x][cur.y] == 0) {
+                for (int k = 0; k < 8; k++) {
+                    int nx = cur.x + dir[k][0];
+                    int ny = cur.y + dir[k][1];
+
+                    if (isValid(nx, ny) && map[nx][ny] != -1) {
+                        int nCost = cur.cost + 1;
+                        if (dist[nx][ny][k] > nCost) {
+                            dist[nx][ny][k] = nCost;
+                            pq.offer(new Node(nx, ny, k, nCost));
+                        }
+                    }
+                }
+            }
+        }
+
+        int result = INF;
+        for (int k = 0; k < 8; k++) {
+            result = Math.min(result, dist[end[0]][end[1]][k]);
+        }
+
+        System.out.println(result == INF ? -1 : result);
+    }
+
+    static boolean isValid(int x, int y) {
+        return x >= 0 && x < N && y >= 0 && y < M;
+    }
+
+    static class Node implements Comparable<Node> {
+        int x, y, dir, cost;
+
+        Node(int x, int y, int dir, int cost) {
+            this.x = x;
+            this.y = y;
+            this.dir = dir;
+            this.cost = cost;
+        }
+
+        @Override
+        public int compareTo(Node o) {
+            return Integer.compare(this.cost, o.cost);
         }
     }
 }
