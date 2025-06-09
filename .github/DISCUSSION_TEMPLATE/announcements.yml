@@ -19,7 +19,7 @@ body:
     id: content
     attributes:
       label: 📌 주요 내용
-      placeholder: 공지 내용을 입력하세요 (목록 형식 추천)
+      placeholder: 공지 내용을 입력하세요 
     validations:
       required: true
 
