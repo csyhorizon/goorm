@@ -17,7 +17,7 @@ body:
     id: options
     attributes:
       label: ✅ 옵션
-      placeholder: Option A: 설명\nOption B: 설명\nOption C: 설명
+      placeholder: "Option A: 설명\nOption B: 설명\nOption C: 설명"
 
   - type: input
     id: deadline
