@@ -1,5 +1,4 @@
-name: General
-description: 자유롭게 이야기하고 소통할 수 있는 공간입니다.
+title: General
 labels: [general]
 body:
   - type: input
