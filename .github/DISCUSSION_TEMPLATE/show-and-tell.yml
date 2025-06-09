@@ -1,0 +1,35 @@
+name: Show and Tell
+description: 완료한 작업이나 구현한 기능을 공유합니다.
+labels: [showcase]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: 🚀 공유 주제
+      placeholder: 예: 사용자 팔로우 기능 구현 완료
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📌 작업 내용 요약
+      placeholder: 어떤 기능을 구현했는지 간단히 설명하세요.
+
+  - type: textarea
+    id: visuals
+    attributes:
+      label: 🖼️ 결과 화면 (선택)
+      placeholder: 이미지/영상/링크 등을 추가하세요.
+
+  - type: textarea
+    id: related
+    attributes:
+      label: 📂 관련 PR 또는 커밋
+      placeholder: PR 링크 또는 커밋 해시를 입력하세요.
+
+  - type: textarea
+    id: comment
+    attributes:
+      label: 💬 코멘트
+      placeholder: 리뷰 요청 또는 추가 설명이 있다면 작성하세요.

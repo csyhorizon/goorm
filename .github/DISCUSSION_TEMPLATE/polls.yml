@@ -1,0 +1,32 @@
+name: Polls
+description: 의사 결정을 위한 투표를 진행합니다.
+labels: [poll]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: 📊 투표 주제
+      placeholder: 예: 로그인 방식 결정
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 📝 배경 설명
+      placeholder: 왜 투표가 필요한지 작성하세요.
+
+  - type: textarea
+    id: options
+    attributes:
+      label: ✅ 옵션
+      placeholder: Option A: 설명\nOption B: 설명\nOption C: 설명
+
+  - type: input
+    id: deadline
+    attributes:
+      label: 📅 마감일
+      placeholder: YYYY-MM-DD
+
+  - type: markdown
+    attributes:
+      value: |
+        > **투표 방법**: 댓글로 옵션 A/B/C 중 하나를 남겨주세요.

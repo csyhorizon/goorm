@@ -1,0 +1,31 @@
+name: Announcements
+description: 회의, 일정, 프로젝트 관련 공지사항을 공유합니다.
+labels: [announcement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📢 공지 제목
+        예: [회의 안내] 6월 12일(수) 정기 회의 안내
+
+  - type: input
+    id: date
+    attributes:
+      label: 📅 일정 또는 배경
+      placeholder: YYYY-MM-DD, Zoom 링크 등
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 📌 주요 내용
+      placeholder: 공지 내용을 입력하세요 (목록 형식 추천)
+    validations:
+      required: true
+
+  - type: textarea
+    id: todo
+    attributes:
+      label: ✅ 전달사항 / 행동 요청
+      placeholder: [ ] TODO 항목 입력

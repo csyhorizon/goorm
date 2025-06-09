@@ -1,0 +1,35 @@
+name: Ideas
+description: 기능, 구조 개선 등 아이디어를 제안하는 공간입니다.
+labels: [idea]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 💡 제안 제목
+      placeholder: 예: 이메일 인증 기능 도입 제안
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 🧩 제안 배경
+      placeholder: 왜 이 아이디어가 필요한지 작성하세요.
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 📌 제안 내용
+      placeholder: 기능 요약 및 예상 적용 방법을 작성하세요.
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: 👍 기대 효과
+      placeholder: 아이디어의 긍정적인 효과를 작성하세요.
+
+  - type: textarea
+    id: concerns
+    attributes:
+      label: 🧪 우려되는 점 또는 고려 사항
+      placeholder: 발생할 수 있는 문제나 리스크를 작성하세요.

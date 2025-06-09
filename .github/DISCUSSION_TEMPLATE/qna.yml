@@ -1,0 +1,29 @@
+name: Q&A
+description: 기술적 질문과 답변을 주고받는 공간입니다.
+labels: [question]
+body:
+  - type: input
+    id: question
+    attributes:
+      label: ❓ 질문 제목
+      placeholder: 예: JPA에서 N+1 문제 해결 방법?
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 🧩 질문 배경
+      placeholder: 상황 및 관련 코드/설명을 작성하세요.
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: 🧪 시도한 해결 방법
+      placeholder: 어떤 방법을 시도했는지 작성하세요.
+
+  - type: textarea
+    id: help
+    attributes:
+      label: 🆘 도움 받고 싶은 포인트
+      placeholder: 어떤 부분이 특히 어려운지 작성하세요.
