@@ -1,12 +1,11 @@
-name: Polls
-description: 의사 결정을 위한 투표를 진행합니다.
+title: Polls
 labels: [poll]
 body:
   - type: input
     id: topic
     attributes:
       label: 📊 투표 주제
-      placeholder: 예: 로그인 방식 결정
+      placeholder: ex)로그인 방식 결정
 
   - type: textarea
     id: background
