@@ -5,7 +5,7 @@ body:
     id: topic
     attributes:
       label: 💬 주제
-      placeholder: 예: 개발자 컨퍼런스 참가 후기
+      placeholder: ex)개발자 컨퍼런스 참가 후기
     validations:
       required: true
 
