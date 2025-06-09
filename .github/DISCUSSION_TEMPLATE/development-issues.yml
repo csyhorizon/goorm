@@ -1,5 +1,4 @@
 title: Development Issues
-description: 개발 관련 이슈나 설계 논의가 필요할 때 사용합니다.
 labels: [discussion, dev-issue]
 body:
   - type: input
