@@ -1,12 +1,11 @@
-name: Q&A
-description: 기술적 질문과 답변을 주고받는 공간입니다.
+title: Q&A
 labels: [question]
 body:
   - type: input
     id: question
     attributes:
       label: ❓ 질문 제목
-      placeholder: 예: JPA에서 N+1 문제 해결 방법?
+      placeholder: ex)JPA에서 N+1 문제 해결 방법?
     validations:
       required: true
 
