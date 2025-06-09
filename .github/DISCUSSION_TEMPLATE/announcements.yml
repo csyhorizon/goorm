@@ -1,11 +1,13 @@
 title: Announcements
 labels: [announcement]
 body:
-  - type: markdown
+  - type: input
+    id: titles
     attributes:
-      value: |
-        ## 📢 공지 제목
-        예: [회의 안내] 6월 12일(수) 정기 회의 안내
+      label: 🪧 제목
+      placeholder: 제목을 입력하세요
+    validations:
+      required: true
 
   - type: input
     id: date
