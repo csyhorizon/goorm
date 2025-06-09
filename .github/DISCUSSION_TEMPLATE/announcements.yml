@@ -1,6 +1,7 @@
-name: Announcements
+title: "[Announcements]"
 description: 회의, 일정, 프로젝트 관련 공지사항을 공유합니다.
 labels: [announcement]
+
 body:
   - type: markdown
     attributes:
@@ -21,6 +22,8 @@ body:
     attributes:
       label: 📌 주요 내용
       placeholder: 공지 내용을 입력하세요 (목록 형식 추천)
+      values: |
+        -
     validations:
       required: true
 
@@ -28,4 +31,6 @@ body:
     id: todo
     attributes:
       label: ✅ 전달사항 / 행동 요청
-      placeholder: [] TODO 항목 입력
+      placeholder: [ ] TODO 항목 입력
+      values: |
+       []
