@@ -1,12 +1,11 @@
-name: Ideas
-description: 기능, 구조 개선 등 아이디어를 제안하는 공간입니다.
+title: Ideas
 labels: [idea]
 body:
   - type: input
     id: title
     attributes:
       label: 💡 제안 제목
-      placeholder: 예: 이메일 인증 기능 도입 제안
+      placeholder: ex)이메일 인증 기능 도입 제안
     validations:
       required: true
 
