@@ -4,6 +4,7 @@ labels: [announcement]
 
 body:
   - type: markdown
+    id: titles
     attributes:
       value: |
         ## 📢 공지 제목
