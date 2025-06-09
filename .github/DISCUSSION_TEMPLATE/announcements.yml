@@ -1,5 +1,4 @@
-name: Announcements
-description: 회의, 일정, 프로젝트 관련 공지사항을 공유합니다.
+title: Announcements
 labels: [announcement]
 body:
   - type: markdown
