@@ -1,11 +1,11 @@
 package uniqram.c1one.user.entity;
 
 import jakarta.persistence.*;
+import uniqram.c1one.global.BaseEntity;
 
-import java.time.LocalDateTime;
 
 @Entity
-public class Users {
+public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,10 +17,6 @@ public class Users {
     private String password;
 
     private String email;
-
-    private LocalDateTime created_at;
-
-    private LocalDateTime updated_at;
 
     protected Users(){}
 
