@@ -38,5 +38,5 @@ out/
 
 /src/main/resources/application-secret.yml
 .env
-
+.env.properties
 
