@@ -6,8 +6,8 @@ import uniqram.c1one.search.dto.UserSearchResultDto;
 
 public interface FindSomething {
 
-	Optional<UserSearchResultDto> findUser();
+	Optional<UserSearchResultDto> findUser(String name);
 	
-	void findHashtag();
+	Optional<UserSearchResultDto> findHashtag(String hashtag);
 	
 }
