@@ -1,7 +1,11 @@
 package uniqram.c1one.user.entity;
 
 import jakarta.persistence.*;
+import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -24,4 +28,8 @@ public class Users extends BaseEntity {
         this.username = username;
         this.password = password;
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
+
 }
