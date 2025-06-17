@@ -1,4 +1,4 @@
-잡설.txt
+잡설/
 
 HELP.md
 .gradle
@@ -41,4 +41,4 @@ out/
 /src/main/resources/application-secret.yml
 .env
 .env.properties
-
+env/
