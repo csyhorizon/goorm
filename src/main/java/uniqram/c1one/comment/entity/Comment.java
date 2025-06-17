@@ -27,9 +27,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "post_id")
+//    private Post post;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_comment_id")
