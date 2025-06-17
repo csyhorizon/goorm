@@ -8,7 +8,7 @@ server:
 
 spring:
   config:
-    import: optional:file:./.env.properties
+    import: optional:file:./env/db.env.properties
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -22,3 +22,4 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
