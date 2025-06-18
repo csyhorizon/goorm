@@ -22,11 +22,17 @@ public class Users extends BaseEntity {
 
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     protected Users(){}
 
-    public Users(String username, String password) {
+    public Users(String username, String password, String email, Role role) {
         this.username = username;
         this.password = password;
+        this.email = email;
+        this.role = role;
     }
 
     @OneToMany(mappedBy = "user")
