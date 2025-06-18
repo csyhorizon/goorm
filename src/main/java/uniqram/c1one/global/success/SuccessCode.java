@@ -1,8 +1,8 @@
-package uniqram.c1one.global.exception;
+package uniqram.c1one.global.success;
 
 import org.springframework.http.HttpStatus;
 
-public interface ErrorCode {
+public interface SuccessCode {
     HttpStatus getStatus();
     String getMessage();
 }
