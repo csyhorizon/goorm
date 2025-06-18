@@ -3,6 +3,7 @@ package uniqram.c1one.comment.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import uniqram.c1one.global.BaseEntity;
+import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.user.entity.Users;
 
 import java.util.ArrayList;
