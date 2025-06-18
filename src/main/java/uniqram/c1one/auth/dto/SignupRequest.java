@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import uniqram.c1one.user.entity.Role;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,4 +28,6 @@ public class SignupRequest {
     @NotBlank
     @Email
     private String email;
+
+    private Role role;
 }
