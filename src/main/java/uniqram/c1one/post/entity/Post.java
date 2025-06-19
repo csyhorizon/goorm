@@ -1,0 +1,39 @@
+package uniqram.c1one.post.entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import uniqram.c1one.global.BaseEntity;
+import uniqram.c1one.user.entity.Users;
+
+@Entity
+@Table(name = "posts")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Post extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+    @Column(length = 4096)
+    private String content;
+
+    private String location;
+
+    private Post(Users user, String content, String location) {
+        this.user = user;
+        this.content = content;
+        this.location = location;
+    }
+
+    public static Post of(Users user, String content, String location) {
+        return new Post(user, content, location);
+    }
+}

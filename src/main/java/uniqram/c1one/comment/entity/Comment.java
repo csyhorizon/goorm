@@ -3,6 +3,7 @@ package uniqram.c1one.comment.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import uniqram.c1one.global.BaseEntity;
+import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.user.entity.Users;
 
 import java.util.ArrayList;
@@ -27,9 +28,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "post_id")
+//    private Post post;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_comment_id")
