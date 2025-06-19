@@ -29,6 +29,7 @@ public class PostService {
         postRepository.save(post);
 
         return PostResponse.builder()
+                .postId(post.getId())
                 .content(post.getContent())
                 .location(post.getLocation())
                 .build();
