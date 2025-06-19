@@ -28,9 +28,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private Users user;
 
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "post_id")
-//    private Post post;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_comment_id")
@@ -39,11 +39,23 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    private int likeCount;
+
     @OneToMany(mappedBy = "parentComment", orphanRemoval = true)
     private List<Comment> childrenComment = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<CommentLike> commentLikes = new ArrayList<>();
+
     public void update(String content) {
         this.content = content;
+    }
+
+    public void increaseLikesCount() {
+        this.likeCount = likeCount + 1;
+    }
+    public void decreaseLikesCount() {
+        this.likeCount = likeCount - 1;
     }
 
 }
