@@ -11,7 +11,9 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "commentLikes")
+@Table(name = "commentLikes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+})
 public class CommentLike {
 
     @Id
