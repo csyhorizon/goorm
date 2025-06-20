@@ -2,6 +2,7 @@ package uniqram.c1one.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import uniqram.c1one.global.BaseEntity;
 import uniqram.c1one.user.entity.Users;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -14,7 +15,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(name = "commentLikes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "comment_id"})
 })
-public class CommentLike {
+public class CommentLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -31,6 +31,8 @@ public class Post extends BaseEntity {
 
     private String location;
 
+    private int likeCount;
+
     private Post(Users user, String content, String location) {
         this.user = user;
         this.content = content;
@@ -43,4 +45,14 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
+
+    public void increaseLikesCount() {
+        this.likeCount = likeCount + 1;
+    }
+    public void decreaseLikesCount() {
+        this.likeCount = likeCount - 1;
+    }
 }
