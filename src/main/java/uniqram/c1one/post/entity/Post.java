@@ -26,6 +26,9 @@ public class Post extends BaseEntity {
     private String content;
 
     private String location;
+    
+    @Column(name = "hashtag")
+    private String Hashtag;
 
     private Post(Users user, String content, String location) {
         this.user = user;
