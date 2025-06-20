@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
 import uniqram.c1one.user.entity.Users;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -36,4 +40,7 @@ public class Post extends BaseEntity {
     public static Post of(Users user, String content, String location) {
         return new Post(user, content, location);
     }
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 }
