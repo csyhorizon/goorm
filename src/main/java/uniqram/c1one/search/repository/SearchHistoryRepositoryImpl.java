@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import uniqram.c1one.search.entity.SearchHistory;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class SearchHistoryRepositoryImpl implements SearchHistoryRepository{
@@ -16,5 +18,10 @@ public class SearchHistoryRepositoryImpl implements SearchHistoryRepository{
 	public SearchHistory save(SearchHistory searchHistory) {
 		em.persist(searchHistory);
 		return searchHistory;
+	}
+
+	@Override
+	public List<SearchHistory> findAll(Long userid) {
+		return List.of();
 	}
 }
