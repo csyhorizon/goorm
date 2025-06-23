@@ -50,9 +50,6 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<PostLike> postLikes = new ArrayList<>();
-
     public void increaseLikesCount() {
         this.likeCount = likeCount + 1;
     }
