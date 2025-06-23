@@ -31,13 +31,16 @@ public class Profile {
     @JoinColumn(name = "user_id", nullable = false)
     private Users userId;
 
-    @Setter
     @Size(max = 255)
     @Column(name = "bio")
     private String bio;
 
-    @Setter
     @Size(max = 255)
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+
+    public void update(String bio, String profileImageUrl) {
+        this.bio = bio;
+        this.profileImageUrl = profileImageUrl;
+    }
 }
