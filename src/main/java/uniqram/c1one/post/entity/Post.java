@@ -34,6 +34,10 @@ public class Post extends BaseEntity {
     @Column(name = "hashtag")
     private String Hashtag;
 
+    // 고급 설정
+    private Boolean hideLikeAndViewCount = false;
+    private Boolean disableComments = false;
+
     private Post(Users user, String content, String location) {
         this.user = user;
         this.content = content;
