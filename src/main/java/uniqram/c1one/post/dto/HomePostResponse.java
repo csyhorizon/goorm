@@ -8,22 +8,22 @@ import java.util.List;
 
 @Getter
 @Builder
-public class PostResponse {
+public class HomePostResponse {
 
     private Long postId;
     private String content;
     private String location;
 
-    private List<String>  mediaUrls;
-
-    private int likeCount;
-    private int commentCount;
+    private List<String> mediaUrls;
 
     private Long memberId;
     private String nickname;
 
-    public static PostResponse from(Post post, List<String> mediaUrl) {
-        return PostResponse.builder()
+    private int likeCount;
+    private int commentCount;
+
+    public static HomePostResponse from(Post post, List<String> mediaUrl) {
+        return HomePostResponse.builder()
                 .postId(post.getId())
                 .content(post.getContent())
                 .location(post.getLocation())
