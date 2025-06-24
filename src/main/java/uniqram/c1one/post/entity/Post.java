@@ -32,6 +32,7 @@ public class Post extends BaseEntity {
     private String location;
 
     private int likeCount;
+    private int commentCount;
 
     // 고급 설정
     private Boolean hideLikeAndViewCount = false;
