@@ -6,10 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uniqram.c1one.global.success.SuccessResponse;
-import uniqram.c1one.post.dto.HomePostResponse;
-import uniqram.c1one.post.dto.PostRequest;
-import uniqram.c1one.post.dto.PostResponse;
-import uniqram.c1one.post.dto.UserPostResponse;
+import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.exception.PostSuccessCode;
 import uniqram.c1one.post.service.PostService;
 
@@ -22,15 +19,15 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<SuccessResponse<PostResponse>> createPost(
-            @RequestBody @Valid PostRequest postRequest
+            @RequestBody @Valid PostCreateRequest postCreateRequest
     ) {
-        Long userId = postRequest.getUserId();
-        PostResponse postResponse = postService.createPost(userId, postRequest);
+        Long userId = postCreateRequest.getUserId();
+        PostResponse postResponse = postService.createPost(userId, postCreateRequest);
         return ResponseEntity.status(PostSuccessCode.POST_CREATED.getStatus())
                 .body(SuccessResponse.of(PostSuccessCode.POST_CREATED, postResponse));
     }
 
-    @GetMapping("/posts/home")
+    @GetMapping("/home")
     public ResponseEntity<Page<HomePostResponse>> getHomePosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -47,5 +44,15 @@ public class PostController {
     ) {
         Page<UserPostResponse> posts = postService.getUserPosts(userId, page, size);
         return ResponseEntity.ok(posts);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<PostResponse> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateRequest postUpdateRequest
+    ) {
+        Long userId = postUpdateRequest.getUserId();
+        PostResponse updatedPost = postService.updatePost(userId, postId, postUpdateRequest);
+        return ResponseEntity.ok(updatedPost);
     }
 }

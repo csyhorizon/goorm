@@ -7,10 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uniqram.c1one.post.dto.HomePostResponse;
-import uniqram.c1one.post.dto.PostRequest;
-import uniqram.c1one.post.dto.PostResponse;
-import uniqram.c1one.post.dto.UserPostResponse;
+import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
 import uniqram.c1one.post.exception.PostErrorCode;
@@ -32,21 +29,21 @@ public class PostService {
     private final PostMediaRepository postMediaRepository;
 
     @Transactional
-    public PostResponse createPost(Long userId, PostRequest postRequest) {
+    public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new PostException(PostErrorCode.USER_NOT_FOUND));
 
         // 이미지 필수
-        if (postRequest.getMediaUrls() == null || postRequest.getMediaUrls().isEmpty()) {
+        if (postCreateRequest.getMediaUrls() == null || postCreateRequest.getMediaUrls().isEmpty()) {
             throw new PostException(PostErrorCode.IMAGE_REQUIRED);
         }
 
-        Post post = Post.of(user, postRequest.getContent(), postRequest.getLocation());
+        Post post = Post.of(user, postCreateRequest.getContent(), postCreateRequest.getLocation());
         postRepository.save(post);
 
         // 이미지 등록
-        if (postRequest.getMediaUrls() != null && !postRequest.getMediaUrls().isEmpty()) {
-            List<PostMedia> mediaList = postRequest.getMediaUrls().stream()
+        if (postCreateRequest.getMediaUrls() != null && !postCreateRequest.getMediaUrls().isEmpty()) {
+            List<PostMedia> mediaList = postCreateRequest.getMediaUrls().stream()
                     .map(url -> PostMedia.of(post, url))
                     .toList();
             postMediaRepository.saveAll(mediaList);
@@ -90,5 +87,49 @@ public class PostService {
 
             return UserPostResponse.from(post, repImageUrl);
         });
+    }
+
+    @Transactional
+    public PostResponse updatePost(Long userId, Long postId, PostUpdateRequest postUpdateRequest) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new PostException(PostErrorCode.NO_AUTHORITY);
+        }
+
+        // 기존 이미지에서 특정 이미지 삭제
+        List<PostMedia> currentMedia = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+        List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null ? postUpdateRequest.getRemainImageUrls() : List.of();
+
+        List<PostMedia> deleteMedia = currentMedia.stream()
+                .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
+                .toList();
+
+        postMediaRepository.deleteAll(deleteMedia);
+
+        // 새 이미지 등록
+        if (postUpdateRequest.getNewImageUrls() != null && !postUpdateRequest.getNewImageUrls().isEmpty()) {
+            List<PostMedia> newMediaList = postUpdateRequest.getNewImageUrls().stream()
+                    .map(url -> PostMedia.of(post, url))
+                    .toList();
+            postMediaRepository.saveAll(newMediaList);
+        }
+
+        // 최종 이미지 개수 확인
+        int finalImageCount = postMediaRepository.findByPostIdOrderByIdAsc(postId).size();
+        if (finalImageCount == 0) {
+            throw new PostException(PostErrorCode.IMAGE_REQUIRED);
+        }
+
+        post.update(postUpdateRequest.getContent(), postUpdateRequest.getLocation());
+
+        List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(postId)
+                .stream()
+                .map(PostMedia::getMediaUrl)
+                .toList();
+
+        return PostResponse.from(post, mediaUrls);
     }
 }
