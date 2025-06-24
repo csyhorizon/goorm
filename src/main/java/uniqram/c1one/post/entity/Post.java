@@ -34,6 +34,8 @@ public class Post extends BaseEntity {
     @Column(name = "hashtag")
     private String Hashtag;
 
+    private int likeCount;
+
     // 고급 설정
     private Boolean hideLikeAndViewCount = false;
     private Boolean disableComments = false;
@@ -50,4 +52,11 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    public void increaseLikesCount() {
+        this.likeCount = likeCount + 1;
+    }
+    public void decreaseLikesCount() {
+        this.likeCount = likeCount - 1;
+    }
 }

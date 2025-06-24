@@ -1,6 +1,7 @@
 package uniqram.c1one.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 
 @Entity
+@Getter
 public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
