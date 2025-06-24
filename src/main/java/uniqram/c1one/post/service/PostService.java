@@ -84,7 +84,8 @@ public class PostService {
 
         return postPage.map(post -> {
 
-            String repImageUrl = postMediaRepository.findFirstImageUrlByPostId(post.getId())
+            String repImageUrl = postMediaRepository.findFirstByPostIdOrderByIdAsc(post.getId())
+                    .map(PostMedia::getMediaUrl)
                     .orElseThrow(() -> new PostException(PostErrorCode.IMAGE_REQUIRED));
 
             return UserPostResponse.from(post, repImageUrl);
