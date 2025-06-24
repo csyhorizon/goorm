@@ -2,6 +2,8 @@ package uniqram.c1one.profile.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +30,9 @@ public class ProfileController {
     @PatchMapping("/{userId}/profile")
     public ProfileResponseDto patchProfile(
             @PathVariable Long userId,
-            @Valid @RequestBody ProfileUpdateRequestDto profileUpdateRequestDto
+            @Valid @RequestBody ProfileUpdateRequestDto profileUpdateRequestDto,
+            @AuthenticationPrincipal User user
     ) {
-        return profileService.updateProfile(userId, profileUpdateRequestDto);
+        return profileService.updateProfile(userId, profileUpdateRequestDto, user);
     }
 }
