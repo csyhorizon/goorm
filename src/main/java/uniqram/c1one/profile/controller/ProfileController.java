@@ -28,8 +28,8 @@ public class ProfileController {
     @PatchMapping("/{userId}/profile")
     public ProfileResponseDto patchProfile(
             @PathVariable Long userId,
-            @Valid @RequestBody ProfileUpdateRequestDto dto
+            @Valid @RequestBody ProfileUpdateRequestDto profileUpdateRequestDto
     ) {
-        return profileService.updateProfile(userId, dto);
+        return profileService.updateProfile(userId, profileUpdateRequestDto);
     }
 }
