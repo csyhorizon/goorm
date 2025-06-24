@@ -1,5 +1,6 @@
 package uniqram.c1one.auth.controller;
 
+import jakarta.validation.Valid;
 import uniqram.c1one.auth.dto.SignupRequest;
 import uniqram.c1one.auth.service.AuthService;
 
@@ -18,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
         authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
     }

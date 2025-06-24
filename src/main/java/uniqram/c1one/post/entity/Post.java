@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
 import uniqram.c1one.user.entity.Users;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -27,6 +31,12 @@ public class Post extends BaseEntity {
 
     private String location;
 
+    private int likeCount;
+
+    // 고급 설정
+    private Boolean hideLikeAndViewCount = false;
+    private Boolean disableComments = false;
+
     private Post(Users user, String content, String location) {
         this.user = user;
         this.content = content;
@@ -35,5 +45,15 @@ public class Post extends BaseEntity {
 
     public static Post of(Users user, String content, String location) {
         return new Post(user, content, location);
+    }
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    public void increaseLikesCount() {
+        this.likeCount = likeCount + 1;
+    }
+    public void decreaseLikesCount() {
+        this.likeCount = likeCount - 1;
     }
 }
