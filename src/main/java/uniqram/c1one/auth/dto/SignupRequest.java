@@ -3,14 +3,12 @@ package uniqram.c1one.auth.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import uniqram.c1one.user.entity.Role;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class SignupRequest {
 
@@ -30,4 +28,13 @@ public class SignupRequest {
     private String email;
 
     private Role role;
+
+    @Builder
+    public SignupRequest(String username, String password, String confirmPassword, String email, Role role) {
+        this.username = username;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.email = email;
+        this.role = role;
+    }
 }
