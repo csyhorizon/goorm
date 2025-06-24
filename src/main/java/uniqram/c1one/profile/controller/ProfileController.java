@@ -21,13 +21,13 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    @GetMapping("/{userId}/profile")
+    @GetMapping("/profiles/{userId}")
     public ProfileResponseDto getProfile(@PathVariable Long userId) {
         return profileService.getProfileById(userId);
     }
 
 
-    @PatchMapping("/{userId}/profile")
+    @PatchMapping("/profiles/{userId}")
     public ProfileResponseDto patchProfile(
             @PathVariable Long userId,
             @Valid @RequestBody ProfileUpdateRequestDto profileUpdateRequestDto,

@@ -19,7 +19,8 @@ public class ProfileService {
 
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfileById(Long profileId) {
-        Profile profile = profileRepository.findById(profileId)
+
+        final Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
         return ProfileResponseDto.from(profile);
@@ -34,7 +35,7 @@ public class ProfileService {
         }
 
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_UPDATE_FAILED));
+                .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
         profile.update(profileUpdateRequestDto.getBio(), profileUpdateRequestDto.getProfileImageUrl());
 

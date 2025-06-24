@@ -4,11 +4,9 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import uniqram.c1one.profile.entity.Profile;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ProfileResponseDto {
