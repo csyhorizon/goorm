@@ -62,6 +62,7 @@ public class CommentService {
 
         return commentRepository.findByPost(post).stream()
                 .map(comment -> CommentResponse.builder()
+                        .commentId(comment.getId())
                         .userName(comment.getUser().getUsername())
                         .content(comment.getContent())
                         .createdAt(comment.getCreatedAt())
