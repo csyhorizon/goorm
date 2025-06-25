@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uniqram.c1one.user.entity.Role;
 
 @Getter
 @NoArgsConstructor
@@ -27,14 +26,11 @@ public class SignupRequest {
     @Email
     private String email;
 
-    private Role role;
-
     @Builder
-    public SignupRequest(String username, String password, String confirmPassword, String email, Role role) {
+    public SignupRequest(String username, String password, String confirmPassword, String email) {
         this.username = username;
         this.password = password;
         this.confirmPassword = confirmPassword;
         this.email = email;
-        this.role = role;
     }
 }

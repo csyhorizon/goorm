@@ -60,4 +60,9 @@ public class Post extends BaseEntity {
     public void decreaseLikesCount() {
         this.likeCount = likeCount - 1;
     }
+
+    public void update(String content, String location) {
+        this.content = content;
+        this.location = location;
+    }
 }
