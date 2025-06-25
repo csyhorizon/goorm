@@ -1,4 +1,4 @@
-package uniqram.c1one.auth.jwt;
+package uniqram.c1one.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -51,7 +51,6 @@ public class JwtTokenProvider {
                 .compact();
 
         return JwtToken.builder()
-                .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

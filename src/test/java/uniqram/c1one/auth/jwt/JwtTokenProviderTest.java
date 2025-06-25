@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import uniqram.c1one.auth.dto.JwtToken;
+import uniqram.c1one.security.jwt.JwtTokenProvider;
 
 import java.util.Base64;
 import java.util.Collections;
