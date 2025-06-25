@@ -1,4 +1,4 @@
-package uniqram.c1one.auth.jwt;
+package uniqram.c1one.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
