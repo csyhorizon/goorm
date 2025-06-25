@@ -1,7 +1,9 @@
 package uniqram.c1one.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
 
@@ -11,9 +13,11 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -27,8 +31,6 @@ public class Users extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
-    protected Users(){}
 
     public Users(String username, String password, String email, Role role) {
         this.username = username;
