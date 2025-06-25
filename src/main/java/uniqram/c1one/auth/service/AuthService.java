@@ -1,11 +1,13 @@
 package uniqram.c1one.auth.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import uniqram.c1one.auth.dto.SignupRequest;
+import uniqram.c1one.auth.exception.AuthErrorCode;
+import uniqram.c1one.auth.exception.AuthException;
 import uniqram.c1one.user.entity.Role;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
@@ -20,11 +22,11 @@ public class AuthService {
 
     public void signup(SignupRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new AuthException(AuthErrorCode.PASSWORD_MISMATCH);
         }
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
