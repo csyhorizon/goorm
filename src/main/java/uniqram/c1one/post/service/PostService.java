@@ -132,4 +132,22 @@ public class PostService {
 
         return PostResponse.from(post, mediaUrls);
     }
+
+    @Transactional
+    public void deletePost(Long userId, Long postId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new PostException(PostErrorCode.NO_AUTHORITY);
+        }
+
+        List<PostMedia> mediaList = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+        postMediaRepository.deleteAll(mediaList);
+
+        // TODO: 댓글, 좋아요 연관 삭제 로직 추가
+
+        postRepository.delete(post);
+    }
 }
