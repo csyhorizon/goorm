@@ -27,18 +27,26 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public void signup(SignupRequest request) {
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new AuthException(AuthErrorCode.PASSWORD_MISMATCH);
+        // 기존 회원가입
+        public void signup(SignupRequest request) {
+            validateAndSave(request, Role.USER);  // USER 역할로 고정
         }
 
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
+        // 추가된 관리자 회원가입
+        public void signupAdmin(SignupRequest request) {
+            validateAndSave(request, Role.ADMIN);  // ADMIN 역할로 고정
         }
 
+        // 공통 회원 저장 로직
+        private void validateAndSave(SignupRequest request, Role role) {
+            if (!request.getPassword().equals(request.getConfirmPassword())) {
+                throw new AuthException(AuthErrorCode.PASSWORD_MISMATCH);
+            }
+
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
+            }
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-        Role role = Role.USER;
 
         Users user = Users.builder()
                 .username(request.getUsername())
@@ -64,6 +72,4 @@ public class AuthService {
         return jwtTokenProvider.generateToken(auth);
 
     }
-
-
-    }
+}
