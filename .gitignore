@@ -42,3 +42,6 @@ out/
 .env
 .env.properties
 env/
+
+src/main/java/uniqram/c1one/test
+src/main/resources/templates/signinTh.html
