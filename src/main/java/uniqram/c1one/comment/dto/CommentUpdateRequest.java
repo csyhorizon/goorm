@@ -1,15 +1,13 @@
 package uniqram.c1one.comment.dto;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class CommentRequest {
-    private Long userId; //임시 포함
-    private Long postId;
-    private Long parentCommentId; //대댓글인 경우
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class CommentUpdateRequest {
     private String content;
 }

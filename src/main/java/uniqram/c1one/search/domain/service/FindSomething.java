@@ -1,8 +1,8 @@
-package uniqram.c1one.search.service;
+package uniqram.c1one.search.domain.service;
 
 
 import java.util.Optional;
-import uniqram.c1one.search.dto.UserSearchResultDto;
+import uniqram.c1one.search.application.dto.UserSearchResultDto;
 
 public interface FindSomething {
 
