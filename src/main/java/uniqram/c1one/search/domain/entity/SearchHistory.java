@@ -1,7 +1,9 @@
-package uniqram.c1one.search.entity;
+package uniqram.c1one.search.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,5 +25,7 @@ public class SearchHistory extends BaseEntity {
 	private String result;
 	
 	// Enum 만들기
-	
+	// Mysql 에 varchar 로 저장
+	@Enumerated(EnumType.STRING)
+	private SearchType searchType;
 }
