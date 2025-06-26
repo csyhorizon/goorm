@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.ModelAndView;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.auth.dto.SigninRequest;
 import uniqram.c1one.auth.dto.SignupRequest;
@@ -14,7 +15,6 @@ import uniqram.c1one.auth.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uniqram.c1one.test.TestAuthController;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,6 +31,11 @@ public class AuthController {
     }
 
     // 로그인
+    @GetMapping("/signin")
+    public ModelAndView showSignForm() {
+        return new ModelAndView("signin");
+    }
+
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@Valid @RequestBody SigninRequest request,
                                     HttpServletResponse response) {
