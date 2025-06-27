@@ -1,4 +1,4 @@
-package uniqram.c1one.search.application.dto;
+package uniqram.c1one.search.dto;
 
 
 import lombok.Getter;
@@ -9,9 +9,12 @@ public class UserSearchResultDto {
 	
 	private String username;
 	
+	private String email;
+	
 	protected UserSearchResultDto(){}
 	
-	public UserSearchResultDto(String username) {
+	public UserSearchResultDto(String username, String email) {
 		this.username = username;
+		this.email = email;
 	}
 }
