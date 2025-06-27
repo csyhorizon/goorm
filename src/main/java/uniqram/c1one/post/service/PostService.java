@@ -12,6 +12,7 @@ import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
 import uniqram.c1one.post.exception.PostErrorCode;
 import uniqram.c1one.post.exception.PostException;
+import uniqram.c1one.post.repository.PostLikeRepository;
 import uniqram.c1one.post.repository.PostMediaRepository;
 import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
@@ -27,6 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostMediaRepository postMediaRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
@@ -68,8 +70,8 @@ public class PostService {
                     .stream()
                     .map(PostMedia::getMediaUrl)
                     .collect(Collectors.toList());
-
-            return HomePostResponse.from(post, mediaUrls);
+            int likeCount = postLikeRepository.countByPost(post);
+            return HomePostResponse.from(post, mediaUrls, likeCount);
         });
     }
 

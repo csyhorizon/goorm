@@ -9,6 +9,7 @@ import uniqram.c1one.comment.dto.CommentUpdateRequest;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.comment.exception.CommentErrorCode;
 import uniqram.c1one.comment.exception.CommentException;
+import uniqram.c1one.comment.repository.CommentLikeRepository;
 import uniqram.c1one.comment.repository.CommentRepository;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.repository.PostRepository;
@@ -25,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public CommentResponse createComment(Long userId, CommentCreateRequest createRequest) {
         Users users = userRepository.findById(userId)
@@ -63,17 +65,22 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        return commentRepository.findByPost(post).stream()
-                .map(comment -> CommentResponse.builder()
+        List<Comment> comments = commentRepository.findByPost(post);
+
+
+        return comments.stream()
+                .map(comment -> { int likeCount = commentLikeRepository.countByComment(comment);
+                        return CommentResponse.builder()
                         .commentId(comment.getId())
                         .userName(comment.getUser().getUsername())
                         .content(comment.getContent())
+                        .likeCount(likeCount)
                         .createdAt(comment.getCreatedAt())
                         .parentCommentId(
                                 comment.getParentComment() != null ? comment.getParentComment().getId() : null
                         )
-                        .build()
-                ).collect(Collectors.toList());
+                        .build();
+                }).collect(Collectors.toList());
     }
 
     @Transactional
