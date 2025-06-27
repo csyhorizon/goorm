@@ -41,7 +41,7 @@ public class FollowController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("follows/{targetUserId}")
+    @DeleteMapping("followers/{targetUserId}")
     public ResponseEntity<Void> removeFollower(
             @RequestBody FollowRequestDto requestDto,
             @PathVariable Long targetUserId
