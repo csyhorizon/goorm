@@ -20,7 +20,7 @@ public class PostResponse {
     private int commentCount;
 
     private Long memberId;
-    private String nickname;
+    private String username;
 
     public static PostResponse from(Post post, List<String> mediaUrl) {
         return PostResponse.builder()
@@ -31,7 +31,7 @@ public class PostResponse {
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
                 .memberId(post.getUser().getId())
-                .nickname(post.getUser().getUsername())
+                .username(post.getUser().getUsername())
                 .build();
     }
 }

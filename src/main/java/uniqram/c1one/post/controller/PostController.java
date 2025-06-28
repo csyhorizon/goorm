@@ -29,12 +29,13 @@ public class PostController {
                 .body(SuccessResponse.of(PostSuccessCode.POST_CREATED, postResponse));
     }
 
-    @GetMapping("/home")
+    @GetMapping("/home/{userId}")
     public ResponseEntity<Page<HomePostResponse>> getHomePosts(
+            @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<HomePostResponse> homePosts = postService.getHomePosts(page, size);
+        Page<HomePostResponse> homePosts = postService.getHomePosts(userId, page, size);
         return ResponseEntity.ok(homePosts);
     }
 

@@ -18,7 +18,7 @@ import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,19 +59,57 @@ public class PostService {
         return PostResponse.from(post, mediaUrls);
     }
 
-    @Transactional(readOnly = true) // TODO: N+1 문제 발생 가능성 있음. PostMedia IN 쿼리로 개선 예정.
-    public Page<HomePostResponse> getHomePosts(int page, int size) {
+    @Transactional(readOnly = true) // TODO: 댓글 관련 로직 주석 제거
+    public Page<HomePostResponse> getHomePosts(Long userId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<Post> postPage = postRepository.findAllByOrderByIdDesc(pageable);
 
+        List<Long> postIds = postPage.stream()
+                .map(Post::getId)
+                .toList();
+
+        List<PostMedia> postMediaList = postMediaRepository.findByPostIdIn(postIds);
+        Map<Long, List<String>> postMediaMap = postMediaList.stream()
+                .collect(Collectors.groupingBy(
+                        pm -> pm.getPost().getId(),
+                        Collectors.mapping(PostMedia::getMediaUrl, Collectors.toList())
+                ));
+
+        // 좋아요 개수
+        Map<Long, Long> likeCountMap = postLikeRepository.countByPostIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        LikeCountDto::getPostId,
+                        LikeCountDto::getCount
+                ));
+
+        // 좋아요 누른 사람
+        Map<Long, List<LikeUserDto>> likeUsersMap = postLikeRepository.findLikeUsersByPostIds(postIds).stream()
+                .collect(Collectors.groupingBy(LikeUserDto::getPostId));
+
+        // 본인 좋아요 여부
+        Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(postIds, userId));
+
+        // 댓글 개수
+//        Map<Long, Long> commentCountMap = commentRepository.countByPostIds(postIds).stream()
+//                .collect(Collectors.toMap(
+//                        CommentCountDto::getPostId,
+//                        CommentCountDto::getCount
+//                ));
+//
+         //댓글 가져오기
+//        Map<Long, List<CommentDto>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
+//                .collect(Collectors.groupingBy(CommentDto::getPostId));
+
         return postPage.map(post -> {
-            List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(post.getId())
-                    .stream()
-                    .map(PostMedia::getMediaUrl)
-                    .collect(Collectors.toList());
-            int likeCount = postLikeRepository.countByPost(post);
-            return HomePostResponse.from(post, mediaUrls, likeCount);
+            List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
+            int likeCount = likeCountMap.getOrDefault(post.getId(), 0L).intValue();
+            List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
+            boolean likedByMe = likedPostIdSet.contains(post.getId());
+//            int commentCount = commentCountMap.getOrDefault(post.getId(), 0L).intValue();
+//            List<CommentDto> comments = commentMap.getOrDefault(post.getId(), List.of());
+
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
         });
     }
 
