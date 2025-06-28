@@ -22,13 +22,13 @@ public class HomePostResponse {
     private int likeCount;
     private int commentCount;
 
-    public static HomePostResponse from(Post post, List<String> mediaUrl) {
+    public static HomePostResponse from(Post post, List<String> mediaUrl, int likeCount) {
         return HomePostResponse.builder()
                 .postId(post.getId())
                 .content(post.getContent())
                 .location(post.getLocation())
                 .mediaUrls(mediaUrl)
-                .likeCount(post.getLikeCount())
+                .likeCount(likeCount)
                 .commentCount(post.getCommentCount())
                 .memberId(post.getUser().getId())
                 .nickname(post.getUser().getUsername())

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import uniqram.c1one.global.success.SuccessResponse;
 import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.exception.PostSuccessCode;
+import uniqram.c1one.post.service.PostLikeService;
 import uniqram.c1one.post.service.PostService;
 
 @RestController
@@ -16,6 +17,7 @@ import uniqram.c1one.post.service.PostService;
 public class PostController {
 
     private final PostService postService;
+    private final PostLikeService postLikeService;
 
     @PostMapping
     public ResponseEntity<SuccessResponse<PostResponse>> createPost(
@@ -63,5 +65,14 @@ public class PostController {
     ) {
         postService.deletePost(userId, postId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<PostLikeResponse> likePost(
+            @PathVariable Long postId,
+            @RequestParam Long userId
+    ){
+        PostLikeResponse like = postLikeService.like(userId, postId);
+        return ResponseEntity.ok(like);
     }
 }

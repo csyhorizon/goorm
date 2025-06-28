@@ -12,6 +12,7 @@ public class CommentResponse {
     private Long userId;
     private String userName;
     private String content;
+    private int likeCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Long parentCommentId;
