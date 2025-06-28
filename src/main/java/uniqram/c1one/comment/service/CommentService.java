@@ -30,10 +30,10 @@ public class CommentService {
 
     public CommentResponse createComment(Long userId, CommentCreateRequest createRequest) {
         Users users = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new CommentException(CommentErrorCode.USER_NOT_FOUND));
 
         Post post = postRepository.findById(createRequest.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
 
         Comment.CommentBuilder commentBuilder = Comment.builder()
                 .user(users)
@@ -42,7 +42,7 @@ public class CommentService {
 
         if (createRequest.getParentCommentId() != null) {
             Comment parent = commentRepository.findById(createRequest.getParentCommentId())
-                    .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
+                    .orElseThrow(() -> new CommentException(CommentErrorCode.PARENT_COMMENT_NOT_FOUND));
             commentBuilder.parentComment(parent);
         }
 
@@ -63,7 +63,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
 
         List<Comment> comments = commentRepository.findByPost(post);
 
