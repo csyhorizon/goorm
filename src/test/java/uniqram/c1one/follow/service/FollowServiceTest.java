@@ -190,4 +190,42 @@ class FollowServiceTest {
         // then
         assertEquals(2, followers.size());
     }
+
+    @DisplayName("팔로잉 목록 조회시 연관 Users 접근 - N+1 쿼리 발생 여부 확인")
+    @Test
+    void checkNPlusOneProblemOnGetFollowings() {
+        // given
+        Users user = userRepository.save(
+                Users.builder()
+                        .username("main")
+                        .password("pw")
+                        .email("main@test.com")
+                        .role(Role.USER)
+                        .build()
+        );
+
+        for (int i = 0; i < 10; i++) {
+            Users following = userRepository.save(
+                    Users.builder()
+                            .username("user" + i)
+                            .password("pw")
+                            .email("user" + i + "@test.com")
+                            .role(Role.USER)
+                            .build()
+            );
+            followService.createFollow(user.getId(), following.getId());
+        }
+
+        // when
+        List<Follow> followings = followService.getFollowings(user.getId());
+
+        // then: 연관된 Users 정보에 반복 접근
+        for (Follow follow : followings) {
+            // 이 부분에서 getFollowing()이 LAZY라면 Users를 매번 select 하므로 N+1 발생
+            System.out.println("팔로잉 유저명: " + follow.getFollowing().getUsername());
+        }
+
+        // 테스트 실행 후 콘솔에 찍힌 SQL 로그에서
+        // SELECT * FROM users WHERE user_id=... 쿼리가 10번 반복된다면 N+1 문제 발생!
+    }
 }
