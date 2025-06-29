@@ -113,17 +113,25 @@ public class PostService {
         });
     }
 
-    @Transactional(readOnly = true) // TODO: N+1 문제 발생 가능성 있음. PostMedia IN 쿼리로 개선 예정.
+    @Transactional(readOnly = true)
     public Page<UserPostResponse> getUserPosts(Long userId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<Post> postPage = postRepository.findByUserIdOrderByIdDesc(userId, pageable);
 
-        return postPage.map(post -> {
+        List<Long> postIds = postPage.stream()
+                .map(Post::getId)
+                .toList();
 
-            String repImageUrl = postMediaRepository.findFirstByPostIdOrderByIdAsc(post.getId())
-                    .map(PostMedia::getMediaUrl)
-                    .orElseThrow(() -> new PostException(PostErrorCode.IMAGE_REQUIRED));
+        List<PostMedia> firstImages = postMediaRepository.findFirstImagesByPostIds(postIds);
+        Map<Long, String> repImageMap = firstImages.stream()
+                .collect(Collectors.toMap(
+                        pm -> pm.getPost().getId(),
+                        PostMedia::getMediaUrl
+                ));
+
+        return postPage.map(post -> {
+            String repImageUrl = repImageMap.get(post.getId());
 
             return UserPostResponse.from(post, repImageUrl);
         });
