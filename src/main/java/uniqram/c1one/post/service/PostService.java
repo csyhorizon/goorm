@@ -130,6 +130,29 @@ public class PostService {
     }
 
     @Transactional
+    public PostDetailResponse getPostDetail(Long userId, Long postId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(postId)
+                .stream().map(PostMedia::getMediaUrl)
+                .toList();
+
+        int likeCount = postLikeRepository.countByPost(post);
+
+        List<LikeUserDto> likeUsers = postLikeRepository.findLikeUsersByPostId(postId);
+
+        boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(postId, userId);
+
+//        int commentCount = commentRepository.countByPostId(postId);
+
+//        List<CommentDto> comments = commentRepository.findCommentsByPostId(postId);
+
+        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
+    }
+
+    @Transactional
     public PostResponse updatePost(Long userId, Long postId, PostUpdateRequest postUpdateRequest) {
 
         Post post = postRepository.findById(postId)

@@ -49,6 +49,15 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> getPostDetail(
+            @PathVariable Long postId,
+            @RequestParam Long userId
+    ) {
+        PostDetailResponse postDetailResponse = postService.getPostDetail(userId, postId);
+        return ResponseEntity.ok(postDetailResponse);
+    }
+
     @PatchMapping("/{postId}")
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable Long postId,
