@@ -219,13 +219,9 @@ class FollowServiceTest {
         // when
         List<Follow> followings = followService.getFollowings(user.getId());
 
-        // then: 연관된 Users 정보에 반복 접근
+        // then
         for (Follow follow : followings) {
-            // 이 부분에서 getFollowing()이 LAZY라면 Users를 매번 select 하므로 N+1 발생
             System.out.println("팔로잉 유저명: " + follow.getFollowing().getUsername());
         }
-
-        // 테스트 실행 후 콘솔에 찍힌 SQL 로그에서
-        // SELECT * FROM users WHERE user_id=... 쿼리가 10번 반복된다면 N+1 문제 발생!
     }
 }
