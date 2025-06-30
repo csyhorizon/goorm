@@ -1,20 +1,22 @@
 package uniqram.c1one.search.dto;
 
 
+import lombok.Builder;
 import lombok.Getter;
 
-// 유저 검색 결과 dto
+// by 유저 검색 결과 DTO
 @Getter
 public class UserSearchResultDto {
 	
-	private String username;
+	private Long userid;
 	
-	private String email;
+	private String username;
 	
 	protected UserSearchResultDto(){}
 	
-	public UserSearchResultDto(String username, String email) {
+	@Builder
+	public UserSearchResultDto(Long userid, String username) {
+		this.userid = userid;
 		this.username = username;
-		this.email = email;
 	}
 }
