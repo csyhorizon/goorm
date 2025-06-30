@@ -27,6 +27,12 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
             "FROM PostLike pl WHERE pl.post.id IN :postIds")
     List<LikeUserDto> findLikeUsersByPostIds(@Param("postIds") List<Long> postIds);
 
+    @Query("SELECT new uniqram.c1one.post.dto.LikeUserDto(pl.post.id, pl.user.id, pl.user.username) " +
+            "FROM PostLike pl WHERE pl.post.id = :postId")
+    List<LikeUserDto> findLikeUsersByPostId(@Param("postId") Long postId);
+
     @Query("SELECT pl.post.id FROM PostLike pl WHERE pl.post.id IN :postIds AND pl.user.id = :userId")
     List<Long> findPostIdsLikedByUser(@Param("postIds") List<Long> postIds, @Param("userId") Long userId);
+
+    boolean existsByPostIdAndUserId(Long postId, Long userId);
 }
