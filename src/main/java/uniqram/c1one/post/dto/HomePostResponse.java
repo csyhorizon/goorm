@@ -17,21 +17,32 @@ public class HomePostResponse {
     private List<String> mediaUrls;
 
     private Long memberId;
-    private String nickname;
+    private String username;
 
     private int likeCount;
-    private int commentCount;
+    private List<LikeUserDto> likeUsers;
+    private boolean likedByMe;
 
-    public static HomePostResponse from(Post post, List<String> mediaUrl, int likeCount) {
+    private int commentCount;
+    private List<CommentDto> comments;
+
+    public static HomePostResponse from(Post post,
+                                        List<String> mediaUrl,
+                                        int likeCount,
+                                        List<LikeUserDto> likeUsers,
+                                        boolean likedByMe) {
         return HomePostResponse.builder()
                 .postId(post.getId())
                 .content(post.getContent())
                 .location(post.getLocation())
                 .mediaUrls(mediaUrl)
                 .likeCount(likeCount)
-                .commentCount(post.getCommentCount())
+                .likeUsers(likeUsers)
+                .likedByMe(likedByMe)
+//                .commentCount(commentCount)
+//                .comments(comments)
                 .memberId(post.getUser().getId())
-                .nickname(post.getUser().getUsername())
+                .username(post.getUser().getUsername())
                 .build();
     }
 }
