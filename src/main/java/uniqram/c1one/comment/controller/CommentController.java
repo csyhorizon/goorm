@@ -21,20 +21,6 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentLikeService commentLikeService;
 
-    @PostMapping
-    public ResponseEntity<SuccessResponse<CommentResponse>> createComment(
-            @RequestBody CommentCreateRequest commentCreateRequest){
-        Long userId = commentCreateRequest.getUserId();
-        CommentResponse response = commentService.createComment(userId, commentCreateRequest);
-        return ResponseEntity.status(CommentSuccessCode.COMMENT_CREATED.getStatus())
-                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, response));
-    }
-
-    @GetMapping("/{postId}")
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getComments(postId));
-    }
-
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
