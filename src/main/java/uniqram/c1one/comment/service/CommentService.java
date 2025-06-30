@@ -28,11 +28,11 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentLikeRepository commentLikeRepository;
 
-    public CommentResponse createComment(Long userId, CommentCreateRequest createRequest) {
+    public CommentResponse createComment(Long userId, Long postId, CommentCreateRequest createRequest) {
         Users users = userRepository.findById(userId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.USER_NOT_FOUND));
 
-        Post post = postRepository.findById(createRequest.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
 
         Comment.CommentBuilder commentBuilder = Comment.builder()

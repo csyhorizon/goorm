@@ -15,27 +15,13 @@ import uniqram.c1one.global.success.SuccessResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/comments/{commentId}")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
     private final CommentLikeService commentLikeService;
 
-    @PostMapping
-    public ResponseEntity<SuccessResponse<CommentResponse>> createComment(
-            @RequestBody CommentCreateRequest commentCreateRequest){
-        Long userId = commentCreateRequest.getUserId();
-        CommentResponse response = commentService.createComment(userId, commentCreateRequest);
-        return ResponseEntity.status(CommentSuccessCode.COMMENT_CREATED.getStatus())
-                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, response));
-    }
-
-    @GetMapping("/{postId}")
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getComments(postId));
-    }
-
-    @PatchMapping("/{commentId}")
+    @PatchMapping
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
             @RequestParam Long userId,
@@ -45,7 +31,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
             @RequestParam Long userId) {
@@ -53,7 +39,7 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{commentId}/like")
+    @PostMapping("/like")
     public ResponseEntity<CommentLikeResponse> likeComment(
             @PathVariable Long commentId,
             @RequestParam Long userId
