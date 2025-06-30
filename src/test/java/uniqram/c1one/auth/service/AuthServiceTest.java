@@ -35,7 +35,7 @@ class AuthServiceTest {
     @DisplayName("회원가입 성공")
     void signupSuccess() {
         // given
-        SignupRequest request = new SignupRequest("user01", "pw1234", "pw1234", "user01@email.com");
+        SignupRequest request = new SignupRequest("user01", "pw1234", "pw1234");
 
         when(userRepository.findByUsername("user01")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("pw1234")).thenReturn("encoded_pw");
@@ -51,7 +51,7 @@ class AuthServiceTest {
     @DisplayName("비밀번호 불일치 시 예외 발생")
     void signupPasswordMismatch() {
         // given
-        SignupRequest request = new SignupRequest("user01", "pw1234", "different_pw", "user01@email.com");
+        SignupRequest request = new SignupRequest("user01", "pw1234", "different_pw");
 
         // when & then
         AuthException exception = assertThrows(AuthException.class, () -> authService.signup(request));
@@ -62,10 +62,10 @@ class AuthServiceTest {
     @DisplayName("username 중복 시 예외 발생")
     void signupDuplicateUsername() {
         // given
-        SignupRequest request = new SignupRequest("user01", "pw1234", "pw1234", "user01@email.com");
+        SignupRequest request = new SignupRequest("user01", "pw1234", "pw1234");
 
         when(userRepository.findByUsername("user01"))
-                .thenReturn(Optional.of(new Users("user01", "encoded_pw", "user01@email.com", Role.USER)));
+                .thenReturn(Optional.of(new Users("user01", "encoded_pw", Role.USER)));
 
         // when & then
         AuthException exception = assertThrows(AuthException.class, () -> authService.signup(request));
@@ -76,7 +76,7 @@ class AuthServiceTest {
     @DisplayName("관리자 회원가입 성공 - Role.ADMIN 확인")
     void signupAdminSuccess() {
         // given
-        SignupRequest request = new SignupRequest("admin", "pw12345", "pw12345", "admin@email.com");
+        SignupRequest request = new SignupRequest("admin", "pw12345", "pw12345");
 
         when(userRepository.findByUsername("admin")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("pw12345")).thenReturn("encoded_pw");
@@ -98,7 +98,7 @@ class AuthServiceTest {
     @DisplayName("관리자 회원가입 실패 - 비밀번호 불일치")
     void signupAdminPasswordMismatch() {
         // given
-        SignupRequest request = new SignupRequest("admin", "pw12345", "different_pw", "admin@email.com");
+        SignupRequest request = new SignupRequest("admin", "pw12345", "different_pw");
 
         // when & then
         AuthException exception = assertThrows(AuthException.class, () -> authService.signupAdmin(request));
@@ -109,10 +109,10 @@ class AuthServiceTest {
     @DisplayName("관리자 회원가입 실패 - 중복 username")
     void signupAdminDuplicateUsername() {
         // given
-        SignupRequest request = new SignupRequest("admin", "pw12345", "pw12345", "admin@email.com");
+        SignupRequest request = new SignupRequest("admin", "pw12345", "pw12345");
 
         when(userRepository.findByUsername("admin"))
-                .thenReturn(Optional.of(new Users("admin", "encoded_pw", "admin@email.com", Role.ADMIN)));
+                .thenReturn(Optional.of(new Users("admin", "encoded_pw", Role.ADMIN)));
 
         // when & then
         AuthException exception = assertThrows(AuthException.class, () -> authService.signupAdmin(request));

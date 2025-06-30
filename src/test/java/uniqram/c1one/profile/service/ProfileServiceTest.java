@@ -29,7 +29,7 @@ class ProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = new Users("testUser", "password", "test@example.com", Role.USER);
+        testUser = new Users("testUser", "password", Role.USER);
         userRepository.save(testUser);
 
         testProfile = Profile.builder()
