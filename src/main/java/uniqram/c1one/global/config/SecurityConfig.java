@@ -43,17 +43,17 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/signin",
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("index.html","/index").authenticated()
+                        .requestMatchers("index.html", "/index").authenticated()
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-//                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll);
                 .formLogin(AbstractHttpConfigurer::disable)
                 .userDetailsService(userDetailsService)
                 .addFilterBefore(
@@ -63,7 +63,7 @@ public class SecurityConfig {
                 // 예외 처리 추가
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/api/auth/signin");  // 로그인 페이지로 리다이렉트
+                           response.sendRedirect("/signin");
                         })
                 );
         return http.build();

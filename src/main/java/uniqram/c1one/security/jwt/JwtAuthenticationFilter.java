@@ -23,7 +23,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Request Header 에서 jwt 토큰 추출
         String token = resolveToken(request);
         validToken(token);
-
         filterChain.doFilter(request, response);
     }
 
@@ -37,12 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        // Authorization 헤더에서 Bearer 토큰 파싱
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-
         // 쿠키에서 토큰 확인
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

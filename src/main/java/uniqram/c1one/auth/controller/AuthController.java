@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.servlet.ModelAndView;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.auth.dto.SigninRequest;
 import uniqram.c1one.auth.dto.SignupRequest;
@@ -34,11 +33,6 @@ public class AuthController {
     }
 
     // 로그인
-    @GetMapping("/signin")
-    public ModelAndView showSignForm() {
-        return new ModelAndView("signin");
-    }
-
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@Valid @RequestBody SigninRequest request,
                                     HttpServletResponse response) {
@@ -55,7 +49,7 @@ public class AuthController {
             Cookie refreshTokenCookie = new Cookie("refresh_token", jwtToken.getRefreshToken());
             refreshTokenCookie.setHttpOnly(true);
             refreshTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+            refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
 
             response.addCookie(accessTokenCookie);
             response.addCookie(refreshTokenCookie);
@@ -72,14 +66,6 @@ public class AuthController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("로그인 실패: " + e.getMessage()));
         }
-    }
-
-    @GetMapping("/check")
-    public ResponseEntity<?> checkLoginStatus(@CookieValue(name = "access_token", required = false) String accessToken) {
-        if (accessToken != null) {
-            return ResponseEntity.ok().body(new SimpleResponse("인증된 사용자입니다."));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new SimpleResponse("인증되지 않은 사용자입니다."));
     }
 
     // 응답용 DTO 클래스들
