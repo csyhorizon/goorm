@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import uniqram.c1one.follow.entity.Follow;
+import uniqram.c1one.follow.dto.FollowDto;
 import uniqram.c1one.follow.exception.FollowErrorCode;
 import uniqram.c1one.follow.exception.FollowException;
-import uniqram.c1one.follow.repository.FollowRepository;
+import uniqram.c1one.profile.entity.Profile;
+import uniqram.c1one.profile.repository.ProfileRepository;
 import uniqram.c1one.user.entity.Role;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
@@ -28,7 +29,7 @@ class FollowServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private FollowRepository followRepository;
+    private ProfileRepository profileRepository;
 
     private Users createUser(String username) {
         Users users = Users.builder()
@@ -37,7 +38,17 @@ class FollowServiceTest {
                 .email(username + "@test.com")
                 .role(Role.USER)
                 .build();
-        return userRepository.save(users);
+
+        users = userRepository.save(users);
+
+        Profile profile = Profile.builder()
+                .userId(users)
+                .bio("bio for " + username)
+                .profileImageUrl("default.png")
+                .build();
+        profileRepository.save(profile);
+
+        return users;
     }
 
     @Test
@@ -48,9 +59,9 @@ class FollowServiceTest {
 
         followService.createFollow(user1.getId(), user2.getId());
 
-        List<Follow> followings = followService.getFollowings(user1.getId());
+        List<FollowDto> followings = followService.getFollowings(user1.getId());
         assertEquals(1, followings.size());
-        assertEquals(user2.getId(), followings.get(0).getFollowing().getId());
+        assertEquals(user2.getId(), followings.get(0).userId());
     }
 
     @Test
@@ -91,7 +102,7 @@ class FollowServiceTest {
         FollowException ex = assertThrows(FollowException.class, () ->
                 followService.createFollow(user1.getId(), user2.getId()));
 
-        //hen
+        // then
         assertEquals(FollowErrorCode.ALREADY_FOLLOWING, ex.getErrorCode());
     }
 
@@ -168,7 +179,7 @@ class FollowServiceTest {
         followService.createFollow(user1.getId(), user3.getId());
 
         // when
-        List<Follow> followings = followService.getFollowings(user1.getId());
+        List<FollowDto> followings = followService.getFollowings(user1.getId());
 
         // then
         assertEquals(2, followings.size());
@@ -185,7 +196,7 @@ class FollowServiceTest {
         followService.createFollow(user3.getId(), user1.getId());
 
         // when
-        List<Follow> followers = followService.getFollowers(user1.getId());
+        List<FollowDto> followers = followService.getFollowers(user1.getId());
 
         // then
         assertEquals(2, followers.size());
@@ -217,11 +228,11 @@ class FollowServiceTest {
         }
 
         // when
-        List<Follow> followings = followService.getFollowings(user.getId());
+        List<FollowDto> followings = followService.getFollowings(user.getId());
 
         // then
-        for (Follow follow : followings) {
-            System.out.println("팔로잉 유저명: " + follow.getFollowing().getUsername());
+        for (FollowDto follow : followings) {
+            System.out.println("팔로잉 유저명: " + follow.username());
         }
     }
 }

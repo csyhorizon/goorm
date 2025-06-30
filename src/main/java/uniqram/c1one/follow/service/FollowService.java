@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.follow.dto.FollowDto;
 import uniqram.c1one.follow.entity.Follow;
 import uniqram.c1one.follow.exception.FollowErrorCode;
 import uniqram.c1one.follow.exception.FollowException;
@@ -82,31 +83,29 @@ public class FollowService {
     /**
      * 팔로잉 목록 조회 기능
      * <p>
-     * 특정 사용자가 팔로우하고 있는 사용자 목록을 조회합니다
+     * 자신이 팔로우하고 있는 사용자 목록을 조회합니다
      * <p>
-     * TODO: 추후 DTO 변환 로직으로 개선 예정
      *
      * @param userId 팔로잉 목록을 조회할 사용자의 ID
      * @return 해당 사용자가 팔로우하고 있는 Follow 엔티티 리스트
      */
     @Transactional(readOnly = true)
-    public List<Follow> getFollowings(Long userId) {
-        return followRepository.findByFollower_Id(userId);
+    public List<FollowDto> getFollowings(Long userId) {
+        return followRepository.findFollowingsByUserId(userId);
     }
 
     /**
      * 팔로워 목록 조회 기능
      * <p>
-     * 특정 사용자를 팔로우하고 있는 사용자 목록을 조회합니다
+     * 자신을 팔로우하고 있는 사용자 목록을 조회합니다
      * <p>
-     * TODO: 추후 DTO 변환 로직으로 개선 예정
      *
      * @param userId 팔로워 목록을 조회할 사용자의 ID
      * @return 해당 사용자를 팔로우하고 있는 Follow 엔티티 리스트
      */
     @Transactional(readOnly = true)
-    public List<Follow> getFollowers(Long userId) {
-        return followRepository.findByFollowing_Id(userId);
+    public List<FollowDto> getFollowers(Long userId) {
+        return followRepository.findFollowersByUserId(userId);
     }
 
     private void deleteFollowRelation(Long followerId, Long followingId) {
