@@ -5,9 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import uniqram.c1one.global.BaseEntity;
 
+// 검색 결과를 DB 에 저장
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SearchHistory extends BaseEntity {
 	
 	// 저장용 인조키(Artificial Key)
@@ -19,9 +24,15 @@ public class SearchHistory extends BaseEntity {
 	@Column(name = "userid")
 	private Long userid;
 	
-	// SearchResult 검색한 내용
-	private String result;
+	// 사용자가 검색할 내용
+	private String searchKeyword;
 	
-	// Enum 만들기
+	// Enum 만들기 시간 부족 추후 구현...
+	//	private SearchType searchType;
 	
+	@Builder
+	public SearchHistory(Long userid, String searchKeyword) {
+		this.userid = userid;
+		this.searchKeyword = searchKeyword;
+	}
 }
