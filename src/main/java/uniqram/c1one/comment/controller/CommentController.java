@@ -15,13 +15,13 @@ import uniqram.c1one.global.success.SuccessResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/comments/{commentId}")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
     private final CommentLikeService commentLikeService;
 
-    @PatchMapping("/{commentId}")
+    @PatchMapping
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
             @RequestParam Long userId,
@@ -31,7 +31,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
             @RequestParam Long userId) {
@@ -39,7 +39,7 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{commentId}/like")
+    @PostMapping("/like")
     public ResponseEntity<CommentLikeResponse> likeComment(
             @PathVariable Long commentId,
             @RequestParam Long userId
