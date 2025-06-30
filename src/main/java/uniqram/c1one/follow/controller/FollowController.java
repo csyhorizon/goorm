@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uniqram.c1one.follow.dto.FollowDto;
 import uniqram.c1one.follow.dto.FollowRequestDto;
-import uniqram.c1one.follow.entity.Follow;
 import uniqram.c1one.follow.service.FollowService;
 
 @RestController
@@ -51,12 +51,12 @@ public class FollowController {
     }
 
     @GetMapping("/users/{userId}/followings")
-    public ResponseEntity<List<Follow>> getFollowings(@PathVariable Long userId) {
+    public ResponseEntity<List<FollowDto>> getFollowings(@PathVariable Long userId) {
         return ResponseEntity.ok(followService.getFollowings(userId));
     }
 
     @GetMapping("/users/{userId}/followers")
-    public ResponseEntity<List<Follow>> getFollowers(@PathVariable Long userId) {
+    public ResponseEntity<List<FollowDto>> getFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(followService.getFollowers(userId));
     }
 }
