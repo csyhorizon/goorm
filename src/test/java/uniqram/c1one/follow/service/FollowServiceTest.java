@@ -34,7 +34,6 @@ class FollowServiceTest {
         Users users = Users.builder()
                 .username(username)
                 .password("password")
-                .email(username + "@test.com")
                 .role(Role.USER)
                 .build();
         return userRepository.save(users);
@@ -199,7 +198,6 @@ class FollowServiceTest {
                 Users.builder()
                         .username("main")
                         .password("pw")
-                        .email("main@test.com")
                         .role(Role.USER)
                         .build()
         );
@@ -209,7 +207,6 @@ class FollowServiceTest {
                     Users.builder()
                             .username("user" + i)
                             .password("pw")
-                            .email("user" + i + "@test.com")
                             .role(Role.USER)
                             .build()
             );

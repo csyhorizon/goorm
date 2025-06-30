@@ -40,7 +40,7 @@ class JwtTokenProviderTest {
 
         // then: 토큰 잘 생성됐는지
         assertThat(jwt).isNotNull();
-        assertThat(jwt.getGrantType()).isEqualTo("Bearer");
+        assertThat(jwt.getTokenType()).isEqualTo("Bearer");
         assertThat(jwt.getAccessToken()).isNotBlank();
         assertThat(jwt.getRefreshToken()).isNotBlank();
 

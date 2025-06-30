@@ -16,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -46,15 +49,23 @@ public class AuthController {
             Cookie accessTokenCookie = new Cookie("access_token", jwtToken.getAccessToken());
             accessTokenCookie.setHttpOnly(true);
             accessTokenCookie.setPath("/");
+            accessTokenCookie.setMaxAge(24 * 60 * 60); // 24시간
+
 
             Cookie refreshTokenCookie = new Cookie("refresh_token", jwtToken.getRefreshToken());
             refreshTokenCookie.setHttpOnly(true);
             refreshTokenCookie.setPath("/");
+            accessTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
 
             response.addCookie(accessTokenCookie);
             response.addCookie(refreshTokenCookie);
 
-            return ResponseEntity.ok(jwtToken);
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("accessToken", jwtToken.getAccessToken());
+            responseBody.put("message", "로그인 성공");
+            responseBody.put("redirectUrl", "/index");
+
+            return ResponseEntity.ok(responseBody);
 
         } catch (Exception e) {
             return ResponseEntity
@@ -83,4 +94,13 @@ public class AuthController {
     static class SimpleResponse {
         private String message;
     }
+
+    @Getter
+    @AllArgsConstructor
+    static class LoginResponse {
+        private String accessToken;
+        private String refreshToken;
+        private String redirectUrl;
+    }
+
 }
