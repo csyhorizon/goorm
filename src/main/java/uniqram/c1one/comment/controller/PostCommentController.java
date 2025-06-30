@@ -1,5 +1,7 @@
 package uniqram.c1one.comment.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,8 @@ public class PostCommentController {
 
     private final CommentService commentService;
 
+    @Operation(summary = "게시글에 댓글 작성", description = "특정 게시글에 새 댓글을 작성합니다.")
+    @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
     public ResponseEntity<SuccessResponse<CommentResponse>> createComment(
             @PathVariable Long postId,
@@ -28,6 +32,8 @@ public class PostCommentController {
                 .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, response));
     }
 
+    @Operation(summary = "게시글의 전체 댓글 조회", description = "특정 게시글에 달린 모든 댓글을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "성공")
     @GetMapping
     public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getComments(postId));
