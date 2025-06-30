@@ -46,8 +46,10 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/css/**", "/js/**"  // 정적 리소스
                         ).permitAll()
+                        .requestMatchers("index.html","/index").authenticated()
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -58,9 +60,13 @@ public class SecurityConfig {
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                // 예외 처리 추가
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/api/auth/signin");  // 로그인 페이지로 리다이렉트
+                        })
                 );
-
-
         return http.build();
     }
 
