@@ -46,8 +46,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/css/**", "/js/**"  // 정적 리소스
+                                "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers("index.html","/index").authenticated()
                         .requestMatchers("/api/user/**").hasRole("USER")
