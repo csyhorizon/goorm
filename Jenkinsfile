@@ -32,8 +32,8 @@ pipeline {
             post {
                 always {
                     junit '**/build/test-results/test/*.xml'
-                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true // 기존 JAR 아카이브
-                    archiveArtifacts artifacts: 'build/reports/tests/test/index.html', allowEmpty: true // 테스트 보고서 추가!
+                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                    archiveArtifacts artifacts: 'build/reports/tests/test/index.html', allowEmptyArchive: true
                 }
             }
         }
