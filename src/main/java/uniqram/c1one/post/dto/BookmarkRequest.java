@@ -8,6 +8,5 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookmarkRequest {
 
-    private Long userId;
     private Long postId;
 }
