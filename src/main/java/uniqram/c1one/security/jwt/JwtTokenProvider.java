@@ -3,6 +3,7 @@ package uniqram.c1one.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.security.adapter.CustomUserDetails;
 import uniqram.c1one.user.entity.Users;
+import uniqram.c1one.user.repository.UserRepository;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -26,10 +28,12 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     private final Key key;
+    private final UserRepository userRepository;
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
+        this.userRepository = userRepository;
     }
 
     public JwtToken generateToken(Authentication authentication) {
@@ -66,15 +70,17 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰");
         }
 
+        String username = claims.getSubject();
+
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+
+        UserDetails principal = new CustomUserDetails(user);
+
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        Users user = Users.builder()
-                .username(claims.getSubject())
-                .build();
-
-        UserDetails principal = new CustomUserDetails(user);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
