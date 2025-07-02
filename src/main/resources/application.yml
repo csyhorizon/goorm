@@ -29,9 +29,3 @@ spring:
 jwt:
   secret: ${JWT_SECRET:}
   expiration-ms : ${JWT_EXPIRATION_MS}
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG # Hibernate가 실행하는 모든 SQL 쿼리를 보여줍니다.
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # SQL 쿼리의 파라미터 값까지 보여줍니다.
-    org.springframework.orm.jpa: DEBUG # JPA 관련 상세 로그를 보여줍니다.
