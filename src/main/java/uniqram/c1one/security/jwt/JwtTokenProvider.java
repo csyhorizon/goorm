@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import uniqram.c1one.auth.dto.JwtToken;
+import uniqram.c1one.security.adapter.CustomUserDetails;
+import uniqram.c1one.user.entity.Users;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -68,7 +70,11 @@ public class JwtTokenProvider {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        Users user = Users.builder()
+                .username(claims.getSubject())
+                .build();
+
+        UserDetails principal = new CustomUserDetails(user);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
