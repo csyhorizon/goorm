@@ -13,7 +13,7 @@ RUN gradle clean build --no-daemon -x test
 # 2. 런타임 환경
 FROM eclipse-temurin:17-jre-jammy
 
-# 시간대 설정
+# 시간대
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
