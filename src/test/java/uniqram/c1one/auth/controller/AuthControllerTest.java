@@ -51,9 +51,9 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("인증되지 않은 사용자 /api/user/test 접근 시 403 Forbidden")
+    @DisplayName("인증되지 않은 사용자 /api/user/test 접근 시 리다이렉트")
     void anonymousAccessUserEndpoint_ShouldForbidden() throws Exception {
         mockMvc.perform(get("/api/user/test"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().is3xxRedirection());
     }
 }

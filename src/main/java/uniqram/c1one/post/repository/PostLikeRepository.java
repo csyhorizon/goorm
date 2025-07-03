@@ -18,6 +18,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     int countByPost(Post post);
     boolean existsByUserAndPost(Users user, Post post);
     Optional<PostLike> findByUserAndPost(Users user, Post post);
+    int countByPostId(Long postId);
 
     @Query("SELECT new uniqram.c1one.post.dto.LikeCountDto(pl.post.id, COUNT(pl)) " +
             "FROM PostLike pl WHERE pl.post.id IN :postIds GROUP BY pl.post.id")

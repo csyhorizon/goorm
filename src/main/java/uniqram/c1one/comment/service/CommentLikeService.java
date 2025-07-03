@@ -10,6 +10,7 @@ import uniqram.c1one.comment.exception.CommentErrorCode;
 import uniqram.c1one.comment.exception.CommentException;
 import uniqram.c1one.comment.repository.CommentLikeRepository;
 import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
@@ -22,6 +23,7 @@ public class CommentLikeService {
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final LikeCountService likeCountService;
 
     @Transactional
     public CommentLikeResponse likeComment(Long userId, Long commentId) {
@@ -36,14 +38,16 @@ public class CommentLikeService {
         boolean liked;
         if (existing.isPresent()) {
             commentLikeRepository.delete(existing.get());
+            likeCountService.decrementCommentLike(commentId);
             liked = false;
         } else {
             CommentLike commentLike = CommentLike.builder().user(user).comment(comment).build();
             commentLikeRepository.save(commentLike);
+            likeCountService.incrementCommentLike(commentId);
             liked = true;
         }
 
-        int likeCount = commentLikeRepository.countByComment(comment);
+        int likeCount = likeCountService.getCommentLikeCount(commentId);
 
         return CommentLikeResponse.builder()
                 .commentId(commentId)

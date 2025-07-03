@@ -11,6 +11,7 @@ import uniqram.c1one.comment.exception.CommentErrorCode;
 import uniqram.c1one.comment.exception.CommentException;
 import uniqram.c1one.comment.repository.CommentLikeRepository;
 import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
@@ -26,7 +27,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final CommentLikeRepository commentLikeRepository;
+    private final LikeCountService likeCountService;
 
     public CommentResponse createComment(Long userId, Long postId, CommentCreateRequest createRequest) {
         Users users = userRepository.findById(userId)
@@ -35,18 +36,19 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
 
-        Comment.CommentBuilder commentBuilder = Comment.builder()
-                .user(users)
-                .post(post)
-                .content(createRequest.getContent());
-
+        Comment parentComment = null;
         if (createRequest.getParentCommentId() != null) {
-            Comment parent = commentRepository.findById(createRequest.getParentCommentId())
+            parentComment = commentRepository.findById(createRequest.getParentCommentId())
                     .orElseThrow(() -> new CommentException(CommentErrorCode.PARENT_COMMENT_NOT_FOUND));
-            commentBuilder.parentComment(parent);
         }
 
-        Comment comment = commentRepository.save(commentBuilder.build());
+        Comment comment = Comment.builder()
+                .user(users)
+                .post(post)
+                .parentComment(parentComment)
+                .content(createRequest.getContent())
+                .build();
+        commentRepository.save(comment);
 
         return CommentResponse.builder()
                 .commentId(comment.getId())
@@ -55,7 +57,7 @@ public class CommentService {
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .parentCommentId(
-                        comment.getParentComment() != null ? comment.getParentComment().getId() : null
+                        parentComment != null ? parentComment.getId() : null
                 )
                 .build();
     }
@@ -69,7 +71,7 @@ public class CommentService {
 
 
         return comments.stream()
-                .map(comment -> { int likeCount = commentLikeRepository.countByComment(comment);
+                .map(comment -> { int likeCount = likeCountService.getCommentLikeCount(comment.getId());
                         return CommentResponse.builder()
                         .commentId(comment.getId())
                         .userName(comment.getUser().getUsername())

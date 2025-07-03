@@ -43,13 +43,13 @@ public class AuthController {
             Cookie accessTokenCookie = new Cookie("access_token", jwtToken.getAccessToken());
             accessTokenCookie.setHttpOnly(true);
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(24 * 60 * 60); // 24시간
+            accessTokenCookie.setMaxAge(3600); // 1시간
 
 
             Cookie refreshTokenCookie = new Cookie("refresh_token", jwtToken.getRefreshToken());
             refreshTokenCookie.setHttpOnly(true);
             refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+            refreshTokenCookie.setMaxAge(14 * 24 * 3600); // 14일
 
             response.addCookie(accessTokenCookie);
             response.addCookie(refreshTokenCookie);
