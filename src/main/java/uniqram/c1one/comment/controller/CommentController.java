@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import uniqram.c1one.comment.dto.CommentCreateRequest;
 import uniqram.c1one.comment.dto.CommentLikeResponse;
@@ -13,6 +14,7 @@ import uniqram.c1one.comment.exception.CommentSuccessCode;
 import uniqram.c1one.comment.service.CommentLikeService;
 import uniqram.c1one.comment.service.CommentService;
 import uniqram.c1one.global.success.SuccessResponse;
+import uniqram.c1one.security.adapter.CustomUserDetails;
 
 import java.util.List;
 
@@ -30,9 +32,10 @@ public class CommentController {
     @PatchMapping
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
-            @RequestParam Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody CommentUpdateRequest updateRequest
     ) {
+        Long userId = userDetails.getUserId();
         CommentResponse response = commentService.updateComment(userId, commentId, updateRequest);
         return ResponseEntity.ok(response);
     }
@@ -44,7 +47,8 @@ public class CommentController {
     @DeleteMapping
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
-            @RequestParam Long userId) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
         commentService.deleteComment(userId, commentId);
         return ResponseEntity.noContent().build();
     }
@@ -55,8 +59,9 @@ public class CommentController {
     @PostMapping("/like")
     public ResponseEntity<CommentLikeResponse> likeComment(
             @PathVariable Long commentId,
-            @RequestParam Long userId
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ){
+        Long userId = userDetails.getUserId();
         CommentLikeResponse like = commentLikeService.likeComment(userId, commentId);
         return ResponseEntity.ok(like);
     }
