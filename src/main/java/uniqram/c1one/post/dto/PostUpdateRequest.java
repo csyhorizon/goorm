@@ -10,7 +10,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostUpdateRequest {
 
-    private Long userId;   // 임시 포함
     private String content;
     private String location;
 

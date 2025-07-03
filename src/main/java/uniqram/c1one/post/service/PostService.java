@@ -172,7 +172,11 @@ public class PostService {
 
         // 기존 이미지에서 특정 이미지 삭제
         List<PostMedia> currentMedia = postMediaRepository.findByPostIdOrderByIdAsc(postId);
-        List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null ? postUpdateRequest.getRemainImageUrls() : List.of();
+        List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null
+                ? postUpdateRequest.getRemainImageUrls().stream()
+                .filter(url -> url != null && !url.trim().isEmpty())
+                .toList()
+                : List.of();
 
         List<PostMedia> deleteMedia = currentMedia.stream()
                 .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
@@ -183,13 +187,17 @@ public class PostService {
         // 새 이미지 등록
         if (postUpdateRequest.getNewImageUrls() != null && !postUpdateRequest.getNewImageUrls().isEmpty()) {
             List<PostMedia> newMediaList = postUpdateRequest.getNewImageUrls().stream()
+                    .filter(url -> url != null && !url.trim().isEmpty())
                     .map(url -> PostMedia.of(post, url))
                     .toList();
             postMediaRepository.saveAll(newMediaList);
         }
 
         // 최종 이미지 개수 확인
-        int finalImageCount = postMediaRepository.findByPostIdOrderByIdAsc(postId).size();
+        int finalImageCount = postMediaRepository.findByPostIdOrderByIdAsc(postId).stream()
+                .filter(pm -> pm.getMediaUrl() != null && !pm.getMediaUrl().trim().isEmpty())
+                .toList()
+                .size();
         if (finalImageCount == 0) {
             throw new PostException(PostErrorCode.IMAGE_REQUIRED);
         }

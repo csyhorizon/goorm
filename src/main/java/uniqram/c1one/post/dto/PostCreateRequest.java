@@ -10,7 +10,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostCreateRequest {
 
-    private Long userId;   // 임시 포함
     private String content;
     private String location;
     private List<String> mediaUrls;
