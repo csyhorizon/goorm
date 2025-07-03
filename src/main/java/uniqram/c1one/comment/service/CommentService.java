@@ -11,6 +11,7 @@ import uniqram.c1one.comment.exception.CommentErrorCode;
 import uniqram.c1one.comment.exception.CommentException;
 import uniqram.c1one.comment.repository.CommentLikeRepository;
 import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
@@ -26,7 +27,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final CommentLikeRepository commentLikeRepository;
+    private final LikeCountService likeCountService;
 
     public CommentResponse createComment(Long userId, Long postId, CommentCreateRequest createRequest) {
         Users users = userRepository.findById(userId)
@@ -70,7 +71,7 @@ public class CommentService {
 
 
         return comments.stream()
-                .map(comment -> { int likeCount = commentLikeRepository.countByComment(comment);
+                .map(comment -> { int likeCount = likeCountService.getCommentLikeCount(comment.getId());
                         return CommentResponse.builder()
                         .commentId(comment.getId())
                         .userName(comment.getUser().getUsername())
