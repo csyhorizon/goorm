@@ -35,18 +35,19 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
 
-        Comment.CommentBuilder commentBuilder = Comment.builder()
-                .user(users)
-                .post(post)
-                .content(createRequest.getContent());
-
+        Comment parentComment = null;
         if (createRequest.getParentCommentId() != null) {
-            Comment parent = commentRepository.findById(createRequest.getParentCommentId())
+            parentComment = commentRepository.findById(createRequest.getParentCommentId())
                     .orElseThrow(() -> new CommentException(CommentErrorCode.PARENT_COMMENT_NOT_FOUND));
-            commentBuilder.parentComment(parent);
         }
 
-        Comment comment = commentRepository.save(commentBuilder.build());
+        Comment comment = Comment.builder()
+                .user(users)
+                .post(post)
+                .parentComment(parentComment)
+                .content(createRequest.getContent())
+                .build();
+        commentRepository.save(comment);
 
         return CommentResponse.builder()
                 .commentId(comment.getId())
@@ -55,7 +56,7 @@ public class CommentService {
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .parentCommentId(
-                        comment.getParentComment() != null ? comment.getParentComment().getId() : null
+                        parentComment != null ? parentComment.getId() : null
                 )
                 .build();
     }
