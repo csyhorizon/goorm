@@ -3,14 +3,12 @@ package uniqram.c1one.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import uniqram.c1one.auth.dto.JwtToken;
@@ -19,6 +17,9 @@ import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
 import java.security.Key;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -30,6 +31,9 @@ public class JwtTokenProvider {
     private final Key key;
     private final UserRepository userRepository;
 
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();      // 1시간
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(14).toMillis();    // 14일
+
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
@@ -40,9 +44,13 @@ public class JwtTokenProvider {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        long now = (new Date()).getTime();
+        LocalDateTime now = LocalDateTime.now();
 
-        Date accessTokenExpires = new Date(now + 86400000);
+        LocalDateTime accessTokenExpiration = now.plusSeconds(ACCESS_TOKEN_EXPIRE_TIME / 1000);
+        Date accessTokenExpires = Date.from(accessTokenExpiration.atZone(ZoneId.systemDefault()).toInstant());
+
+        LocalDateTime refreshTokenExpiryDateTime = now.plusSeconds(REFRESH_TOKEN_EXPIRE_TIME / 1000);
+        Date refreshTokenExpires = Date.from(refreshTokenExpiryDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -52,7 +60,7 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .setExpiration(accessTokenExpires)
+                .setExpiration(refreshTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
