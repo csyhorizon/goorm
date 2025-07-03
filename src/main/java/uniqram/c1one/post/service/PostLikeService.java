@@ -3,6 +3,7 @@ package uniqram.c1one.post.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.PostLikeResponse;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostLike;
@@ -21,6 +22,7 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeCountService likeCountService;
 
     @Transactional
     public PostLikeResponse like(Long userId, Long postId) {
@@ -34,6 +36,7 @@ public class PostLikeService {
         boolean liked;
         if (existing.isPresent()) {
             postLikeRepository.delete(existing.get());
+            likeCountService.decrementPostLike(postId);
             liked = false;
         } else {
             PostLike postLike = PostLike.builder()
@@ -41,9 +44,10 @@ public class PostLikeService {
                     .post(post)
                     .build();
             postLikeRepository.save(postLike);
+            likeCountService.incrementPostLike(postId);
             liked = true;
         }
-        int likeCount = postLikeRepository.countByPost(post);
+        int likeCount = likeCountService.getPostLikeCount(postId);
 
         return PostLikeResponse.builder()
                 .postId(postId)
