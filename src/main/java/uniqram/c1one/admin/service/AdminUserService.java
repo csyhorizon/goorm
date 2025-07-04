@@ -3,7 +3,7 @@ package uniqram.c1one.admin.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uniqram.c1one.admin.dto.UserSummaryResponse;
-import uniqram.c1one.user.entity.Users;
+import uniqram.c1one.redis.service.ActiveUserService;
 import uniqram.c1one.user.repository.UserRepository;
 
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.List;
 public class AdminUserService {
 
     private final UserRepository userRepository;
+    private final ActiveUserService activeUserService;
 
     public List<UserSummaryResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -22,8 +23,7 @@ public class AdminUserService {
     }
 
     public List<UserSummaryResponse> getOnlineUsers() {
-        // 임시: 전체 유저 리턴. redis 적용 후 리펙토링 예정.
-        return userRepository.findAll().stream()
+        return activeUserService.getAllActiveUsers().stream()
                 .map(UserSummaryResponse::from)
                 .toList();
     }
