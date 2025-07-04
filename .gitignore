@@ -1,5 +1,7 @@
 # customs
 personalMEMO/
+.env
+.env.*
 
 # Logs
 logs
