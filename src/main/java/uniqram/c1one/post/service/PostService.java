@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.comment.dto.CommentResponse;
+import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
@@ -29,6 +32,8 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostMediaRepository postMediaRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
+    private final LikeCountService likeCountService;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
@@ -59,7 +64,7 @@ public class PostService {
         return PostResponse.from(post, mediaUrls);
     }
 
-    @Transactional(readOnly = true) // TODO: 댓글 관련 로직 주석 제거
+    @Transactional(readOnly = true)
     public Page<HomePostResponse> getHomePosts(Long userId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -77,10 +82,10 @@ public class PostService {
                 ));
 
         // 좋아요 개수
-        Map<Long, Long> likeCountMap = postLikeRepository.countByPostIds(postIds).stream()
+        Map<Long, Integer> likeCountMap = postIds.stream()
                 .collect(Collectors.toMap(
-                        LikeCountDto::getPostId,
-                        LikeCountDto::getCount
+                        postId -> postId,
+                        likeCountService::getPostLikeCount
                 ));
 
         // 좋아요 누른 사람
@@ -91,25 +96,21 @@ public class PostService {
         Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(postIds, userId));
 
         // 댓글 개수
-//        Map<Long, Long> commentCountMap = commentRepository.countByPostIds(postIds).stream()
-//                .collect(Collectors.toMap(
-//                        CommentCountDto::getPostId,
-//                        CommentCountDto::getCount
-//                ));
-//
-         //댓글 가져오기
-//        Map<Long, List<CommentDto>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
-//                .collect(Collectors.groupingBy(CommentDto::getPostId));
+
+
+        // 댓글 조회
+        Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
+                .collect(Collectors.groupingBy(CommentResponse::getPostId));
 
         return postPage.map(post -> {
             List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
-            int likeCount = likeCountMap.getOrDefault(post.getId(), 0L).intValue();
+            int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
             boolean likedByMe = likedPostIdSet.contains(post.getId());
-//            int commentCount = commentCountMap.getOrDefault(post.getId(), 0L).intValue();
-//            List<CommentDto> comments = commentMap.getOrDefault(post.getId(), List.of());
+//            int commentCount = commentCountMap.getOrDefault(post.getId(), 0L);
+            List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
-            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
         });
     }
 
@@ -147,7 +148,7 @@ public class PostService {
                 .stream().map(PostMedia::getMediaUrl)
                 .toList();
 
-        int likeCount = postLikeRepository.countByPost(post);
+        int likeCount = likeCountService.getPostLikeCount(postId);
 
         List<LikeUserDto> likeUsers = postLikeRepository.findLikeUsersByPostId(postId);
 
@@ -155,9 +156,9 @@ public class PostService {
 
 //        int commentCount = commentRepository.countByPostId(postId);
 
-//        List<CommentDto> comments = commentRepository.findCommentsByPostId(postId);
+        List<CommentResponse> comments = commentRepository.findCommentsByPostId(postId);
 
-        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
+        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
     }
 
     @Transactional
