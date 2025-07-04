@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import uniqram.c1one.comment.dto.CommentCreateRequest;
+import uniqram.c1one.comment.dto.CommentListResponse;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.comment.exception.CommentSuccessCode;
 import uniqram.c1one.comment.service.CommentService;
@@ -39,7 +40,7 @@ public class PostCommentController {
     @Operation(summary = "게시글의 전체 댓글 조회", description = "특정 게시글에 달린 모든 댓글을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
+    public ResponseEntity<List<CommentListResponse>> getComments(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getComments(postId));
     }
 
