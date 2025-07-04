@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.comment.dto.CommentListResponse;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.comment.repository.CommentRepository;
 import uniqram.c1one.global.service.LikeCountService;
@@ -156,7 +157,7 @@ public class PostService {
 
 //        int commentCount = commentRepository.countByPostId(postId);
 
-        List<CommentResponse> comments = commentRepository.findCommentsByPostId(postId);
+        List<CommentListResponse> comments = commentRepository.findCommentsByPostId(postId);
 
         return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
     }

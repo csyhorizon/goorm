@@ -37,6 +37,7 @@ public class Users extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
 }
