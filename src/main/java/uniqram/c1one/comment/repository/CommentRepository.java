@@ -45,5 +45,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 //            "ORDER BY c.createdAt ASC")
 //    List<CommentResponse> findCommentsByPostId(@Param("postId") Long postId);
 
-    List<CommentListResponse> findCommentsByPostId(Long postId);
 }
