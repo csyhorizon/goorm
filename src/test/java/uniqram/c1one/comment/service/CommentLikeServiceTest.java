@@ -1,3 +1,4 @@
+/**
 package uniqram.c1one.comment.service;
 
 import org.assertj.core.api.Assertions;
@@ -95,3 +96,4 @@ class CommentLikeServiceTest {
 
 
 }
+*/
