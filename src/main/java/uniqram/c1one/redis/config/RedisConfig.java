@@ -39,7 +39,7 @@ public class RedisConfig {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        // 최신 방식: 생성자에 mapper 전달!
+        // 생성자에 mapper 전달
         Jackson2JsonRedisSerializer<Object> serializer =
                 new Jackson2JsonRedisSerializer<>(mapper, Object.class);
 
