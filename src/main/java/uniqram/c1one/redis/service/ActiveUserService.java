@@ -60,4 +60,13 @@ public class ActiveUserService {
                 .collect(Collectors.toList());
     }
 
+    public long countActiveUsers() {
+        List<ActiveUser> users = getAllActiveUsers();
+        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+
+        return users.stream()
+                .filter(user -> user.getLastAccessTime() != null &&
+                        user.getLastAccessTime().isAfter(fiveMinutesAgo))   // 최근 5분 이내 요청이 있으면 접속 중으로 판단.
+                .count();
+    }
 }
