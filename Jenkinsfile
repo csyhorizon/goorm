@@ -41,22 +41,12 @@ pipeline {
                                "DB_PASSWORD=\"${DB_PASSWORD_ENV}\" " +
                                "JWT_SECRET=\"${JWT_SECRET_ENV}\" " +
                                "JWT_EXPIRATION_MS=\"${env.JWT_EXPIRATION_MS}\" " +
-                               "./gradlew clean build --no-daemon -x test"
-                            sh "DB_URL=\"${env.DB_URL}\" " +
-                               "DB_USERNAME=\"${env.DB_USERNAME}\" " +
-                               "DB_PASSWORD=\"${DB_PASSWORD_ENV}\" " +
-                               "JWT_SECRET=\"${JWT_SECRET_ENV}\" " +
-                               "JWT_EXPIRATION_MS=\"${env.JWT_EXPIRATION_MS}\" " +
-                               "./gradlew test --no-daemon"
+                               "./gradlew clean build --no-daemon"
                         } else {
                             bat "set DB_URL=\"%DB_URL%\" && set DB_USERNAME=\"%DB_USERNAME%\" && ^" +
                                 "set DB_PASSWORD=\"%DB_PASSWORD_ENV%\" && set JWT_SECRET=\"%JWT_SECRET_ENV%\" && ^" +
                                 "set JWT_EXPIRATION_MS=\"%JWT_EXPIRATION_MS%\" && ^" +
-                                "gradlew.bat clean build -x test"
-                            bat "set DB_URL=\"%DB_URL%\" && set DB_USERNAME=\"%DB_USERNAME%\" && ^" +
-                                "set DB_PASSWORD=\"%DB_PASSWORD_ENV%\" && set JWT_SECRET=\"%JWT_SECRET_ENV%\" && ^" +
-                                "set JWT_EXPIRATION_MS=\"%JWT_EXPIRATION_MS%\" && ^" +
-                                "gradlew.bat test"
+                                "gradlew.bat clean build"
                         }
                     }
                 }
@@ -92,20 +82,31 @@ pipeline {
                         string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_ENV'),
                         sshUserPrivateKey(credentialsId: 'my-gcp-ssh-key', keyFileVariable: 'SSH_KEY_PATH')
                     ]) {
-                        sh "ssh -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} 'docker stop ${env.APP_CONTAINER_NAME} || true'"
-                        sh "ssh -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} 'docker rm ${env.APP_CONTAINER_NAME} || true'"
+                        sh """
+                        ssh -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} << 'EOF'
+                            # 원격 서버에서 실행될 스크립트 시작
 
-                        sh "ssh -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} 'docker pull ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}'"
+                            # 기존 컨테이너 중지 및 삭제
+                            docker stop ${env.APP_CONTAINER_NAME} || true
+                            docker rm ${env.APP_CONTAINER_NAME} || true
 
-                        sh "ssh -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} 'docker run -d " +
-                           "-p ${env.APP_PORT}:${env.APP_PORT} " +
-                           "--name ${env.APP_CONTAINER_NAME} " +
-                           "-e DB_URL=\"${env.DB_URL}\" " +
-                           "-e DB_USERNAME=\"${env.DB_USERNAME}\" " +
-                           "-e DB_PASSWORD=\"${DB_PASSWORD_ENV}\" " +
-                           "-e JWT_SECRET=\"${JWT_SECRET_ENV}\" " +
-                           "-e JWT_EXPIRATION_MS=\"${env.JWT_EXPIRATION_MS}\" " +
-                           "${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}'"
+                            # 최신 이미지 pull
+                            docker pull ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+
+                            # 새로운 컨테이너 실행 (3. 가독성 개선)
+                            docker run -d \\
+                               -p ${env.APP_PORT}:${env.APP_PORT} \\
+                               --name ${env.APP_CONTAINER_NAME} \\
+                               -e DB_URL="${env.DB_URL}" \\
+                               -e DB_USERNAME="${env.DB_USERNAME}" \\
+                               -e DB_PASSWORD="${DB_PASSWORD_ENV}" \\
+                               -e JWT_SECRET="${JWT_SECRET_ENV}" \\
+                               -e JWT_EXPIRATION_MS="${env.JWT_EXPIRATION_MS}" \\
+                               ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+
+                            echo "Deployment script finished."
+                        EOF
+                        """
                     }
                 }
             }
