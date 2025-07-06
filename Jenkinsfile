@@ -110,6 +110,8 @@ pipeline {
                                        ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                                     echo "Deployment script finished."
+
+                                    exit 0
                                 EOF
                                 """
                             }
