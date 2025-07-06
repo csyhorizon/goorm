@@ -82,12 +82,10 @@ pipeline {
                                 string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_ENV'),
                                 sshUserPrivateKey(credentialsId: 'my-gcp-ssh-key', keyFileVariable: 'SSH_KEY_PATH')
                             ]) {
-                                // 1. EOF에 따옴표 제거: Groovy 변수가 SSH 스크립트 안에서 사용되도록 변경
                                 sh """
                                 ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} << EOF
-                                    # 원격 서버에서 실행될 스크립트 시작
 
-                                    # 2. GCR 인증 명령어 추가 (가장 중요)
+                                    # GCR 인증 명령어 추가
                                     gcloud auth configure-docker gcr.io -q
 
                                     # 기존 컨테이너 중지 및 삭제
@@ -98,7 +96,6 @@ pipeline {
                                     docker pull ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                                     # 새로운 컨테이너 실행
-                                    # 3. Jenkins 비밀번호 변수를 docker run 명령어에 직접 전달
                                     docker run -d \\
                                        -p ${env.APP_PORT}:${env.APP_PORT} \\
                                        --name ${env.APP_CONTAINER_NAME} \\
