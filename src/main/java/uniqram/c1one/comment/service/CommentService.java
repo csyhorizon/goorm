@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uniqram.c1one.comment.dto.CommentCreateRequest;
+import uniqram.c1one.comment.dto.CommentListResponse;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.comment.dto.CommentUpdateRequest;
 import uniqram.c1one.comment.entity.Comment;
@@ -63,26 +64,44 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> getComments(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
+    public List<CommentListResponse> getComments(Long postId) {
+        List<CommentListResponse> dtos = commentRepository.findCommentsByPostId(postId);
 
-        List<Comment> comments = commentRepository.findByPost(post);
+        return dtos.stream()
+                .map(dto -> {
+                    int likeCount = likeCountService.getCommentLikeCount(dto.getCommentId());
+                    return CommentListResponse.builder()
+                            .commentId(dto.getCommentId())
+                            .userId(dto.getUserId())
+                            .userName(dto.getUserName())
+                            .content(dto.getContent())
+                            .likeCount(likeCount)
+                            .createdAt(dto.getCreatedAt())
+                            .parentCommentId(dto.getParentCommentId())
+                            .build();
+                })
+                .collect(Collectors.toList());
 
-
-        return comments.stream()
-                .map(comment -> { int likeCount = likeCountService.getCommentLikeCount(comment.getId());
-                        return CommentResponse.builder()
-                        .commentId(comment.getId())
-                        .userName(comment.getUser().getUsername())
-                        .content(comment.getContent())
-                        .likeCount(likeCount)
-                        .createdAt(comment.getCreatedAt())
-                        .parentCommentId(
-                                comment.getParentComment() != null ? comment.getParentComment().getId() : null
-                        )
-                        .build();
-                }).collect(Collectors.toList());
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new CommentException(CommentErrorCode.POST_NOT_FOUND));
+//
+//        List<Comment> comments = commentRepository.findByPost(post);
+//
+//
+//        return comments.stream()
+//                .map(comment -> { int likeCount = likeCountService.getCommentLikeCount(comment.getId());
+//                        return CommentResponse.builder()
+//                        .commentId(comment.getId())
+//                                .userId(comment.getUser().getId())
+//                        .userName(comment.getUser().getUsername())
+//                        .content(comment.getContent())
+//                        .likeCount(likeCount)
+//                        .createdAt(comment.getCreatedAt())
+//                        .parentCommentId(
+//                                comment.getParentComment() != null ? comment.getParentComment().getId() : null
+//                        )
+//                        .build();
+//                }).collect(Collectors.toList());
     }
 
     @Transactional

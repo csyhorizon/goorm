@@ -7,11 +7,11 @@ import uniqram.c1one.comment.repository.CommentRepository;
 import uniqram.c1one.comment.repository.CommentLikeRepository;
 import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.post.repository.PostLikeRepository;
+import uniqram.c1one.redis.service.ActiveUserService;
 import uniqram.c1one.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-
 public class AdminDashboardService {
 
     private final UserRepository userRepository;
@@ -19,6 +19,7 @@ public class AdminDashboardService {
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final ActiveUserService activeUserService;
 
     public DashboardResponse getDashboardStats() {
         return DashboardResponse.builder()
@@ -27,6 +28,7 @@ public class AdminDashboardService {
                 .commentCount(commentRepository.count())
                 .postLikeCount(postLikeRepository.count())
                 .commentLikeCount(commentLikeRepository.count())
+                .onlineUserCount(activeUserService.countActiveUsers())
                 .build();
     }
 }

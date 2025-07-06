@@ -38,10 +38,14 @@ public class RedisConfig {
         // ObjectMapper에 LocalDateTime 지원
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+        mapper.activateDefaultTyping(
+                mapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL
+        );
 
-        // 생성자에 mapper 전달
-        Jackson2JsonRedisSerializer<Object> serializer =
-                new Jackson2JsonRedisSerializer<>(mapper, Object.class);
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        // Deprecated된 방식이지만, 캐스팅 문제를 피하기 위해 명시적으로 설정
+        serializer.setObjectMapper(mapper);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(serializer);
@@ -50,5 +54,4 @@ public class RedisConfig {
 
         return template;
     }
-
 }

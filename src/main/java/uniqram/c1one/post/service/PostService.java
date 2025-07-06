@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.comment.dto.CommentListResponse;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.comment.repository.CommentRepository;

@@ -39,6 +39,7 @@ public class Users extends BaseEntity implements Serializable {
     }
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
 }

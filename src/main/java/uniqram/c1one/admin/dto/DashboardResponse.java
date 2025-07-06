@@ -12,4 +12,5 @@ public class DashboardResponse {
     private long commentCount;
     private long postLikeCount;
     private long commentLikeCount;
+    private long onlineUserCount;
 }
