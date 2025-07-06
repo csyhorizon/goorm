@@ -16,9 +16,6 @@ public class PostResponse {
 
     private List<String>  mediaUrls;
 
-    private int likeCount;
-    private int commentCount;
-
     private Long memberId;
     private String username;
 
@@ -28,8 +25,6 @@ public class PostResponse {
                 .content(post.getContent())
                 .location(post.getLocation())
                 .mediaUrls(mediaUrl)
-                .likeCount(post.getLikeCount())
-                .commentCount(post.getCommentCount())
                 .memberId(post.getUser().getId())
                 .username(post.getUser().getUsername())
                 .build();

@@ -8,10 +8,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uniqram.c1one.comment.dto.CommentResponse;
+import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.s3.S3Service;
 import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
+import uniqram.c1one.post.entity.PostLike;
 import uniqram.c1one.post.entity.PostMedia;
 import uniqram.c1one.post.exception.PostErrorCode;
 import uniqram.c1one.post.exception.PostException;
@@ -34,14 +37,17 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
     private final LikeCountService likeCountService;
+    private final S3Service s3Service;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new PostException(PostErrorCode.USER_NOT_FOUND));
 
+        List<String> mediaUrls = postCreateRequest.getMediaUrls();
+
         // 이미지 필수
-        if (postCreateRequest.getMediaUrls() == null || postCreateRequest.getMediaUrls().isEmpty()) {
+        if (mediaUrls == null || mediaUrls.isEmpty()) {
             throw new PostException(PostErrorCode.IMAGE_REQUIRED);
         }
 
@@ -49,17 +55,10 @@ public class PostService {
         postRepository.save(post);
 
         // 이미지 등록
-        if (postCreateRequest.getMediaUrls() != null && !postCreateRequest.getMediaUrls().isEmpty()) {
-            List<PostMedia> mediaList = postCreateRequest.getMediaUrls().stream()
-                    .map(url -> PostMedia.of(post, url))
-                    .toList();
-            postMediaRepository.saveAll(mediaList);
-        }
-
-        List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(post.getId())
-                .stream()
-                .map(PostMedia::getMediaUrl)
-                .collect(Collectors.toList());
+        List<PostMedia> mediaList = mediaUrls.stream()
+                .map(url -> PostMedia.of(post, url))
+                .toList();
+        postMediaRepository.saveAll(mediaList);
 
         return PostResponse.from(post, mediaUrls);
     }
@@ -95,9 +94,6 @@ public class PostService {
         // 본인 좋아요 여부
         Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(postIds, userId));
 
-        // 댓글 개수
-
-
         // 댓글 조회
         Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
                 .collect(Collectors.groupingBy(CommentResponse::getPostId));
@@ -107,7 +103,6 @@ public class PostService {
             int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
             boolean likedByMe = likedPostIdSet.contains(post.getId());
-//            int commentCount = commentCountMap.getOrDefault(post.getId(), 0L);
             List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
             return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
@@ -138,7 +133,7 @@ public class PostService {
         });
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(Long userId, Long postId) {
 
         Post post = postRepository.findById(postId)
@@ -153,8 +148,6 @@ public class PostService {
         List<LikeUserDto> likeUsers = postLikeRepository.findLikeUsersByPostId(postId);
 
         boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(postId, userId);
-
-//        int commentCount = commentRepository.countByPostId(postId);
 
         List<CommentResponse> comments = commentRepository.findCommentsByPostId(postId);
 
@@ -182,6 +175,11 @@ public class PostService {
         List<PostMedia> deleteMedia = currentMedia.stream()
                 .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
                 .toList();
+
+        for (PostMedia media: deleteMedia) {
+            String mediaUrl = media.getMediaUrl();
+            s3Service.deleteFile(mediaUrl);
+        }
 
         postMediaRepository.deleteAll(deleteMedia);
 
@@ -224,9 +222,16 @@ public class PostService {
         }
 
         List<PostMedia> mediaList = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+        for (PostMedia media : mediaList) {
+            s3Service.deleteFile(media.getMediaUrl());
+        }
         postMediaRepository.deleteAll(mediaList);
 
-        // TODO: 댓글, 좋아요 연관 삭제 로직 추가
+        List<PostLike> postLikes = postLikeRepository.findByPostId(postId);
+        postLikeRepository.deleteAll(postLikes);
+
+        List<Comment> comments = commentRepository.findByPost(post);
+        commentRepository.deleteAll(comments);
 
         postRepository.delete(post);
     }

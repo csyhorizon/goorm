@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
+import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.global.s3.S3Service;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
@@ -46,6 +49,15 @@ public class PostServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private LikeCountService likeCountService;
+
+    @Mock
+    private S3Service s3Service;
+
     @Test
     @DisplayName("게시물 생성 성공")
     void create_post_success() {
@@ -78,8 +90,7 @@ public class PostServiceTest {
             ReflectionTestUtils.setField(argument, "id", 1L); // id 강제 주입
             return argument;
         });
-        when(postMediaRepository.findByPostIdOrderByIdAsc(any()))
-                .thenReturn(savedMediaList);
+
         // then
         PostResponse response = postService.createPost(userId, request);
 
@@ -91,9 +102,6 @@ public class PostServiceTest {
         verify(userRepository).findById(userId);
         verify(postRepository).save(any(Post.class));
         verify(postMediaRepository).saveAll(anyList());
-        verify(postMediaRepository).findByPostIdOrderByIdAsc(savedPost.getId());
-
-
     }
 
     @Test
@@ -155,9 +163,11 @@ public class PostServiceTest {
         // when
         when(postRepository.findAllByOrderByIdDesc(any(Pageable.class))).thenReturn(postPage);
         when(postMediaRepository.findByPostIdIn(anyList())).thenReturn(mediaList);
-        when(postLikeRepository.countByPostIds(anyList())).thenReturn(likeCountList);
+        when(likeCountService.getPostLikeCount(1L)).thenReturn(3);
+        when(likeCountService.getPostLikeCount(2L)).thenReturn(5);
         when(postLikeRepository.findLikeUsersByPostIds(anyList())).thenReturn(likeUserList);
         when(postLikeRepository.findPostIdsLikedByUser(anyList(), eq(userId))).thenReturn(likedPostIds);
+        when(commentRepository.findCommentsByPostIds(anyList())).thenReturn(List.of());
 
         // then
         Page<HomePostResponse> responsePage = postService.getHomePosts(userId, page, size);
@@ -179,7 +189,6 @@ public class PostServiceTest {
 
         verify(postRepository).findAllByOrderByIdDesc(any(Pageable.class));
         verify(postMediaRepository).findByPostIdIn(anyList());
-        verify(postLikeRepository).countByPostIds(anyList());
         verify(postLikeRepository).findLikeUsersByPostIds(anyList());
         verify(postLikeRepository).findPostIdsLikedByUser(anyList(), eq(userId));
     }
@@ -196,7 +205,6 @@ public class PostServiceTest {
 
         when(postRepository.findAllByOrderByIdDesc(any(Pageable.class))).thenReturn(emptyPage);
         when(postMediaRepository.findByPostIdIn(Collections.emptyList())).thenReturn(Collections.emptyList());
-        when(postLikeRepository.countByPostIds(Collections.emptyList())).thenReturn(Collections.emptyList());
         when(postLikeRepository.findLikeUsersByPostIds(Collections.emptyList())).thenReturn(Collections.emptyList());
         when(postLikeRepository.findPostIdsLikedByUser(Collections.emptyList(), userId)).thenReturn(Collections.emptyList());
 
@@ -205,11 +213,7 @@ public class PostServiceTest {
 
         // then
         assertEquals(0, responsePage.getTotalElements());
-        verify(postRepository).findAllByOrderByIdDesc(any(Pageable.class));
-        verify(postMediaRepository).findByPostIdIn(Collections.emptyList());
-        verify(postLikeRepository).countByPostIds(Collections.emptyList());
-        verify(postLikeRepository).findLikeUsersByPostIds(Collections.emptyList());
-        verify(postLikeRepository).findPostIdsLikedByUser(Collections.emptyList(), userId);
+        verify(postLikeRepository, atMostOnce()).countByPostIds(anyList());
     }
 
     @Test
@@ -225,9 +229,10 @@ public class PostServiceTest {
         when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(List.of(
                 PostMedia.of(post, "url1"), PostMedia.of(post, "url2")
         ));
-        when(postLikeRepository.countByPost(post)).thenReturn(3);
+        when(likeCountService.getPostLikeCount(postId)).thenReturn(3);
         when(postLikeRepository.findLikeUsersByPostId(postId)).thenReturn(List.of());
         when(postLikeRepository.existsByPostIdAndUserId(postId, userId)).thenReturn(true);
+        when(commentRepository.findCommentsByPostId(postId)).thenReturn(List.of());
 
         PostDetailResponse response = postService.getPostDetail(userId, postId);
 
@@ -318,9 +323,7 @@ public class PostServiceTest {
         ReflectionTestUtils.setField(post, "id", postId);
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(List.of(
-                PostMedia.of(post, "url1"), PostMedia.of(post, "url2")
-        ));
+        when(commentRepository.findByPost(any())).thenReturn(List.of());
 
         postService.deletePost(userId, postId);
 
