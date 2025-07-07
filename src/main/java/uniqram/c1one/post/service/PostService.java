@@ -150,7 +150,7 @@ public class PostService {
 
         boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(postId, userId);
 
-        List<CommentResponse> comments = commentRepository.findCommentsByPostId(postId);
+        List<CommentListResponse> comments = commentRepository.findCommentsByPostId(postId);
 
         return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
     }

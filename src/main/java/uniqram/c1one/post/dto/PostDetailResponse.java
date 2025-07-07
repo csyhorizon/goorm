@@ -3,7 +3,6 @@ package uniqram.c1one.post.dto;
 import lombok.Builder;
 import lombok.Getter;
 import uniqram.c1one.comment.dto.CommentListResponse;
-import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.post.entity.Post;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class PostDetailResponse {
     private List<LikeUserDto> likeUsers;
     private boolean likedByMe;
 
-    private List<CommentResponse> comments;
+    private List<CommentListResponse> comments;
 
     public static PostDetailResponse from(Post post,
                                           List<String> mediaUrl,
