@@ -11,8 +11,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.security.adapter.CustomUserDetails;
+import uniqram.c1one.security.jwt.entity.RefreshToken;
+import uniqram.c1one.security.jwt.repository.RefreshTokenRepository;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
@@ -23,6 +26,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,16 +34,21 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
     private final Key key;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();      // 1시간
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(14).toMillis();    // 14일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, 
+                           UserRepository userRepository,
+                           RefreshTokenRepository refreshTokenRepository) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
         this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    @Transactional
     public JwtToken generateToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -60,9 +69,19 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(refreshTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        // 인증 정보 가져오기
+        String username = authentication.getName();
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+
+        // DB에 리프레시 토큰 저장
+        saveRefreshToken(user, refreshToken, refreshTokenExpiryDateTime);
 
         return JwtToken.builder()
                 .accessToken(accessToken)
@@ -125,4 +144,62 @@ public class JwtTokenProvider {
         }
     }
 
+    @Transactional
+    public void saveRefreshToken(Users user, String token, LocalDateTime expiryDate) {
+        // 토큰 여부 확인
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
+
+        if (existingToken.isPresent()) {
+            // Update existing token
+            existingToken.get().updateToken(token, expiryDate);
+        } else {
+            // Create new token
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .user(user)
+                    .token(token)
+                    .expiryDate(expiryDate)
+                    .build();
+            refreshTokenRepository.save(refreshToken);
+        }
+    }
+
+    @Transactional
+    public JwtToken refreshToken(String refreshToken) {
+        // valid refresh token
+        if (!validateToken(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        // Find refresh token in database
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found in database"));
+
+        // Check if token is expired
+        if (token.isExpired()) {
+            refreshTokenRepository.delete(token);
+            throw new RuntimeException("Refresh token expired");
+        }
+
+        // Get user from token
+        Users user = token.getUser();
+
+        // Create authentication object
+        UserDetails userDetails = new CustomUserDetails(user);
+        Collection<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole().name()));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+
+        // Generate new tokens
+        return generateToken(authentication);
+    }
+
+    @Transactional
+    public void deleteRefreshTokenByUser(Users user) {
+        refreshTokenRepository.deleteByUser(user);
+    }
+
+    @Transactional
+    public void deleteRefreshTokenByUsername(String username) {
+        userRepository.findByUsername(username)
+                .ifPresent(this::deleteRefreshTokenByUser);
+    }
 }
