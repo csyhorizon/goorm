@@ -11,12 +11,11 @@ import uniqram.c1one.comment.dto.CommentListResponse;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.follow.repository.FollowRepository;
 import uniqram.c1one.global.s3.S3Service;
 import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
-import uniqram.c1one.post.entity.Post;
-import uniqram.c1one.post.entity.PostLike;
-import uniqram.c1one.post.entity.PostMedia;
+import uniqram.c1one.post.entity.*;
 import uniqram.c1one.post.exception.PostErrorCode;
 import uniqram.c1one.post.exception.PostException;
 import uniqram.c1one.post.repository.PostLikeRepository;
@@ -25,6 +24,7 @@ import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +39,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final LikeCountService likeCountService;
     private final S3Service s3Service;
+    private final FollowRepository followRepository;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
@@ -65,16 +66,24 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<HomePostResponse> getHomePosts(Long userId, int page, int size) {
+    public List<HomePostResponse> getFollowingRecentPosts(Long userId) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Post> postPage = postRepository.findAllByOrderByIdDesc(pageable);
+        List<Long> followingIds = followRepository.findFollowerIdsByUserId(userId);
 
-        List<Long> postIds = postPage.stream()
+        if (followingIds.isEmpty()) {
+            return List.<HomePostResponse>of();
+        }
+
+        LocalDateTime fourDaysAgo = LocalDateTime.now().minusDays(4);
+
+        List<Post> recentPostsByUserIds = postRepository.findRecentPostsByUserIds(followingIds, fourDaysAgo, PageRequest.of(0, 5));
+
+        List<Long> postIds = recentPostsByUserIds.stream()
                 .map(Post::getId)
                 .toList();
 
         List<PostMedia> postMediaList = postMediaRepository.findByPostIdIn(postIds);
+
         Map<Long, List<String>> postMediaMap = postMediaList.stream()
                 .collect(Collectors.groupingBy(
                         pm -> pm.getPost().getId(),
@@ -99,7 +108,7 @@ public class PostService {
         Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
                 .collect(Collectors.groupingBy(CommentResponse::getPostId));
 
-        return postPage.map(post -> {
+        return recentPostsByUserIds.stream().map(post -> {
             List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
             int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
@@ -107,8 +116,15 @@ public class PostService {
             List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
             return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
-        });
+        }).toList();
     }
+
+//    @Transactional(readOnly = true)
+//    public Page<HomePostResponse> getRecommendedPosts(Long userId, int page, int size) {
+//
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+//        Page<Post> postPage = postRepository.findAllByOrderByIdDesc(pageable);
+//    }
 
     @Transactional(readOnly = true)
     public Page<UserPostResponse> getUserPosts(Long userId, int page, int size) {

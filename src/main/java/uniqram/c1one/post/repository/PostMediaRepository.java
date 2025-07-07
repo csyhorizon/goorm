@@ -21,10 +21,10 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Long> {
     @Query(value = "SELECT pm.* " +
             "FROM post_media pm " +
             "INNER JOIN ( " +
-            "   SELECT post_id, MIN(id) AS min_id " +
+            "   SELECT post_id, MIN(post_media_id) AS min_id " +
             "   FROM post_media " +
             "   WHERE post_id IN :postIds " +
             "   GROUP BY post_id " +
-            ") first_pm ON pm.id = first_pm.min_id", nativeQuery = true)
+            ") first_pm ON pm.post_media_id = first_pm.min_id", nativeQuery = true)
     List<PostMedia> findFirstImagesByPostIds(@Param("postIds") List<Long> postIds);
 }
