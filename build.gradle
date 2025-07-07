@@ -48,6 +48,10 @@ dependencies {
 	// Thymeleaf 템플릿 엔진
 	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
 
+    // AWS S3
+	implementation platform('software.amazon.awssdk:bom:2.20.56')
+	implementation 'software.amazon.awssdk:s3'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'

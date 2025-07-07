@@ -23,8 +23,7 @@ public class PostDetailResponse {
     private List<LikeUserDto> likeUsers;
     private boolean likedByMe;
 
-    private int commentCount;
-    private List<CommentListResponse> comments;
+    private List<CommentResponse> comments;
 
     public static PostDetailResponse from(Post post,
                                           List<String> mediaUrl,
@@ -40,7 +39,6 @@ public class PostDetailResponse {
                 .likeCount(likeCount)
                 .likeUsers(likeUsers)
                 .likedByMe(likedByMe)
-//                .commentCount(commentCount)
                 .comments(comments)
                 .memberId(post.getUser().getId())
                 .username(post.getUser().getUsername())

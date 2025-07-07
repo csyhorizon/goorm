@@ -22,7 +22,6 @@ public class HomePostResponse {
     private List<LikeUserDto> likeUsers;
     private boolean likedByMe;
 
-    private int commentCount;
     private List<CommentResponse> comments;
 
     public static HomePostResponse from(Post post,
@@ -39,7 +38,6 @@ public class HomePostResponse {
                 .likeCount(likeCount)
                 .likeUsers(likeUsers)
                 .likedByMe(likedByMe)
-//                .commentCount(commentCount)
                 .comments(comments)
                 .memberId(post.getUser().getId())
                 .username(post.getUser().getUsername())
