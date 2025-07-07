@@ -3,8 +3,13 @@ package uniqram.c1one.post.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uniqram.c1one.post.entity.Post;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -14,4 +19,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 특정 사용자의 게시글 리스트
     Page<Post> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
+
+    @Query("SELECT p FROM Post p WHERE p.user.id IN :userIds AND p.createdAt >= :after ORDER BY p.id DESC")
+    List<Post> findRecentPostsByUserIds(@Param("userIds") List<Long> userIds,
+                                        @Param("after") LocalDateTime after,
+                                        Pageable pageable);
 }
