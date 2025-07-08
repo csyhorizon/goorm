@@ -119,12 +119,66 @@ public class PostService {
         }).toList();
     }
 
-//    @Transactional(readOnly = true)
-//    public Page<HomePostResponse> getRecommendedPosts(Long userId, int page, int size) {
-//
-//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-//        Page<Post> postPage = postRepository.findAllByOrderByIdDesc(pageable);
-//    }
+    @Transactional(readOnly = true)
+    public List<HomePostResponse> getRecommendedPosts(Long userId) {
+
+        List<Long> excludeIds = followRepository.findFollowerIdsByUserId(userId);
+        excludeIds.add(userId);
+
+        List<Post> topLikedPosts = postRepository.findTopLikedPosts(excludeIds, Pageable.ofSize(3));
+
+        List<Long> topLikedPostIds = topLikedPosts.stream()
+                .map(Post::getId)
+                .toList();
+
+        List<Post> randomPosts = postRepository.findRandomPosts(excludeIds, topLikedPostIds, Pageable.ofSize(5));
+
+        List<Post> combinedPosts = new ArrayList<>();
+        combinedPosts.addAll(topLikedPosts);
+        combinedPosts.addAll(randomPosts);
+
+        Collections.shuffle(combinedPosts);
+
+        List<Long> combinedPostIds = combinedPosts.stream()
+                .map(Post::getId)
+                .toList();
+
+        List<PostMedia> postMediaList = postMediaRepository.findByPostIdIn(combinedPostIds);
+
+        Map<Long, List<String>> postMediaMap = postMediaList.stream()
+                .collect(Collectors.groupingBy(
+                        pm -> pm.getPost().getId(),
+                        Collectors.mapping(PostMedia::getMediaUrl, Collectors.toList())
+                ));
+
+        // 좋아요 개수
+        Map<Long, Integer> likeCountMap = combinedPostIds.stream()
+                .collect(Collectors.toMap(
+                        postId -> postId,
+                        likeCountService::getPostLikeCount
+                ));
+
+        // 좋아요 누른 사람
+        Map<Long, List<LikeUserDto>> likeUsersMap = postLikeRepository.findLikeUsersByPostIds(combinedPostIds).stream()
+                .collect(Collectors.groupingBy(LikeUserDto::getPostId));
+
+        // 본인 좋아요 여부
+        Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(combinedPostIds, userId));
+
+        // 댓글 조회
+        Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(combinedPostIds).stream()
+                .collect(Collectors.groupingBy(CommentResponse::getPostId));
+
+        return combinedPosts.stream().map(post -> {
+            List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
+            int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
+            List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
+            boolean likedByMe = likedPostIdSet.contains(post.getId());
+            List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
+
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+        }).toList();
+    }
 
     @Transactional(readOnly = true)
     public Page<UserPostResponse> getUserPosts(Long userId, int page, int size) {
