@@ -1,3 +1,11 @@
+URL-based 폴더 구조 사용 (vite-plugin-pages 사용) \
+axios 사용 \
+redux 사용 
+
+
+---
+아래는 vibe coding 이 생성한 readme
+
 # Welcome to your Lovable project
 
 ## Project info
