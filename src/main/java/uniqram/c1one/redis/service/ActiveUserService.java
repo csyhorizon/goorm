@@ -49,8 +49,8 @@ public class ActiveUserService {
         }
     }
 
-    public void removeActiveUser(Long sessionId) {
-        redisTemplate.opsForHash().delete(ACTIVE_USERS_KEY, sessionId);
+    public void removeActiveUser(Long userId) {
+        redisTemplate.opsForHash().delete(ACTIVE_USERS_KEY, String.valueOf(userId));
     }
 
     public List<ActiveUser> getAllActiveUsers() {

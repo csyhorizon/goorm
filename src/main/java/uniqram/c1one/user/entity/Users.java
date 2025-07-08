@@ -32,14 +32,22 @@ public class Users extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean blacklisted = false;
+
     public Users(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.blacklisted = false;
     }
 
     @OneToMany(mappedBy = "user")
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
+    public void setBlacklisted(boolean blacklisted) {
+        this.blacklisted = blacklisted;
+    }
 }

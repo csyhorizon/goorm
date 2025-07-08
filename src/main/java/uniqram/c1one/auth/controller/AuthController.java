@@ -130,6 +130,8 @@ public class AuthController {
                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (accessTokenCookie != null) {
             System.out.println(">>> accessTokenCookie 존재");
+            String accessToken = accessTokenCookie.getValue();
+
             // 쿠키 삭제
             accessTokenCookie.setMaxAge(0);
             accessTokenCookie.setPath("/");
@@ -141,15 +143,33 @@ public class AuthController {
             refreshTokenCookie.setPath("/");
             response.addCookie(refreshTokenCookie);
 
-            // Redis에서 활성 사용자 제거
-            if (userDetails != null) {
-                System.out.println(">>> userDetails: " + userDetails.getUsername());
-                // 데이터베이스에서 리프레시 토큰 삭제
-                jwtTokenProvider.deleteRefreshTokenByUsername(userDetails.getUsername());
-                // Redis에서 활성 사용자 제거
-                activeUserService.removeActiveUser(userDetails.getUserId());
-            }else {
-                System.out.println(">>> userDetails가 null 입니다.");
+            // 사용자 ID 추출 및 활성 사용자 제거
+            try {
+                if (userDetails != null) {
+                    // 데이터베이스에서 리프레시 토큰 삭제
+                    jwtTokenProvider.deleteRefreshTokenByUserDetails(userDetails);
+                    // Redis에서 활성 사용자 제거
+                    activeUserService.removeActiveUser(userDetails.getUserId());
+                    System.out.println(">>> userDetails에서 userId 추출: " + userDetails.getUserId());
+                } else {
+                    System.out.println(">>> userDetails가 null 입니다. 토큰에서 사용자 정보 추출 시도");
+                    // userDetails가 null인 경우 토큰에서 사용자 정보 추출
+                    if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                        if (authentication.getPrincipal() instanceof CustomUserDetails extractedUserDetails) {
+                            // Redis에서 활성 사용자 제거
+                            activeUserService.removeActiveUser(extractedUserDetails.getUserId());
+                            // 데이터베이스에서 리프레시 토큰 삭제
+                            jwtTokenProvider.deleteRefreshTokenByUserDetails(extractedUserDetails);
+                            System.out.println(">>> 토큰에서 userId 추출: " + extractedUserDetails.getUserId());
+                        }
+                    } else {
+                        System.out.println(">>> 토큰이 유효하지 않거나 null입니다.");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(">>> 로그아웃 처리 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
             }
         } else {
             System.out.println(">>> accessTokenCookie가 null 입니다.");

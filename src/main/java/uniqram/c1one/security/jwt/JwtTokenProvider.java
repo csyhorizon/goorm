@@ -28,6 +28,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.security.jwt.entity.RefreshToken;
+import uniqram.c1one.security.jwt.repository.RefreshTokenRepository;
 
 @Slf4j
 @Component
@@ -39,9 +42,7 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();      // 1시간
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(14).toMillis();    // 14일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, 
-                           UserRepository userRepository,
-                           RefreshTokenRepository refreshTokenRepository) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository, RefreshTokenRepository refreshTokenRepository) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
         this.userRepository = userRepository;
@@ -80,6 +81,11 @@ public class JwtTokenProvider {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
+        // Check if user is blacklisted
+        if (user.isBlacklisted()) {
+            throw new RuntimeException("사용자가 블랙리스트에 등록되어 있습니다.");
+        }
+
         // DB에 리프레시 토큰 저장
         saveRefreshToken(user, refreshToken, refreshTokenExpiryDateTime);
 
@@ -101,6 +107,11 @@ public class JwtTokenProvider {
 
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+
+        // Check if user is blacklisted
+        if (user.isBlacklisted()) {
+            throw new RuntimeException("사용자가 블랙리스트에 등록되어 있습니다.");
+        }
 
         UserDetails principal = new CustomUserDetails(user);
 
@@ -183,6 +194,12 @@ public class JwtTokenProvider {
         // Get user from token
         Users user = token.getUser();
 
+        // Check if user is blacklisted
+        if (user.isBlacklisted()) {
+            refreshTokenRepository.delete(token);
+            throw new RuntimeException("사용자가 블랙리스트에 등록되어 있습니다.");
+        }
+
         // Create authentication object
         UserDetails userDetails = new CustomUserDetails(user);
         Collection<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole().name()));
@@ -201,5 +218,13 @@ public class JwtTokenProvider {
     public void deleteRefreshTokenByUsername(String username) {
         userRepository.findByUsername(username)
                 .ifPresent(this::deleteRefreshTokenByUser);
+    }
+  
+    @Transactional
+    public void deleteRefreshTokenByUserDetails(CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            userRepository.findById(userDetails.getUserId())
+                    .ifPresent(this::deleteRefreshTokenByUser);
+        }
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.security.adapter.CustomUserDetails;
 import uniqram.c1one.security.jwt.JwtTokenProvider;
+import uniqram.c1one.security.jwt.repository.RefreshTokenRepository;
 import uniqram.c1one.user.entity.Role;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
@@ -28,6 +29,9 @@ class JwtTokenProviderTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -36,7 +40,7 @@ class JwtTokenProviderTest {
         new java.security.SecureRandom().nextBytes(keyBytes);
         String base64Secret = Base64.getEncoder().encodeToString(keyBytes);
 
-        provider = new JwtTokenProvider(base64Secret,userRepository);
+        provider = new JwtTokenProvider(base64Secret, userRepository, refreshTokenRepository);
     }
 
     @Test
