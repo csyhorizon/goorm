@@ -45,3 +45,5 @@ env/
 
 src/main/java/uniqram/c1one/test
 src/main/resources/templates/signinTh.html
+.github
+src/main/generated

@@ -6,11 +6,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import uniqram.c1one.user.entity.Users;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, Serializable {
 
     private final Users user;
 
@@ -36,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !user.isBlacklisted();
     }
 
     @Override

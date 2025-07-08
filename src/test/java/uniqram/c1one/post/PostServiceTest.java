@@ -1,13 +1,29 @@
 package uniqram.c1one.post;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.follow.repository.FollowRepository;
+import uniqram.c1one.global.s3.S3Service;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
@@ -18,15 +34,6 @@ import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.post.service.PostService;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
@@ -45,6 +52,18 @@ public class PostServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private LikeCountService likeCountService;
+
+    @Mock
+    private FollowRepository followRepository;
+
+    @Mock
+    private S3Service s3Service;
 
     @Test
     @DisplayName("게시물 생성 성공")
@@ -78,8 +97,7 @@ public class PostServiceTest {
             ReflectionTestUtils.setField(argument, "id", 1L); // id 강제 주입
             return argument;
         });
-        when(postMediaRepository.findByPostIdOrderByIdAsc(any()))
-                .thenReturn(savedMediaList);
+
         // then
         PostResponse response = postService.createPost(userId, request);
 
@@ -91,9 +109,6 @@ public class PostServiceTest {
         verify(userRepository).findById(userId);
         verify(postRepository).save(any(Post.class));
         verify(postMediaRepository).saveAll(anyList());
-        verify(postMediaRepository).findByPostIdOrderByIdAsc(savedPost.getId());
-
-
     }
 
     @Test
@@ -118,30 +133,23 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("홈 게시물 목록 조회 성공")
-    void getHomePosts_success() {
+    @DisplayName("팔로잉 중인 유저의 게시물 목록 조회 성공")
+    void getFollowingRecentPosts_success() {
         // given
         Long userId = 1L;
-        int page = 0;
-        int size = 5;
+
+        List<Long> followingIds = List.of(2L, 3L);
 
         List<Post> postList = List.of(
-                Post.of(Users.builder().id(userId).build(), "내용1", "서울"),
-                Post.of(Users.builder().id(userId).build(), "내용2", "부산")
+                Post.of(Users.builder().id(2L).build(), "내용1", "서울"),
+                Post.of(Users.builder().id(3L).build(), "내용2", "부산")
         );
         ReflectionTestUtils.setField(postList.get(0), "id", 1L);
         ReflectionTestUtils.setField(postList.get(1), "id", 2L);
 
-        Page<Post> postPage = new PageImpl<>(postList);
-
         List<PostMedia> mediaList = List.of(
                 PostMedia.of(postList.get(0), "url1"),
                 PostMedia.of(postList.get(1), "url2")
-        );
-
-        List<LikeCountDto> likeCountList = List.of(
-                new LikeCountDto(1L, 3L),
-                new LikeCountDto(2L, 5L)
         );
 
         List<LikeUserDto> likeUserList = List.of(
@@ -152,64 +160,107 @@ public class PostServiceTest {
 
         List<Long> likedPostIds = List.of(1L);
 
-        // when
-        when(postRepository.findAllByOrderByIdDesc(any(Pageable.class))).thenReturn(postPage);
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(followingIds);
+        when(postRepository.findRecentPostsByUserIds(eq(followingIds), any(), any())).thenReturn(postList);
         when(postMediaRepository.findByPostIdIn(anyList())).thenReturn(mediaList);
-        when(postLikeRepository.countByPostIds(anyList())).thenReturn(likeCountList);
+        when(likeCountService.getPostLikeCount(1L)).thenReturn(3);
+        when(likeCountService.getPostLikeCount(2L)).thenReturn(5);
         when(postLikeRepository.findLikeUsersByPostIds(anyList())).thenReturn(likeUserList);
         when(postLikeRepository.findPostIdsLikedByUser(anyList(), eq(userId))).thenReturn(likedPostIds);
+        when(commentRepository.findCommentsByPostIds(anyList())).thenReturn(List.of());
+
+        // when
+        List<HomePostResponse> responses = postService.getFollowingRecentPosts(userId);
 
         // then
-        Page<HomePostResponse> responsePage = postService.getHomePosts(userId, page, size);
-
-        assertEquals(2, responsePage.getTotalElements());
-        List<HomePostResponse> responses = responsePage.getContent();
+        assertEquals(2, responses.size());
 
         assertEquals(1L, responses.get(0).getPostId());
         assertEquals(3, responses.get(0).getLikeCount());
-        assertEquals(true, responses.get(0).isLikedByMe());
+        assertTrue(responses.get(0).isLikedByMe());
         assertEquals(List.of("url1"), responses.get(0).getMediaUrls());
         assertEquals(2, responses.get(0).getLikeUsers().size());
 
         assertEquals(2L, responses.get(1).getPostId());
         assertEquals(5, responses.get(1).getLikeCount());
-        assertEquals(false, responses.get(1).isLikedByMe());
+        assertFalse(responses.get(1).isLikedByMe());
         assertEquals(List.of("url2"), responses.get(1).getMediaUrls());
         assertEquals(1, responses.get(1).getLikeUsers().size());
 
-        verify(postRepository).findAllByOrderByIdDesc(any(Pageable.class));
+        verify(followRepository).findFollowerIdsByUserId(userId);
+        verify(postRepository).findRecentPostsByUserIds(eq(followingIds), any(), any());
         verify(postMediaRepository).findByPostIdIn(anyList());
-        verify(postLikeRepository).countByPostIds(anyList());
         verify(postLikeRepository).findLikeUsersByPostIds(anyList());
         verify(postLikeRepository).findPostIdsLikedByUser(anyList(), eq(userId));
     }
 
     @Test
-    @DisplayName("홈 게시물 조회 - 게시물이 없는 경우 빈 리스트 반환")
-    void get_home_fail_posts_empty() {
+    @DisplayName("팔로잉 중인 유저의 게시물 목록 조회 실패 - 게시물이 없는 경우 빈 리스트 반환")
+    void getFollowingRecentPosts_empty() {
         // given
         Long userId = 1L;
-        int page = 0;
-        int size = 10;
 
-        Page<Post> emptyPage = Page.empty(PageRequest.of(page, size));
-
-        when(postRepository.findAllByOrderByIdDesc(any(Pageable.class))).thenReturn(emptyPage);
-        when(postMediaRepository.findByPostIdIn(Collections.emptyList())).thenReturn(Collections.emptyList());
-        when(postLikeRepository.countByPostIds(Collections.emptyList())).thenReturn(Collections.emptyList());
-        when(postLikeRepository.findLikeUsersByPostIds(Collections.emptyList())).thenReturn(Collections.emptyList());
-        when(postLikeRepository.findPostIdsLikedByUser(Collections.emptyList(), userId)).thenReturn(Collections.emptyList());
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(List.of(2L, 3L));
+        when(postRepository.findRecentPostsByUserIds(anyList(), any(), any())).thenReturn(Collections.emptyList());
 
         // when
-        Page<HomePostResponse> responsePage = postService.getHomePosts(userId, page, size);
+        List<HomePostResponse> responses = postService.getFollowingRecentPosts(userId);
 
         // then
-        assertEquals(0, responsePage.getTotalElements());
-        verify(postRepository).findAllByOrderByIdDesc(any(Pageable.class));
-        verify(postMediaRepository).findByPostIdIn(Collections.emptyList());
-        verify(postLikeRepository).countByPostIds(Collections.emptyList());
-        verify(postLikeRepository).findLikeUsersByPostIds(Collections.emptyList());
-        verify(postLikeRepository).findPostIdsLikedByUser(Collections.emptyList(), userId);
+        assertEquals(0, responses.size());
+
+        verify(followRepository).findFollowerIdsByUserId(userId);
+        verify(postRepository).findRecentPostsByUserIds(anyList(), any(), any());
+    }
+
+    @Test
+    @DisplayName("추천 게시물 조회 성공")
+    void getRecommendedPosts_success() {
+        // given
+        Long userId = 1L;
+        List<Long> excludeIds = List.of(2L, 3L, userId);
+
+        Users writer = Users.builder().id(4L).build();
+        Post post = Post.of(writer, "추천글1", "서울");
+        ReflectionTestUtils.setField(post, "id", 10L);
+
+        Page<Post> recommendedPostPage = new PageImpl<>(List.of(post), PageRequest.of(0, 5), 1);
+
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+        when(postMediaRepository.findByPostIdIn(anyList())).thenReturn(List.of());
+        when(likeCountService.getPostLikeCount(10L)).thenReturn(0);
+        when(postLikeRepository.findLikeUsersByPostIds(List.of(10L))).thenReturn(List.of());
+        when(postLikeRepository.findPostIdsLikedByUser(List.of(10L), userId)).thenReturn(List.of());
+        when(commentRepository.findCommentsByPostIds(List.of(10L))).thenReturn(List.of());
+        when(postRepository.findTopLikedPosts(anyList(), any(Pageable.class))).thenReturn(List.of(post));
+        when(postRepository.findRandomPosts(anyList(), anyList(), any(Pageable.class))).thenReturn(List.of());
+
+
+        // when
+        List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
+
+        // then
+        assertEquals(1, responseList.size());
+        assertEquals(10L, responseList.get(0).getPostId());
+    }
+
+
+    @Test
+    @DisplayName("추천 게시물 조회 실패 - 추천 게시물 없는 경우 빈 리스트 반환")
+    void getRecommendedPosts_fail_empty() {
+        // given
+        Long userId = 1L;
+        List<Long> excludeIds = List.of(2L, 3L, userId);
+
+        Page<Post> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
+
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+
+        // when
+        List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
+
+        // then
+        assertTrue(responseList.isEmpty());
     }
 
     @Test
@@ -225,9 +276,10 @@ public class PostServiceTest {
         when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(List.of(
                 PostMedia.of(post, "url1"), PostMedia.of(post, "url2")
         ));
-        when(postLikeRepository.countByPost(post)).thenReturn(3);
+        when(likeCountService.getPostLikeCount(postId)).thenReturn(3);
         when(postLikeRepository.findLikeUsersByPostId(postId)).thenReturn(List.of());
         when(postLikeRepository.existsByPostIdAndUserId(postId, userId)).thenReturn(true);
+        when(commentRepository.findCommentsByPostId(postId)).thenReturn(List.of());
 
         PostDetailResponse response = postService.getPostDetail(userId, postId);
 
@@ -318,9 +370,7 @@ public class PostServiceTest {
         ReflectionTestUtils.setField(post, "id", postId);
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(List.of(
-                PostMedia.of(post, "url1"), PostMedia.of(post, "url2")
-        ));
+        when(commentRepository.findByPost(any())).thenReturn(List.of());
 
         postService.deletePost(userId, postId);
 

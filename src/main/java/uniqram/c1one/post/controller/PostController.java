@@ -13,6 +13,8 @@ import uniqram.c1one.post.service.PostLikeService;
 import uniqram.c1one.post.service.PostService;
 import uniqram.c1one.security.adapter.CustomUserDetails;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
@@ -32,14 +34,21 @@ public class PostController {
                 .body(SuccessResponse.of(PostSuccessCode.POST_CREATED, postResponse));
     }
 
-    @GetMapping("/home")
-    public ResponseEntity<Page<HomePostResponse>> getHomePosts(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    @GetMapping("/home/following")
+    public ResponseEntity<List<HomePostResponse>> getFollowingRecentPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long userId = userDetails.getUserId();
-        Page<HomePostResponse> homePosts = postService.getHomePosts(userId, page, size);
+        List<HomePostResponse> homePosts = postService.getFollowingRecentPosts(userId);
+        return ResponseEntity.ok(homePosts);
+    }
+
+    @GetMapping("/home/recommend")
+    public ResponseEntity<List<HomePostResponse>> getRecommendedPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        List<HomePostResponse> homePosts = postService.getRecommendedPosts(userId);
         return ResponseEntity.ok(homePosts);
     }
 

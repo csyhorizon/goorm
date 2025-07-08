@@ -5,6 +5,7 @@ import lombok.*;
 import uniqram.c1one.comment.entity.Comment;
 import uniqram.c1one.global.BaseEntity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Users extends BaseEntity {
+@ToString
+public class Users extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -30,13 +32,22 @@ public class Users extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean blacklisted = false;
+
     public Users(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.blacklisted = false;
     }
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
+    public void setBlacklisted(boolean blacklisted) {
+        this.blacklisted = blacklisted;
+    }
 }

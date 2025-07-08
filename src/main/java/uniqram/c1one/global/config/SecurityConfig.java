@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import uniqram.c1one.security.adapter.CustomUserDetailsService;
 import uniqram.c1one.security.jwt.JwtAuthenticationFilter;
 import uniqram.c1one.security.jwt.JwtTokenProvider;
+import uniqram.c1one.redis.service.ActiveUserService;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider provider;
     private final CustomUserDetailsService userDetailsService;
+    private final ActiveUserService activeUserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(provider);
+        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(provider, activeUserService);
 
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -49,7 +51,8 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/admin/signup"
                         ).permitAll()
                         .requestMatchers("index.html", "/index").authenticated()
                         .requestMatchers("/api/user/**").hasRole("USER")
@@ -78,7 +81,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(provider);
+        return new JwtAuthenticationFilter(provider, activeUserService);
     }
 
 }

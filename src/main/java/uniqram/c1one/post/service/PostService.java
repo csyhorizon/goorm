@@ -7,9 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.comment.dto.CommentListResponse;
+import uniqram.c1one.comment.dto.CommentResponse;
+import uniqram.c1one.comment.entity.Comment;
+import uniqram.c1one.comment.repository.CommentRepository;
+import uniqram.c1one.follow.repository.FollowRepository;
+import uniqram.c1one.global.s3.S3Service;
+import uniqram.c1one.global.service.LikeCountService;
 import uniqram.c1one.post.dto.*;
-import uniqram.c1one.post.entity.Post;
-import uniqram.c1one.post.entity.PostMedia;
+import uniqram.c1one.post.entity.*;
 import uniqram.c1one.post.exception.PostErrorCode;
 import uniqram.c1one.post.exception.PostException;
 import uniqram.c1one.post.repository.PostLikeRepository;
@@ -18,6 +24,7 @@ import uniqram.c1one.post.repository.PostRepository;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,14 +36,20 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostMediaRepository postMediaRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
+    private final LikeCountService likeCountService;
+    private final S3Service s3Service;
+    private final FollowRepository followRepository;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new PostException(PostErrorCode.USER_NOT_FOUND));
 
+        List<String> mediaUrls = postCreateRequest.getMediaUrls();
+
         // 이미지 필수
-        if (postCreateRequest.getMediaUrls() == null || postCreateRequest.getMediaUrls().isEmpty()) {
+        if (mediaUrls == null || mediaUrls.isEmpty()) {
             throw new PostException(PostErrorCode.IMAGE_REQUIRED);
         }
 
@@ -44,32 +57,33 @@ public class PostService {
         postRepository.save(post);
 
         // 이미지 등록
-        if (postCreateRequest.getMediaUrls() != null && !postCreateRequest.getMediaUrls().isEmpty()) {
-            List<PostMedia> mediaList = postCreateRequest.getMediaUrls().stream()
-                    .map(url -> PostMedia.of(post, url))
-                    .toList();
-            postMediaRepository.saveAll(mediaList);
-        }
-
-        List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(post.getId())
-                .stream()
-                .map(PostMedia::getMediaUrl)
-                .collect(Collectors.toList());
+        List<PostMedia> mediaList = mediaUrls.stream()
+                .map(url -> PostMedia.of(post, url))
+                .toList();
+        postMediaRepository.saveAll(mediaList);
 
         return PostResponse.from(post, mediaUrls);
     }
 
-    @Transactional(readOnly = true) // TODO: 댓글 관련 로직 주석 제거
-    public Page<HomePostResponse> getHomePosts(Long userId, int page, int size) {
+    @Transactional(readOnly = true)
+    public List<HomePostResponse> getFollowingRecentPosts(Long userId) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Post> postPage = postRepository.findAllByOrderByIdDesc(pageable);
+        List<Long> followingIds = followRepository.findFollowerIdsByUserId(userId);
 
-        List<Long> postIds = postPage.stream()
+        if (followingIds.isEmpty()) {
+            return List.<HomePostResponse>of();
+        }
+
+        LocalDateTime fourDaysAgo = LocalDateTime.now().minusDays(4);
+
+        List<Post> recentPostsByUserIds = postRepository.findRecentPostsByUserIds(followingIds, fourDaysAgo, PageRequest.of(0, 5));
+
+        List<Long> postIds = recentPostsByUserIds.stream()
                 .map(Post::getId)
                 .toList();
 
         List<PostMedia> postMediaList = postMediaRepository.findByPostIdIn(postIds);
+
         Map<Long, List<String>> postMediaMap = postMediaList.stream()
                 .collect(Collectors.groupingBy(
                         pm -> pm.getPost().getId(),
@@ -77,10 +91,10 @@ public class PostService {
                 ));
 
         // 좋아요 개수
-        Map<Long, Long> likeCountMap = postLikeRepository.countByPostIds(postIds).stream()
+        Map<Long, Integer> likeCountMap = postIds.stream()
                 .collect(Collectors.toMap(
-                        LikeCountDto::getPostId,
-                        LikeCountDto::getCount
+                        postId -> postId,
+                        likeCountService::getPostLikeCount
                 ));
 
         // 좋아요 누른 사람
@@ -90,27 +104,80 @@ public class PostService {
         // 본인 좋아요 여부
         Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(postIds, userId));
 
-        // 댓글 개수
-//        Map<Long, Long> commentCountMap = commentRepository.countByPostIds(postIds).stream()
-//                .collect(Collectors.toMap(
-//                        CommentCountDto::getPostId,
-//                        CommentCountDto::getCount
-//                ));
-//
-         //댓글 가져오기
-//        Map<Long, List<CommentDto>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
-//                .collect(Collectors.groupingBy(CommentDto::getPostId));
+        // 댓글 조회
+        Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
+                .collect(Collectors.groupingBy(CommentResponse::getPostId));
 
-        return postPage.map(post -> {
+        return recentPostsByUserIds.stream().map(post -> {
             List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
-            int likeCount = likeCountMap.getOrDefault(post.getId(), 0L).intValue();
+            int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
             boolean likedByMe = likedPostIdSet.contains(post.getId());
-//            int commentCount = commentCountMap.getOrDefault(post.getId(), 0L).intValue();
-//            List<CommentDto> comments = commentMap.getOrDefault(post.getId(), List.of());
+            List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
-            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
-        });
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<HomePostResponse> getRecommendedPosts(Long userId) {
+
+        List<Long> excludeIds = followRepository.findFollowerIdsByUserId(userId);
+        excludeIds.add(userId);
+
+        List<Post> topLikedPosts = postRepository.findTopLikedPosts(excludeIds, Pageable.ofSize(3));
+
+        List<Long> topLikedPostIds = topLikedPosts.stream()
+                .map(Post::getId)
+                .toList();
+
+        List<Post> randomPosts = postRepository.findRandomPosts(excludeIds, topLikedPostIds, Pageable.ofSize(5));
+
+        List<Post> combinedPosts = new ArrayList<>();
+        combinedPosts.addAll(topLikedPosts);
+        combinedPosts.addAll(randomPosts);
+
+        Collections.shuffle(combinedPosts);
+
+        List<Long> combinedPostIds = combinedPosts.stream()
+                .map(Post::getId)
+                .toList();
+
+        List<PostMedia> postMediaList = postMediaRepository.findByPostIdIn(combinedPostIds);
+
+        Map<Long, List<String>> postMediaMap = postMediaList.stream()
+                .collect(Collectors.groupingBy(
+                        pm -> pm.getPost().getId(),
+                        Collectors.mapping(PostMedia::getMediaUrl, Collectors.toList())
+                ));
+
+        // 좋아요 개수
+        Map<Long, Integer> likeCountMap = combinedPostIds.stream()
+                .collect(Collectors.toMap(
+                        postId -> postId,
+                        likeCountService::getPostLikeCount
+                ));
+
+        // 좋아요 누른 사람
+        Map<Long, List<LikeUserDto>> likeUsersMap = postLikeRepository.findLikeUsersByPostIds(combinedPostIds).stream()
+                .collect(Collectors.groupingBy(LikeUserDto::getPostId));
+
+        // 본인 좋아요 여부
+        Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(combinedPostIds, userId));
+
+        // 댓글 조회
+        Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(combinedPostIds).stream()
+                .collect(Collectors.groupingBy(CommentResponse::getPostId));
+
+        return combinedPosts.stream().map(post -> {
+            List<String> mediaUrls = postMediaMap.getOrDefault(post.getId(), List.of());
+            int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
+            List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
+            boolean likedByMe = likedPostIdSet.contains(post.getId());
+            List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
+
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+        }).toList();
     }
 
     @Transactional(readOnly = true)
@@ -137,7 +204,7 @@ public class PostService {
         });
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(Long userId, Long postId) {
 
         Post post = postRepository.findById(postId)
@@ -147,17 +214,15 @@ public class PostService {
                 .stream().map(PostMedia::getMediaUrl)
                 .toList();
 
-        int likeCount = postLikeRepository.countByPost(post);
+        int likeCount = likeCountService.getPostLikeCount(postId);
 
         List<LikeUserDto> likeUsers = postLikeRepository.findLikeUsersByPostId(postId);
 
         boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(postId, userId);
 
-//        int commentCount = commentRepository.countByPostId(postId);
+        List<CommentListResponse> comments = commentRepository.findCommentsByPostId(postId);
 
-//        List<CommentDto> comments = commentRepository.findCommentsByPostId(postId);
-
-        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe);
+        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
     }
 
     @Transactional
@@ -181,6 +246,11 @@ public class PostService {
         List<PostMedia> deleteMedia = currentMedia.stream()
                 .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
                 .toList();
+
+        for (PostMedia media: deleteMedia) {
+            String mediaUrl = media.getMediaUrl();
+            s3Service.deleteFile(mediaUrl);
+        }
 
         postMediaRepository.deleteAll(deleteMedia);
 
@@ -223,9 +293,16 @@ public class PostService {
         }
 
         List<PostMedia> mediaList = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+        for (PostMedia media : mediaList) {
+            s3Service.deleteFile(media.getMediaUrl());
+        }
         postMediaRepository.deleteAll(mediaList);
 
-        // TODO: 댓글, 좋아요 연관 삭제 로직 추가
+        List<PostLike> postLikes = postLikeRepository.findByPostId(postId);
+        postLikeRepository.deleteAll(postLikes);
+
+        List<Comment> comments = commentRepository.findByPost(post);
+        commentRepository.deleteAll(comments);
 
         postRepository.delete(post);
     }

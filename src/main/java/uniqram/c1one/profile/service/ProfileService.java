@@ -1,7 +1,6 @@
 package uniqram.c1one.profile.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uniqram.c1one.profile.dto.ProfileResponseDto;
@@ -28,12 +27,7 @@ public class ProfileService {
 
 
     @Transactional
-    public ProfileResponseDto updateProfile(Long profileId, ProfileUpdateRequestDto profileUpdateRequestDto, User user) {
-
-        if (!user.getUsername().equals(profileId.toString())) {
-            throw new ProfileException(ProfileErrorCode.PROFILE_UPDATE_NONE_PERMISSION);
-        }
-
+    public ProfileResponseDto updateProfile(Long profileId, ProfileUpdateRequestDto profileUpdateRequestDto) {
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
