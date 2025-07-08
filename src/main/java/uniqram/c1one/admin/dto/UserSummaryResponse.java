@@ -13,12 +13,14 @@ public class UserSummaryResponse {
     private Long id;
     private String username;
     private String role;
+    private boolean blacklisted;
 
     public static UserSummaryResponse from(Users user) {
         return UserSummaryResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .role(user.getRole().name())
+                .blacklisted(user.isBlacklisted())
                 .build();
     }
 
@@ -26,6 +28,7 @@ public class UserSummaryResponse {
         return UserSummaryResponse.builder()
                 .id(user.getUserId())
                 .username(user.getUsername())
+                .blacklisted(false) // Active users are not blacklisted by definition
                 .build();
     }
 }

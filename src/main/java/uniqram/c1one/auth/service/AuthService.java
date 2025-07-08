@@ -58,6 +58,14 @@ public class AuthService {
     }
 
     public JwtToken signin(SigninRequest request) {
+        // 사용자가 블랙리스트에 등록되어 있는지 확인
+        userRepository.findByUsername(request.getUsername())
+                .ifPresent(user -> {
+                    if (user.isBlacklisted()) {
+                        throw new AuthException(AuthErrorCode.USER_BLACKLISTED);
+                    }
+                });
+
         // username / password 검증
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -70,6 +78,5 @@ public class AuthService {
 
         // JWT 토큰 발급
         return jwtTokenProvider.generateToken(auth);
-
     }
 }

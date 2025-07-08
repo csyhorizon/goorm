@@ -37,7 +37,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !user.isBlacklisted();
     }
 
     @Override

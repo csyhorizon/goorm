@@ -7,9 +7,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import uniqram.c1one.auth.dto.SigninRequest;
 import uniqram.c1one.auth.dto.SignupRequest;
+import uniqram.c1one.auth.exception.AuthErrorCode;
 import uniqram.c1one.auth.exception.AuthException;
+import uniqram.c1one.security.jwt.JwtTokenProvider;
 import uniqram.c1one.user.entity.Role;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
@@ -30,6 +34,12 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     @DisplayName("회원가입 성공")
@@ -117,5 +127,31 @@ class AuthServiceTest {
         // when & then
         AuthException exception = assertThrows(AuthException.class, () -> authService.signupAdmin(request));
         assertEquals("이미 존재하는 사용자입니다.", exception.getErrorCode().getMessage());
+    }
+
+    @Test
+    @DisplayName("블랙리스트에 등록된 사용자 로그인 시도 시 예외 발생")
+    void signinBlacklistedUser() {
+        // given
+        SigninRequest request = new SigninRequest("tester", "password");
+
+        // Create a blacklisted user
+        Users blacklistedUser = Users.builder()
+                .username("tester")
+                .password("encoded_password")
+                .role(Role.USER)
+                .blacklisted(true)
+                .build();
+
+        when(userRepository.findByUsername("tester"))
+                .thenReturn(Optional.of(blacklistedUser));
+
+        // when & then
+        AuthException exception = assertThrows(AuthException.class, () -> authService.signin(request));
+        assertEquals(AuthErrorCode.USER_BLACKLISTED, exception.getErrorCode());
+        assertEquals("블랙리스트에 등록된 사용자입니다.", exception.getErrorCode().getMessage());
+
+        // Verify that authentication was never attempted
+        verify(authenticationManager, never()).authenticate(any());
     }
 }

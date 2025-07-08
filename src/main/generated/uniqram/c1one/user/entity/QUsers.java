@@ -22,6 +22,8 @@ public class QUsers extends EntityPathBase<Users> {
 
     public final uniqram.c1one.global.QBaseEntity _super = new uniqram.c1one.global.QBaseEntity(this);
 
+    public final BooleanPath blacklisted = createBoolean("blacklisted");
+
     public final ListPath<uniqram.c1one.comment.entity.Comment, uniqram.c1one.comment.entity.QComment> comments = this.<uniqram.c1one.comment.entity.Comment, uniqram.c1one.comment.entity.QComment>createList("comments", uniqram.c1one.comment.entity.Comment.class, uniqram.c1one.comment.entity.QComment.class, PathInits.DIRECT2);
 
     //inherited
