@@ -7,7 +7,6 @@ import uniqram.c1one.dm.entity.ChatRoom;
 import java.util.List;
 
 @Repository
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatRoomRepositoryCustom {
 
-    List<ChatRoom> findAllByUserId(Long userId);
 }
