@@ -1,21 +1,36 @@
 
+import { setToken } from '@/lib/auth';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLogin } from '@/features/auth/authSlice';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Separator } from './ui/separator';
 import { Facebook } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Api, SigninRequest } from '@/api/api'; // Api 클래스와 SigninRequest 타입 임포트
+
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const api = new Api(); // Api 클래스의 인스턴스 생성
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 로그인 로직 구현 (현재는 프로필 페이지로 이동)
-    navigate('/');
+    try {
+      // 생성된 API 클라이언트 코드 사용
+      const response = await api.api.signin({ username: email, password: password } as SigninRequest);
+      const { token } = response.data; // API 응답에서 토큰을 추출 (응답 구조에 따라 변경될 수 있음)
+      setToken(token);
+      dispatch(setLogin({ username: email, email: email })); // 예시 사용자 정보
+      window.location.href = '/'; // 로그인 성공 후 메인 페이지로 리디렉션
+    } catch (error) {
+      console.error('Login failed:', error);
+      // 로그인 실패 처리 (예: 에러 메시지 표시)
+      alert('로그인 실패: 이메일 또는 비밀번호를 확인하세요.');
+    }
   };
 
   const handleFacebookLogin = () => {
