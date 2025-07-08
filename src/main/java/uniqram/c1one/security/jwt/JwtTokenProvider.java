@@ -11,8 +11,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.security.adapter.CustomUserDetails;
+import uniqram.c1one.security.jwt.entity.RefreshToken;
+import uniqram.c1one.security.jwt.repository.RefreshTokenRepository;
 import uniqram.c1one.user.entity.Users;
 import uniqram.c1one.user.repository.UserRepository;
 
@@ -46,6 +49,7 @@ public class JwtTokenProvider {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    @Transactional
     public JwtToken generateToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -66,6 +70,8 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(refreshTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -82,6 +88,7 @@ public class JwtTokenProvider {
 
         // DB에 리프레시 토큰 저장
         saveRefreshToken(user, refreshToken, refreshTokenExpiryDateTime);
+
         return JwtToken.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -212,7 +219,7 @@ public class JwtTokenProvider {
         userRepository.findByUsername(username)
                 .ifPresent(this::deleteRefreshTokenByUser);
     }
-
+  
     @Transactional
     public void deleteRefreshTokenByUserDetails(CustomUserDetails userDetails) {
         if (userDetails != null) {

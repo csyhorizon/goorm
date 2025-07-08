@@ -33,7 +33,7 @@ public class RefreshToken {
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiryDate);
     }
-
+  
     public void updateToken(String token, LocalDateTime expiryDate) {
         this.token = token;
         this.expiryDate = expiryDate;

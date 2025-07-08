@@ -85,6 +85,45 @@ public class AuthController {
 
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+                                         HttpServletResponse response) {
+        if (refreshToken == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("리프레시 토큰이 없습니다."));
+        }
+
+        try {
+            // 리프레시 토큰을 사용하여 새로운 토큰 발급
+            JwtToken jwtToken = jwtTokenProvider.refreshToken(refreshToken);
+
+            // 새로운 토큰을 쿠키에 설정
+            Cookie accessTokenCookie = new Cookie("access_token", jwtToken.getAccessToken());
+            accessTokenCookie.setHttpOnly(true);
+            accessTokenCookie.setPath("/");
+            accessTokenCookie.setMaxAge(3600); // 1시간
+
+            Cookie refreshTokenCookie = new Cookie("refresh_token", jwtToken.getRefreshToken());
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setPath("/");
+            refreshTokenCookie.setMaxAge(14 * 24 * 3600); // 14일
+
+            response.addCookie(accessTokenCookie);
+            response.addCookie(refreshTokenCookie);
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("accessToken", jwtToken.getAccessToken());
+            responseBody.put("message", "토큰 갱신 성공");
+
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("토큰 갱신 실패: " + e.getMessage()));
+        }
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "access_token", required = false) Cookie accessTokenCookie,
                                     HttpServletResponse response,
