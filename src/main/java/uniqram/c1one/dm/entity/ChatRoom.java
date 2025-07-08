@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uniqram.c1one.global.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -21,4 +24,12 @@ public class ChatRoom extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ChatRoomType roomType; //DM, GROUP
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<ChatRoomMember> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<ChatMessage> messages = new ArrayList<>();
 }
