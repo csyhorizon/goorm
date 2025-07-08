@@ -34,12 +34,21 @@ public class PostController {
                 .body(SuccessResponse.of(PostSuccessCode.POST_CREATED, postResponse));
     }
 
-    @GetMapping("/home")
+    @GetMapping("/home/following")
     public ResponseEntity<List<HomePostResponse>> getFollowingRecentPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long userId = userDetails.getUserId();
         List<HomePostResponse> homePosts = postService.getFollowingRecentPosts(userId);
+        return ResponseEntity.ok(homePosts);
+    }
+
+    @GetMapping("/home/recommend")
+    public ResponseEntity<List<HomePostResponse>> getRecommendedPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        List<HomePostResponse> homePosts = postService.getRecommendedPosts(userId);
         return ResponseEntity.ok(homePosts);
     }
 

@@ -24,4 +24,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findRecentPostsByUserIds(@Param("userIds") List<Long> userIds,
                                         @Param("after") LocalDateTime after,
                                         Pageable pageable);
+
+    @Query("SELECT p FROM Post p WHERE p.user.id NOT IN :followingIds ORDER BY FUNCTION('RAND')")
+    Page<Post> findRecommendedPosts(@Param("followingIds") List<Long> followingIds, Pageable pageable);
+
+    // 좋아요 순 상위 N개
+    @Query("SELECT p FROM Post p WHERE p.user.id NOT IN :excludeUserIds ORDER BY p.likeCount DESC")
+    List<Post> findTopLikedPosts(@Param("excludeUserIds") List<Long> excludeUserIds, Pageable pageable);
+
+    @Query("SELECT p FROM Post p WHERE p.user.id NOT IN :excludeUserIds AND p.id NOT IN :excludePostIds ORDER BY function('RAND') ")
+    List<Post> findRandomPosts(@Param("excludeUserIds") List<Long> excludeUserIds,
+                               @Param("excludePostIds") List<Long> excludePostIds,
+                               Pageable pageable);
 }

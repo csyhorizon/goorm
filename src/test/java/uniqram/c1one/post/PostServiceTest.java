@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import uniqram.c1one.comment.repository.CommentRepository;
 import uniqram.c1one.follow.repository.FollowRepository;
@@ -206,6 +211,56 @@ public class PostServiceTest {
 
         verify(followRepository).findFollowerIdsByUserId(userId);
         verify(postRepository).findRecentPostsByUserIds(anyList(), any(), any());
+    }
+
+    @Test
+    @DisplayName("추천 게시물 조회 성공")
+    void getRecommendedPosts_success() {
+        // given
+        Long userId = 1L;
+        List<Long> excludeIds = List.of(2L, 3L, userId);
+
+        Users writer = Users.builder().id(4L).build();
+        Post post = Post.of(writer, "추천글1", "서울");
+        ReflectionTestUtils.setField(post, "id", 10L);
+
+        Page<Post> recommendedPostPage = new PageImpl<>(List.of(post), PageRequest.of(0, 5), 1);
+
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+        when(postMediaRepository.findByPostIdIn(anyList())).thenReturn(List.of());
+        when(likeCountService.getPostLikeCount(10L)).thenReturn(0);
+        when(postLikeRepository.findLikeUsersByPostIds(List.of(10L))).thenReturn(List.of());
+        when(postLikeRepository.findPostIdsLikedByUser(List.of(10L), userId)).thenReturn(List.of());
+        when(commentRepository.findCommentsByPostIds(List.of(10L))).thenReturn(List.of());
+        when(postRepository.findTopLikedPosts(anyList(), any(Pageable.class))).thenReturn(List.of(post));
+        when(postRepository.findRandomPosts(anyList(), anyList(), any(Pageable.class))).thenReturn(List.of());
+
+
+        // when
+        List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
+
+        // then
+        assertEquals(1, responseList.size());
+        assertEquals(10L, responseList.get(0).getPostId());
+    }
+
+
+    @Test
+    @DisplayName("추천 게시물 조회 실패 - 추천 게시물 없는 경우 빈 리스트 반환")
+    void getRecommendedPosts_fail_empty() {
+        // given
+        Long userId = 1L;
+        List<Long> excludeIds = List.of(2L, 3L, userId);
+
+        Page<Post> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
+
+        when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+
+        // when
+        List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
+
+        // then
+        assertTrue(responseList.isEmpty());
     }
 
     @Test
