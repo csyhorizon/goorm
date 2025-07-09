@@ -1,28 +1,23 @@
 import React, { useState } from 'react';
 import { Heart, MessageSquare, Plus, MoreHorizontal } from 'lucide-react';
-
-
-interface Post {
-  id: number;
-  username: string;
-  location: string;
-  timeAgo: string;
-  image: string;
-  likes: number;
-  caption: string;
-  comments: Array<{ username: string; comment: string; }>;
-}
+import { HomePostResponse } from '@/api/api';
 
 interface FeedPostProps {
-  post: Post;
+  post: HomePostResponse;
 }
 
 export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(post.likedByMe || false);
   const [saved, setSaved] = useState(false);
+  
   const handleCommentClick = () => {
-    window.location.href = `/post/${post.id}`;
+    window.location.href = `/post/${post.postId}`;
   };
+
+  // 첫 번째 이미지를 대표 이미지로 사용
+  const imageUrl = post.mediaUrls && post.mediaUrls.length > 0 
+    ? post.mediaUrls[0] 
+    : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop';
 
   return (
     <article className="bg-instagram-dark border border-instagram-border rounded-lg overflow-hidden">
@@ -33,18 +28,18 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
             <div className="w-full h-full bg-instagram-dark rounded-full p-0.5">
               <img
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=32&h=32&fit=crop&crop=face"
-                alt={post.username}
+                alt={post.username || 'User'}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
           </div>
           <div>
             <div className="flex items-center space-x-1">
-              <span className="font-semibold text-sm text-instagram-text">{post.username}</span>
+              <span className="font-semibold text-sm text-instagram-text">{post.username || 'Unknown User'}</span>
               <span className="text-instagram-muted">•</span>
-              <span className="text-sm text-instagram-muted">{post.timeAgo}</span>
+              <span className="text-sm text-instagram-muted">방금 전</span>
             </div>
-            <span className="text-xs text-instagram-muted">{post.location}</span>
+            <span className="text-xs text-instagram-muted">{post.location || ''}</span>
           </div>
         </div>
         <button className="text-instagram-muted hover:text-instagram-text">
@@ -55,7 +50,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
       {/* Post Image */}
       <div className="relative">
         <img
-          src={post.image}
+          src={imageUrl}
           alt="Post content"
           className="w-full h-96 object-cover"
         />
@@ -91,24 +86,29 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
 
         {/* Likes Count */}
         <div className="text-sm font-semibold text-instagram-text">
-          좋아요 {liked ? post.likes + 1 : post.likes}개
+          좋아요 {post.likeCount || 0}개
         </div>
 
         {/* Caption */}
         <div className="text-sm">
-          <span className="font-semibold text-instagram-text mr-2">{post.username}</span>
-          <span className="text-instagram-text">{post.caption}</span>
+          <span className="font-semibold text-instagram-text mr-2">{post.username || 'Unknown User'}</span>
+          <span className="text-instagram-text">{post.content || ''}</span>
         </div>
 
         {/* Comments */}
-        {post.comments.length > 0 && (
+        {post.comments && post.comments.length > 0 && (
           <div className="space-y-1">
-            {post.comments.map((comment, index) => (
+            {post.comments.slice(0, 2).map((comment, index) => (
               <div key={index} className="text-sm">
-                <span className="font-semibold text-instagram-text mr-2">{comment.username}</span>
-                <span className="text-instagram-text">{comment.comment}</span>
+                <span className="font-semibold text-instagram-text mr-2">{comment.userName || 'Unknown User'}</span>
+                <span className="text-instagram-text">{comment.content || ''}</span>
               </div>
             ))}
+            {post.comments.length > 2 && (
+              <div className="text-sm text-instagram-muted">
+                댓글 {post.comments.length}개 모두 보기
+              </div>
+            )}
           </div>
         )}
 

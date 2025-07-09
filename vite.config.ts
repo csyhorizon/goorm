@@ -8,17 +8,26 @@ import Pages from "vite-plugin-pages";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 8081,
+    strictPort: true, // 포트 고정
+    cors: true, // CORS 활성화
   },
   plugins: [
     react(),
-    Pages(),
-    mode === 'development' &&
-    componentTagger(),
+    Pages({
+      dirs: 'src/pages',
+      extensions: ['tsx', 'ts', 'jsx', 'js'],
+      exclude: ['**/components/**'],
+    }),
+    mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // 개발 환경에서 더 나은 에러 처리
+  build: {
+    sourcemap: mode === 'development',
   },
 }));

@@ -1,49 +1,90 @@
 
 import React from 'react';
-import { LoginForm } from '../components/LoginForm';
+import { useLoginMutation } from '@/lib/api';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import bcrypt from 'bcryptjs'; // bcrypt 라이브러리 임포트
 
-const Login = () => {
+interface LoginForm {
+  username: string;
+  password: string;
+}
+
+const LoginPage: React.FC = () => {
+  const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
+
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      // 비밀번호를 bcrypt로 해시화 (rounds: 10)
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      console.log('🔐 비밀번호 해시화 완료');
+      
+      const result = await login({ email: data.username, password: hashedPassword }).unwrap();
+      localStorage.setItem('token', result.token);
+      toast.success('로그인 성공!');
+      navigate('/');
+    } catch {
+      toast.error('로그인에 실패했습니다.');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-instagram-dark flex">
-      {/* Left side - Image Preview */}
-      <div className="hidden lg:flex lg:flex-1 items-center justify-center p-8 bg-gradient-to-br from-instagram-dark to-instagram-gray">
-        <div className="relative w-80 h-96">
-          {/* Mobile mockup container */}
-          <div className="absolute inset-0 bg-instagram-border rounded-3xl p-2">
-            <div className="w-full h-full bg-instagram-dark rounded-2xl overflow-hidden relative">
-              {/* Overlapping story images */}
-              <div className="absolute top-8 left-4 w-64 h-80 transform rotate-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                  alt="운동하는 사람"
-                  className="w-full h-full object-cover rounded-xl shadow-lg"
-                />
-              </div>
-              <div className="absolute top-12 left-8 w-64 h-80 transform -rotate-2">
-                <img 
-                  src="https://images.unsplash.com/photo-1594736797933-d0d6bbd4f6bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                  alt="셀카"
-                  className="w-full h-full object-cover rounded-xl shadow-lg"
-                />
-              </div>
-              <div className="absolute top-6 left-12 w-64 h-80 transform rotate-1">
-                <img 
-                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                  alt="음식"
-                  className="w-full h-full object-cover rounded-xl shadow-lg"
-                />
-              </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">로그인</CardTitle>
+          <CardDescription className="text-center">
+            계정에 로그인하세요
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <Input
+                {...register('username', { 
+                  required: '사용자 이름을 입력해주세요'
+                })}
+                type="text"
+                placeholder="사용자 이름"
+                className="w-full"
+              />
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
+              )}
             </div>
-          </div>
-        </div>
-      </div>
+            
+            <div>
+              <Input
+                {...register('password', { 
+                  required: '비밀번호를 입력해주세요'
+                })}
+                type="text"
+                placeholder="비밀번호 (아무 값이나 가능)"
+                className="w-full"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
+            </div>
 
-      {/* Right side - Login Form */}
-      <div className="flex-1 lg:max-w-md xl:max-w-lg flex items-center justify-center p-8">
-        <LoginForm />
-      </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? '로그인 중...' : '로그인'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default Login;
+export default LoginPage;
