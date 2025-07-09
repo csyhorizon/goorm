@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { useGetPostsQuery } from '@/lib/api';
 import MainFeed from '@/components/MainFeed';
 import { Sidebar } from '@/components/Sidebar';
 import { RightPanel } from '@/components/RightPanel';
 
-const HomePage: React.FC = () => {
+export default function HomePage() {
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 10 });
 
   // 백엔드가 없을 때를 위한 더미 데이터
@@ -71,6 +70,4 @@ const HomePage: React.FC = () => {
       <RightPanel />
     </div>
   );
-};
-
-export default HomePage;
+} 

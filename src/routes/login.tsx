@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLoginMutation } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,7 @@ interface LoginForm {
   password: string;
 }
 
-const LoginPage: React.FC = () => {
+export default function LoginPage() {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
@@ -88,6 +87,4 @@ const LoginPage: React.FC = () => {
       </Card>
     </div>
   );
-};
-
-export default LoginPage;
+} 

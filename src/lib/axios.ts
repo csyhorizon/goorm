@@ -1,18 +1,19 @@
 import axios from 'axios';
-import { getToken, removeToken } from './auth';
 
-const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api', // 환경 변수에서 API 기본 URL을 가져오거나 기본값 사용
-  timeout: 10000, // 요청 타임아웃 10초
+// axios 인스턴스 생성
+const api = axios.create({
+  baseURL: '/api', // vite.config.ts의 프록시 설정과 맞춤
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// 요청 인터셉터: 모든 요청에 JWT 토큰 추가
-instance.interceptors.request.use(
+// 요청 인터셉터
+api.interceptors.request.use(
   (config) => {
-    const token = getToken();
+    // 토큰이 있으면 헤더에 추가
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,19 +24,19 @@ instance.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터: 401 Unauthorized 에러 처리
-instance.interceptors.response.use(
+// 응답 인터셉터
+api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // 401 Unauthorized 에러 발생 시 JWT 제거 및 로그인 페이지로 리디렉션
-      removeToken();
+    // 401 에러 시 토큰 제거 및 로그인 페이지로 리다이렉트
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-export default instance;
+export default api;

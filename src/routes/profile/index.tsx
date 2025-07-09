@@ -1,14 +1,11 @@
-
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useGetUserProfileQuery } from '@/lib/api';
+import { useGetProfileQuery } from '@/lib/api';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { ProfileGrid } from '@/components/ProfileGrid';
 import { ProfileTabs } from '@/components/ProfileTabs';
 
-const ProfilePage: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
-  const { data: user, isLoading, error } = useGetUserProfileQuery(Number(userId) || 1);
+export default function MyProfilePage() {
+  const { data: user, isLoading, error } = useGetProfileQuery();
 
   if (isLoading) {
     return (
@@ -35,6 +32,4 @@ const ProfilePage: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default ProfilePage;
+} 

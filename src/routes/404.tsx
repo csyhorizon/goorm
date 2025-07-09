@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-const NotFoundPage: React.FC = () => {
+export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
@@ -16,6 +15,4 @@ const NotFoundPage: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default NotFoundPage;
+} 
