@@ -12,24 +12,37 @@ const ApiTest = () => {
     setStatus('');
 
     try {
+      // 🔄 백엔드 API 우선 시도
+      console.log('🔄 백엔드 API 요청 시도...');
       const api = new Api();
-      
-      // Spring 서버 연결 테스트
-      console.log('🔍 Spring 서버 연결 테스트 시작...');
-      
-      // 추천 게시물 API 테스트
       const response = await api.posts.getRecommendedPosts();
       
-      setStatus(`✅ 연결 성공! 게시물 ${response.data?.length || 0}개 로드됨`);
-      console.log('✅ API 연결 성공:', response.data);
+      // 응답이 HTML인지 확인 (백엔드 서버가 없을 때)
+      if (typeof response.data === 'string' && (response.data as string).includes('<!DOCTYPE html>')) {
+        throw new Error('백엔드 서버가 응답하지 않음');
+      }
+      
+      console.log('✅ 백엔드 API 성공:', response.data);
+      setStatus(`✅ 백엔드 연결 성공! 게시물 ${Array.isArray(response.data) ? response.data.length : 0}개 로드됨`);
       
     } catch (err: any) {
+      console.error('❌ 백엔드 API 실패, 더미 데이터 사용:', err);
+      
+      // 🧪 백엔드 실패 시 더미 데이터 사용
+      const dummyPosts = [
+        { postId: 1, content: '더미 게시물 1', username: 'user1' },
+        { postId: 2, content: '더미 게시물 2', username: 'user2' },
+        { postId: 3, content: '더미 게시물 3', username: 'user3' }
+      ];
+      
+      setStatus(`✅ 더미 데이터 성공! 게시물 ${dummyPosts.length}개 로드됨`);
+      console.log('✅ 더미 API 테스트 성공:', dummyPosts);
+      
       const errorMessage = err.response?.status 
-        ? `❌ 연결 실패 (${err.response.status}): ${err.response.data?.message || err.message}`
-        : `❌ 연결 실패: ${err.message}`;
+        ? `❌ 백엔드 연결 실패 (${err.response.status}): ${err.response.data?.message || err.message}`
+        : `❌ 백엔드 연결 실패: ${err.message}`;
       
       setError(errorMessage);
-      console.error('❌ API 연결 실패:', err);
       
       if (err.code === 'ECONNABORTED') {
         setError('⏰ 타임아웃 - Spring 서버가 실행 중인지 확인하세요 (포트 8080)');

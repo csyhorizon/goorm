@@ -12,14 +12,36 @@ export const RightPanel = () => {
     const fetchSuggestedUsers = async () => {
       try {
         setLoading(true);
-        // '추천'이라는 키워드로 사용자 검색 (예시)
-        // 실제로는 팔로우하지 않은 사용자 목록을 가져오는 API가 더 적절합니다.
+        
+        // 🔄 백엔드 API 우선 시도
+        console.log('🔄 백엔드 API 요청 시도...');
         const response = await api.api.searchResult('추천');
-        setSuggestedUsers(response.data); // 응답 데이터로 사용자 상태 업데이트
+        
+        // 응답이 HTML인지 확인 (백엔드 서버가 없을 때)
+        if (typeof response.data === 'string' && (response.data as string).includes('<!DOCTYPE html>')) {
+          throw new Error('백엔드 서버가 응답하지 않음');
+        }
+        
+        const users = Array.isArray(response.data) ? response.data : [];
+        
+        console.log('✅ 백엔드 API 성공:', users);
+        setSuggestedUsers(users);
+        setLoading(false);
+        
       } catch (err) {
-        console.error('Failed to fetch suggested users:', err);
-        setError('추천 사용자를 불러오는 데 실패했습니다.');
-      } finally {
+        console.error('❌ 백엔드 API 실패, 더미 데이터 사용:', err);
+        
+        // 🧪 백엔드 실패 시 더미 데이터 사용
+        const dummyUsers: UserSearchResultDto[] = [
+          { userid: 1, username: 'user1' },
+          { userid: 2, username: 'user2' },
+          { userid: 3, username: 'user3' },
+          { userid: 4, username: 'user4' },
+          { userid: 5, username: 'user5' }
+        ];
+        
+        setSuggestedUsers(dummyUsers);
+        setError('백엔드 연결 실패 - 더미 데이터 사용 중');
         setLoading(false);
       }
     };
@@ -73,14 +95,14 @@ export const RightPanel = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={user.profileImageUrl || 'https://via.placeholder.com/40'} // 프로필 이미지 URL이 없으면 기본 이미지 사용
+                      src="https://via.placeholder.com/40" // 기본 이미지 사용
                       alt={user.username}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div>
                     <div className="font-semibold text-sm text-instagram-text">{user.username}</div>
-                    <div className="text-xs text-instagram-muted line-clamp-1">{user.subtitle || '회원님을 위한 추천'}</div>
+                    <div className="text-xs text-instagram-muted line-clamp-1">회원님을 위한 추천</div>
                   </div>
                 </div>
                 <button className="text-instagram-blue text-sm font-semibold hover:text-blue-400">

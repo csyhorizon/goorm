@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import bcrypt from 'bcryptjs'; // bcrypt 라이브러리 임포트
 
 interface LoginForm {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -20,7 +21,11 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      const result = await login(data).unwrap();
+      // 비밀번호를 bcrypt로 해시화 (rounds: 10)
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      console.log('🔐 비밀번호 해시화 완료');
+      
+      const result = await login({ email: data.username, password: hashedPassword }).unwrap();
       localStorage.setItem('token', result.token);
       toast.success('로그인 성공!');
       navigate('/');
@@ -42,33 +47,25 @@ const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Input
-                {...register('email', { 
-                  required: '이메일을 입력해주세요',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: '유효한 이메일을 입력해주세요'
-                  }
+                {...register('username', { 
+                  required: '사용자 이름을 입력해주세요'
                 })}
-                type="email"
-                placeholder="이메일"
+                type="text"
+                placeholder="사용자 이름"
                 className="w-full"
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
               )}
             </div>
             
             <div>
               <Input
                 {...register('password', { 
-                  required: '비밀번호를 입력해주세요',
-                  minLength: {
-                    value: 6,
-                    message: '비밀번호는 최소 6자 이상이어야 합니다'
-                  }
+                  required: '비밀번호를 입력해주세요'
                 })}
-                type="password"
-                placeholder="비밀번호"
+                type="text"
+                placeholder="비밀번호 (아무 값이나 가능)"
                 className="w-full"
               />
               {errors.password && (

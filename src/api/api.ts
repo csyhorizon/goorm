@@ -150,15 +150,7 @@ export interface Cookie {
 }
 
 export interface SignupRequest {
-  /**
-   * @minLength 2
-   * @maxLength 20
-   */
   username: string;
-  /**
-   * @minLength 6
-   * @maxLength 100
-   */
   password: string;
   confirmPassword: string;
 }

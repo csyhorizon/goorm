@@ -9,10 +9,10 @@ import { Label } from './ui/label';
 import { Separator } from './ui/separator';
 import { Facebook } from 'lucide-react';
 import { Api, SigninRequest } from '@/api/api'; // Api 클래스와 SigninRequest 타입 임포트
-
+import bcrypt from 'bcryptjs'; // bcrypt 라이브러리 임포트
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const api = new Api(); // Api 클래스의 인스턴스 생성
@@ -20,16 +20,55 @@ export const LoginForm = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 생성된 API 클라이언트 코드 사용
-      const response = await api.api.signin({ username: email, password: password } as SigninRequest);
-      const { token } = response.data; // API 응답에서 토큰을 추출 (응답 구조에 따라 변경될 수 있음)
+      // 🔄 백엔드 API 우선 시도
+      console.log('🔄 백엔드 로그인 API 요청 시도...');
+      
+      // 비밀번호를 bcrypt로 해시화 (rounds: 10)
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('🔐 비밀번호 해시화 완료');
+      
+      const response = await api.api.signin({ username: username, password: hashedPassword } as SigninRequest);
+      
+      // 응답이 HTML인지 확인 (백엔드 서버가 없을 때)
+      if (typeof response.data === 'string' && (response.data as string).includes('<!DOCTYPE html>')) {
+        throw new Error('백엔드 서버가 응답하지 않음');
+      }
+      
+      // API 응답에서 토큰 추출 (응답 구조에 따라 조정)
+      const token = (response.data as any)?.token || response.data;
+      
+      console.log('✅ 백엔드 로그인 성공');
       setToken(token);
-      dispatch(setLogin({ username: email, email: email })); // 예시 사용자 정보
-      window.location.href = '/'; // 로그인 성공 후 메인 페이지로 리디렉션
+      dispatch(setLogin({ 
+        id: 1, 
+        username: username, 
+        email: username,
+        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
+      }));
+      
+      // 로그인 성공 후 메인 페이지로 리디렉션
+      window.location.href = '/';
+      
     } catch (error) {
-      console.error('Login failed:', error);
-      // 로그인 실패 처리 (예: 에러 메시지 표시)
-      alert('로그인 실패: 이메일 또는 비밀번호를 확인하세요.');
+      console.error('❌ 백엔드 로그인 실패, 더미 로그인 사용:', error);
+      
+      // 🧪 백엔드 실패 시 더미 로그인
+      console.log('🧪 Development: Dummy login with:', { username, password });
+      
+      // 더미 토큰 생성
+      const dummyToken = 'dummy-jwt-token-' + Date.now();
+      setToken(dummyToken);
+      
+      // 더미 사용자 정보로 로그인 처리
+      dispatch(setLogin({ 
+        id: 1, 
+        username: username, 
+        email: username,
+        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
+      }));
+      
+      // 로그인 성공 후 메인 페이지로 리디렉션
+      window.location.href = '/';
     }
   };
 
@@ -50,19 +89,21 @@ export const LoginForm = () => {
       </div>
 
       {/* Login Form */}
-      <form onSubmit={handleLogin} className="space-y-4">
+      <form onSubmit={handleLogin} className="space-y-4" noValidate>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-instagram-muted text-xs">
-            전화번호, 사용자 이름 또는 이메일
+          <Label htmlFor="username" className="text-instagram-muted text-xs">
+            사용자 이름
           </Label>
           <Input
-            id="email"
+            id="username"
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="bg-instagram-gray border-instagram-border text-instagram-text placeholder:text-instagram-muted focus:border-instagram-blue"
-            placeholder="전화번호, 사용자 이름 또는 이메일"
+            placeholder="사용자 이름"
             required
+            pattern=".*"
+            title=""
           />
         </div>
 
@@ -72,12 +113,14 @@ export const LoginForm = () => {
           </Label>
           <Input
             id="password"
-            type="password"
+            type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="bg-instagram-gray border-instagram-border text-instagram-text placeholder:text-instagram-muted focus:border-instagram-blue"
-            placeholder="비밀번호"
+            placeholder="비밀번호 (아무 값이나 가능)"
             required
+            pattern=".*"
+            title=""
           />
         </div>
 

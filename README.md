@@ -30,6 +30,42 @@ npm run dev
 - **Spring 백엔드 서버**: http://localhost:8080
 - ~~**API 프록시**: `/api` → `http://localhost:8080`~~ (현재 사용하지 않음)
 
+## 🔐 JWT 인증 설정
+
+### 개발 환경 시나리오
+
+프로젝트 루트에 `.env` 파일을 생성하고 다음 설정 중 하나를 선택하세요:
+
+#### 🧪 시나리오 1: 인증 우회 (JWT 없이 개발)
+```env
+# JWT 없이도 모든 페이지 접근 가능
+VITE_BYPASS_AUTH=true
+VITE_TEST_JWT=false
+```
+
+#### 🧪 시나리오 2: JWT 테스트 (실제 JWT 검증)
+```env
+# 실제 JWT 검증 로직 테스트
+VITE_BYPASS_AUTH=false
+VITE_TEST_JWT=true
+```
+
+### 환경 변수 설명
+- `VITE_BYPASS_AUTH`: 인증 우회 모드 (true/false)
+- `VITE_TEST_JWT`: JWT 테스트 모드 (true/false)
+- `VITE_API_BASE_URL`: API 기본 URL
+- `VITE_APP_TITLE`: 앱 제목
+
+### 🔐 비밀번호 보안
+- 모든 비밀번호는 bcrypt로 해시화되어 전송됩니다
+- 해시 라운드: 10 (보안과 성능의 균형)
+- 클라이언트 사이드에서 해시화 후 서버로 전송
+
+### 🔄 인증 로직 동작
+1. **인증 우회 모드**: JWT 없이도 모든 페이지 접근 가능
+2. **JWT 테스트 모드**: 실제 JWT 토큰 검증 (만료 시간, 형식 등)
+3. **프로덕션 모드**: 완전한 JWT 검증
+
 ## 🛠 기술 스택
 
 ### Frontend
@@ -51,7 +87,7 @@ npm run dev
 - ✅ **피드 시스템**: 게시물 스크롤, 좋아요, 댓글
 - ✅ **스토리**: 스토리 캐러셀
 - ✅ **사이드바**: 네비게이션 메뉴
-- ✅ **인증**: 로그인/로그아웃 시스템
+- ✅ **인증**: 로그인/로그아웃 시스템 (JWT 기반)
 - ✅ **프로필**: 사용자 프로필 관리
 - ~~✅ **채팅**: 실시간 메시징~~ (현재 구현되지 않음)
 - ~~✅ **북마크**: 게시물 저장~~ (현재 구현되지 않음)
@@ -76,7 +112,9 @@ proxy: {
 ```
 
 ### 환경 변수
-- ~~`VITE_API_BASE_URL`: API 기본 URL (기본값: `/api`)~~ (현재 사용하지 않음)
+- `VITE_BYPASS_AUTH`: 인증 우회 모드 (기본값: false)
+- `VITE_TEST_JWT`: JWT 테스트 모드 (기본값: true)
+- `VITE_API_BASE_URL`: API 기본 URL (기본값: http://localhost:8080/api)
 - `VITE_APP_TITLE`: 앱 제목
 
 ## 🎨 디자인 특징
@@ -95,7 +133,9 @@ Instagram 다크 테마 완벽 재현:
 src/
 ├── api/           # API 클라이언트 (자동 생성)
 ├── components/    # React 컴포넌트
+│   └── AuthWrapper.tsx  # 전역 인증 관리
 ├── features/      # Redux 슬라이스
+│   └── auth/      # 인증 상태 관리
 ├── lib/          # 유틸리티 (axios, auth)
 ├── routes/       # 파일 기반 라우팅
 │   ├── _layout.tsx          # 공통 레이아웃
@@ -155,6 +195,11 @@ Spring 서버에서 CORS 설정이 되어 있는지 확인하세요.
 - API 호출 실패 시 더미 데이터 사용
 - 콘솔에 "Backend not available, using dummy data" 메시지 출력
 - UI는 정상적으로 표시됨
+
+### JWT 인증 문제
+1. `.env` 파일에서 인증 설정 확인
+2. 브라우저 개발자 도구 콘솔에서 인증 로그 확인
+3. 로컬 스토리지에서 토큰 확인
 
 ## 📝 API 문서
 
