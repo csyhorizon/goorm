@@ -1,0 +1,36 @@
+title: Development Issues
+labels: [discussion, dev-issue]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 🔍 주제
+      placeholder: ex)게시물 조회 성능 개선 방안 논의
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 💡 배경 / 문제 상황
+      placeholder: 어떤 문제나 이슈가 있는지 작성하세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: 📈 현재 구현 방식
+      placeholder: 간단한 코드/설명을 작성하세요.
+  
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: 🤔 제안 / 고려 중인 해결책
+      placeholder: 대안 또는 아이디어를 제시하세요.
+  
+  - type: textarea
+    id: points
+    attributes:
+      label: 🗣 논의하고 싶은 포인트
+      placeholder: 함께 고민하고 싶은 부분을 작성하세요.

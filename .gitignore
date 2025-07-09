@@ -1,7 +1,12 @@
 # customs
 personalMEMO/
+잡설/
+
+# Environment files
 .env
 .env.*
+.env.properties
+env/
 
 # Logs
 logs
@@ -12,18 +17,53 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Build outputs
 node_modules
 dist
 dist-ssr
 *.local
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+*.iws
+*.iml
+*.ipr
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Spring Boot specific
+HELP.md
+.gradle
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# Application specific
+/src/main/resources/application-secret.yml
+src/main/java/uniqram/c1one/test
+src/main/resources/templates/signinTh.html
+.github
+src/main/generated
