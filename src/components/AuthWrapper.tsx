@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setUser, clearUser } from '@/features/auth/authSlice';
+import { Navigate } from 'react-router-dom';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -179,12 +180,14 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   }
 
   // ✅ 인증된 사용자 또는 로그인 페이지인 경우 자식 컴포넌트 렌더링
-  if (isAuthenticated || user || getToken() || location.pathname === '/login' || (isDevelopment && bypassAuth)) {
-    return <>{children}</>;
-  }
+  // if (isAuthenticated || user || getToken() || location.pathname === '/login' || (isDevelopment && bypassAuth)) {
+  //   return <>{children}</>;
+  // }
 
-  // ❌ 인증되지 않은 경우 (리다이렉트 중)
-  return null;
+  // return <Navigate to="/login" replace />;
+
+  // ✅ 개발 중 잠시 인증 막기 해제
+return <>{children}</>;
 };
 
 export default AuthWrapper;
