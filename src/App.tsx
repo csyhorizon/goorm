@@ -25,6 +25,7 @@ import NotificationsPage from "./routes/notifications"; // 알림 페이지 (/no
 import MyProfilePage from "./routes/profile/index";     // 내 프로필 (/profile)
 import UserProfilePage from "./routes/profile/$userId"; // 다른 사용자 프로필 (/profile/:userId)
 import PostDetailPage from "./routes/post/$id";         // 포스트 상세 (/post/:id)
+import SignupPage from "./routes/signup";              // 회원가입 페이지 (/signup)
 import NotFoundPage from "./routes/404";                // 404 에러 페이지 (/*)
 
 // 🛣️ 라우터 설정 - 어떤 URL이 어떤 컴포넌트를 보여줄지 정의
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "login", // "/login" 경로
         element: <LoginPage />,
+      },
+      {
+        path: "signup", // "/signup" 경로
+        element: <SignupPage />,
       },
       {
         path: "explore", // "/explore" 경로
