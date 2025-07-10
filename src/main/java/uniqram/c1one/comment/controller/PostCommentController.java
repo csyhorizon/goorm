@@ -18,7 +18,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/posts/{postId}/comments")
+@RequestMapping("/api/posts/{postId}/comments")
 @RequiredArgsConstructor
 public class PostCommentController {
 
