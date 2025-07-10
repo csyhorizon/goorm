@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLoginMutation } from '@/lib/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,6 +78,15 @@ export default function LoginPage() {
             >
               {isLoading ? '로그인 중...' : '로그인'}
             </Button>
+
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600">
+                계정이 없으신가요?{" "}
+                <Link to="/signup" className="text-blue-600 hover:underline">
+                  회원가입
+                </Link>
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

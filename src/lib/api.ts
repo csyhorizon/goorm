@@ -14,7 +14,6 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export interface User {
   id: number;           // 사용자 고유 ID
   username: string;      // 사용자명
-  email: string;         // 이메일
   profileImage?: string; // 프로필 이미지 URL (선택사항)
 }
 
@@ -48,8 +47,8 @@ export interface AuthResponse {
   user: User;    // 사용자 정보
 }
 
-// 🔧 커스텀 baseQuery - 백엔드 연결 실패 시 오류 무시
-// 백엔드 서버가 없어도 프론트엔드가 정상 작동하도록 하는 설정
+// 🔧 커스텀 baseQuery - 백엔드 연결 실패 시 오류 처리
+// 백엔드 서버가 없으면 명확한 오류를 반환하도록 수정
 const customBaseQuery = async (args: any, api: any, extraOptions: any) => {
   try {
     // 기본 fetch 설정
@@ -64,11 +63,27 @@ const customBaseQuery = async (args: any, api: any, extraOptions: any) => {
         return headers;
       },
     })(args, api, extraOptions);
+
+    // 결과가 오류인 경우 그대로 반환
+    if (result.error) {
+      return result;
+    }
+
+    // 결과가 없거나 데이터가 null인 경우 오류 반환
+    if (!result.data) {
+      console.log('Backend returned no data');
+      return {
+        error: { status: 'CUSTOM_ERROR', data: { message: '서버에서 데이터를 받지 못했습니다.' } },
+      };
+    }
+
     return result;
-  } catch {
-    // 백엔드 연결 실패 시 오류 무시하고 빈 데이터 반환
-    console.log('Backend not available, using dummy data');
-    return { data: null };
+  } catch (error) {
+    // 백엔드 연결 실패 시 오류 반환
+    console.log('Backend not available:', error);
+    return {
+      error: { status: 'FETCH_ERROR', data: { message: '서버에 연결할 수 없습니다.' } },
+    };
   }
 };
 
@@ -90,11 +105,11 @@ export const apiService = createApi({
     }),
 
     // 회원가입
-    register: builder.mutation<AuthResponse, { username: string; email: string; password: string }>({
+    register: builder.mutation<AuthResponse, { username: string; password: string; confirmPassword: string; email?: string }>({
       query: (userData) => ({
-        url: '/auth/register',
+        url: '/auth/join',
         method: 'POST',
-        body: userData, // 사용자명, 이메일, 비밀번호 전송
+        body: userData, // 사용자명, 비밀번호, 비밀번호 확인 전송 (이메일은 선택사항)
       }),
     }),
 
