@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { useGetPostsQuery } from '@/lib/api';
-import MainFeed from '@/components/MainFeed';
+import MainFeed from '@/components/home/MainFeed';
 import { Sidebar } from '@/components/Sidebar';
-import { RightPanel } from '@/components/RightPanel';
+import { RightPanel } from '@/components/home/RightPanel';
 
 const HomePage: React.FC = () => {
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 10 });

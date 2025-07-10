@@ -8,12 +8,18 @@ import React from 'react';
 // API 호출을 위한 커스텀 훅 (React Query 기반)
 import { useGetPostsQuery } from '@/lib/api';
 // UI 컴포넌트들
-import MainFeed from '@/components/MainFeed';     // 게시물 목록을 보여주는 컴포넌트
-import { RightPanel } from '@/components/RightPanel'; // 오른쪽 패널 (추천 사용자 등)
+
+import MainFeed from '@/components/home/MainFeed';     // 게시물 목록을 보여주는 컴포넌트
+import { Sidebar } from '@/components/Sidebar';   // 왼쪽 네비게이션 바
+import { RightPanel } from '@/components/home/RightPanel'; // 오른쪽 패널 (추천 사용자 등)
+import { useMatch, useNavigate } from 'react-router-dom';
+import { PostDetailModal } from '@/components/PostDetailModal';
 
 // 🎯 HomePage 컴포넌트 - 메인 페이지
 export default function HomePage() {
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 10 });
+  const match = useMatch('/post/:id');
+  const navigate = useNavigate();
 
   const dummyPosts = [
     {
@@ -63,14 +69,25 @@ export default function HomePage() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50 flex">
-        {/* 메인 콘텐츠 영역 - 게시물 피드 */}
-        <div className="flex-1 flex justify-center">
+    <div className="min-h-screen bg-black flex">
+      <Sidebar />
+      
+      <div className="flex flex-1 justify-center">
+        <div className="flex justify-between w-full max-w-6xl">
           <MainFeed posts={displayPosts} />
+  
+          <div className="ml-2 w-80 mt-10">
+            <RightPanel />
+          </div>
         </div>
-
-        {/* 오른쪽 패널 - 추천 사용자, 광고 등 */}
-        <RightPanel />
       </div>
-  );
-}
+  
+      {match && (
+        <PostDetailModal 
+          postId={match.params.id} 
+          onClose={() => navigate('/')} 
+        />
+      )}
+    </div>
+  );  
+} 

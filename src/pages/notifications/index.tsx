@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { RightPanel } from '@/components/RightPanel';
+import { RightPanel } from '@/components/home/RightPanel';
 
 const NotificationsPage: React.FC = () => {
   return (

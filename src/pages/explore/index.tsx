@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGetPostsQuery } from '@/lib/api';
 import { Sidebar } from '@/components/Sidebar';
-import { RightPanel } from '@/components/RightPanel';
+import { RightPanel } from '@/components/home/RightPanel';
 
 const ExplorePage: React.FC = () => {
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 20 });

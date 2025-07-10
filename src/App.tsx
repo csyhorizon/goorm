@@ -41,6 +41,7 @@ const router = createBrowserRouter([
   // 공통 레이아웃이 적용되는 페이지들
   {
     path: "/",
+
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
@@ -49,7 +50,7 @@ const router = createBrowserRouter([
       { path: "notifications", element: <NotificationsPage /> },
       { path: "profile", element: <MyProfilePage /> },
       { path: "profile/:userId", element: <UserProfilePage /> },
-      { path: "post/:id", element: <PostDetailPage /> },
+      { path: "post/:id", element: <HomePage />, 
       { path: "*", element: <NotFoundPage /> },
     ],
   },
