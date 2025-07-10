@@ -69,25 +69,16 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex">
-      <Sidebar />
-      
-      <div className="flex flex-1 justify-center">
-        <div className="flex justify-between w-full max-w-6xl">
-          <MainFeed posts={displayPosts} />
-  
-          <div className="ml-2 w-80 mt-10">
-            <RightPanel />
-          </div>
-        </div>
+    <div className="flex w-full justify-center max-w-6xl mx-auto">
+      {/* Main Feed (flex-grow) */}
+      <div className="flex-1 max-w-2xl">
+        <MainFeed posts={displayPosts} />
       </div>
   
-      {match && (
-        <PostDetailModal 
-          postId={match.params.id} 
-          onClose={() => navigate('/')} 
-        />
-      )}
+      {/* Right Panel */}
+      <div className="hidden lg:block w-80 ml-10 mt-8">
+        <RightPanel />
+      </div>
     </div>
-  );  
+  );
 } 

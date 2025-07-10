@@ -50,7 +50,7 @@ const router = createBrowserRouter([
       { path: "notifications", element: <NotificationsPage /> },
       { path: "profile", element: <MyProfilePage /> },
       { path: "profile/:userId", element: <UserProfilePage /> },
-      { path: "post/:id", element: <HomePage />, 
+      { path: "post/:id", element: <HomePage /> }, 
       { path: "*", element: <NotFoundPage /> },
     ],
   },

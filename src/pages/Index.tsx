@@ -1,14 +1,11 @@
-
 import React from 'react';
 import { useGetPostsQuery } from '@/lib/api';
 import MainFeed from '@/components/home/MainFeed';
-import { Sidebar } from '@/components/Sidebar';
 import { RightPanel } from '@/components/home/RightPanel';
 
 const HomePage: React.FC = () => {
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 10 });
 
-  // 백엔드가 없을 때를 위한 더미 데이터
   const dummyPosts = [
     {
       id: 1,
@@ -46,7 +43,6 @@ const HomePage: React.FC = () => {
     }
   ];
 
-  // 백엔드 연결 실패 시 더미 데이터 사용
   const displayPosts = error ? dummyPosts : (posts || []);
 
   if (isLoading) {
@@ -59,14 +55,11 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Sidebar */}
-      <Sidebar />
-      
       {/* Main Content */}
       <div className="flex-1 flex justify-center">
         <MainFeed posts={displayPosts} />
       </div>
-      
+
       {/* Right Panel */}
       <RightPanel />
     </div>

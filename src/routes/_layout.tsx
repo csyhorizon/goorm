@@ -19,17 +19,12 @@ export default function Layout() {
       {/* AuthWrapper: 사용자 로그인 상태를 확인하고 관리 */}
       <AuthWrapper>
         {/* 전체 레이아웃: 사이드바 + 페이지 콘텐츠 */}
-        <div className="flex min-h-screen">
-          {/* 사이드바 */}
-          <Sidebar />
-
-          {/* 페이지 콘텐츠 */}
-          <main className="flex-1">
-            {/* Outlet: 실제 페이지 내용이 여기에 렌더링됨 */}
-            {/* 예: /profile 경로면 ProfilePage가 여기에 표시 */}
-            <Outlet />
-          </main>
-        </div>
+      <div className="flex min-h-screen">
+        <Sidebar />   {/* ← 여기서 공통 사이드바 렌더링 */}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
       </AuthWrapper>
 
       {/* Toaster: 화면 우상단에 나타나는 알림 메시지 */}
