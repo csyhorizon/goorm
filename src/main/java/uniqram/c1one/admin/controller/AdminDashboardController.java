@@ -8,7 +8,7 @@ import uniqram.c1one.admin.dto.DashboardResponse;
 import uniqram.c1one.admin.service.AdminDashboardService;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 

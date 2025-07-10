@@ -16,7 +16,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
 

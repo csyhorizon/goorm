@@ -12,7 +12,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chatrooms")
+@RequestMapping("/api/chatrooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
@@ -50,6 +50,29 @@ public class ChatRoomController {
             @RequestParam(defaultValue = "20") int limit
     ){
         return ResponseEntity.ok(chatMessageService.getChatMessages(chatRoomId, offset, limit));
+    }
+
+    @DeleteMapping("/{chatRoomId}/messages/{messageId}")
+    public ResponseEntity<Void> deleteChatMessage(
+            @PathVariable Long chatRoomId,
+            @PathVariable Long messageId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        chatMessageService.deleteChatMessage(chatRoomId, messageId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{chatRoomId}/messages/{messageId}")
+    public ResponseEntity<ChatMessageResponse> updateChatMessage(
+            @PathVariable Long chatRoomId,
+            @PathVariable Long messageId,
+            @RequestBody ChatMessageRequeset updateRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        ChatMessageResponse response = chatMessageService.updateMessage(chatRoomId, messageId, userId, updateRequest);
+        return ResponseEntity.ok(response);
     }
 
 }

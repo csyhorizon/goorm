@@ -15,7 +15,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bookmarks")
+@RequestMapping("/api/bookmarks")
 @RequiredArgsConstructor
 public class BookmarkController {
 
