@@ -12,7 +12,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chatrooms")
+@RequestMapping("/api/chatrooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
