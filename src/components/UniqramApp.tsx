@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Sidebar } from './Sidebar';
-import { MainFeed } from './MainFeed';
-import { RightPanel } from './RightPanel';
+import { MainFeed } from './home/MainFeed';
+import { RightPanel } from './home/RightPanel';
 
 const UniqramApp = () => {
   return (

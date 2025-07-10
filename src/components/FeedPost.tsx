@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, MessageSquare, Plus, MoreHorizontal } from 'lucide-react';
 import { HomePostResponse } from '@/api/api';
 
 interface FeedPostProps {
   post: HomePostResponse;
+  onCommentClick?: () => void; 
 }
 
-export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
+export const FeedPost: React.FC<FeedPostProps> = ({ post, onCommentClick }) => {
+  const navigate = useNavigate();
   const [liked, setLiked] = useState(post.likedByMe || false);
   const [saved, setSaved] = useState(false);
-  
+
   const handleCommentClick = () => {
-    window.location.href = `/post/${post.postId}`;
+    navigate(`/post/${post.postId}`); // useNavigate로 자연스럽게 이동
   };
 
-  // 첫 번째 이미지를 대표 이미지로 사용
-  const imageUrl = post.mediaUrls && post.mediaUrls.length > 0 
-    ? post.mediaUrls[0] 
-    : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop';
+  const imageUrl =
+    post.mediaUrls && post.mediaUrls.length > 0
+      ? post.mediaUrls[0]
+      : 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop';
 
   return (
     <article className="bg-instagram-dark border border-instagram-border rounded-lg overflow-hidden">
@@ -35,7 +38,9 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
           </div>
           <div>
             <div className="flex items-center space-x-1">
-              <span className="font-semibold text-sm text-instagram-text">{post.username || 'Unknown User'}</span>
+              <span className="font-semibold text-sm text-instagram-text">
+                {post.username || 'Unknown User'}
+              </span>
               <span className="text-instagram-muted">•</span>
               <span className="text-sm text-instagram-muted">방금 전</span>
             </div>
@@ -49,25 +54,23 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
 
       {/* Post Image */}
       <div className="relative">
-        <img
-          src={imageUrl}
-          alt="Post content"
-          className="w-full h-96 object-cover"
-        />
+        <img src={imageUrl} alt="Post content" className="w-full h-96 object-cover" />
       </div>
 
       {/* Post Actions */}
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={() => setLiked(!liked)}
-              className={`transition-colors ${liked ? 'text-instagram-red' : 'text-instagram-text hover:text-instagram-muted'}`}
+              className={`transition-colors ${
+                liked ? 'text-instagram-red' : 'text-instagram-text hover:text-instagram-muted'
+              }`}
             >
               <Heart size={24} fill={liked ? 'currentColor' : 'none'} />
             </button>
-            <button 
-              onClick={handleCommentClick}
+            <button
+              onClick={onCommentClick}
               className="text-instagram-text hover:text-instagram-muted"
             >
               <MessageSquare size={24} />
@@ -76,7 +79,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
               <Plus size={24} />
             </button>
           </div>
-          <button 
+          <button
             onClick={() => setSaved(!saved)}
             className="text-instagram-text hover:text-instagram-muted"
           >
@@ -91,7 +94,9 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
 
         {/* Caption */}
         <div className="text-sm">
-          <span className="font-semibold text-instagram-text mr-2">{post.username || 'Unknown User'}</span>
+          <span className="font-semibold text-instagram-text mr-2">
+            {post.username || 'Unknown User'}
+          </span>
           <span className="text-instagram-text">{post.content || ''}</span>
         </div>
 
@@ -100,7 +105,9 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post }) => {
           <div className="space-y-1">
             {post.comments.slice(0, 2).map((comment, index) => (
               <div key={index} className="text-sm">
-                <span className="font-semibold text-instagram-text mr-2">{comment.userName || 'Unknown User'}</span>
+                <span className="font-semibold text-instagram-text mr-2">
+                  {comment.userName || 'Unknown User'}
+                </span>
                 <span className="text-instagram-text">{comment.content || ''}</span>
               </div>
             ))}

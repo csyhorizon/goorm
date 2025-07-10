@@ -8,9 +8,11 @@ import React from 'react';
 // API 호출을 위한 커스텀 훅 (React Query 기반)
 import { useGetPostsQuery } from '@/lib/api';
 // UI 컴포넌트들
-import MainFeed from '@/components/MainFeed';     // 게시물 목록을 보여주는 컴포넌트
+import MainFeed from '@/components/home/MainFeed';     // 게시물 목록을 보여주는 컴포넌트
 import { Sidebar } from '@/components/Sidebar';   // 왼쪽 네비게이션 바
-import { RightPanel } from '@/components/RightPanel'; // 오른쪽 패널 (추천 사용자 등)
+import { RightPanel } from '@/components/home/RightPanel'; // 오른쪽 패널 (추천 사용자 등)
+import { useMatch, useNavigate } from 'react-router-dom';
+import { PostDetailModal } from '@/components/PostDetailModal';
 
 // 🎯 HomePage 컴포넌트 - 메인 페이지
 export default function HomePage() {
@@ -18,6 +20,8 @@ export default function HomePage() {
   // useGetPostsQuery는 React Query를 사용한 커스텀 훅
   // { page: 1, limit: 10 } = 첫 번째 페이지에서 10개 게시물 가져오기
   const { data: posts, isLoading, error } = useGetPostsQuery({ page: 1, limit: 10 });
+  const match = useMatch('/post/:id');
+  const navigate = useNavigate();
 
   // 📝 더미 데이터 (백엔드 서버가 없을 때 사용)
   // 실제 개발에서는 백엔드 API가 없어도 프론트엔드가 작동하도록
@@ -72,21 +76,26 @@ export default function HomePage() {
       </div>
     );
   }
-
-  // 🎨 실제 홈페이지 레이아웃
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* 왼쪽 사이드바 - 네비게이션 메뉴 */}
+    <div className="min-h-screen bg-black flex">
       <Sidebar />
       
-      {/* 메인 콘텐츠 영역 - 게시물 피드 */}
-      <div className="flex-1 flex justify-center">
-        {/* MainFeed 컴포넌트에 게시물 데이터 전달 */}
-        <MainFeed posts={displayPosts} />
+      <div className="flex flex-1 justify-center">
+        <div className="flex justify-between w-full max-w-6xl">
+          <MainFeed posts={displayPosts} />
+  
+          <div className="ml-2 w-80 mt-10">
+            <RightPanel />
+          </div>
+        </div>
       </div>
-      
-      {/* 오른쪽 패널 - 추천 사용자, 광고 등 */}
-      <RightPanel />
+  
+      {match && (
+        <PostDetailModal 
+          postId={match.params.id} 
+          onClose={() => navigate('/')} 
+        />
+      )}
     </div>
-  );
+  );  
 } 

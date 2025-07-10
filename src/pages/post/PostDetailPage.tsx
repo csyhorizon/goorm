@@ -1,10 +1,11 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useGetPostQuery, useGetCommentsQuery } from '@/lib/api';
 import { PostDetailView } from '@/components/PostDetailView';
 
 const PostDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate(); 
   const postId = Number(id);
 
   const { data: post, isLoading: postLoading, error: postError } = useGetPostQuery(postId);
@@ -28,9 +29,13 @@ const PostDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PostDetailView post={post} comments={comments || []} />
+      <PostDetailView
+        post={post}
+        comments={comments || []}
+        onClose={() => navigate(-1)} // ← 뒤로가기 (onClose 실행 시)
+      />
     </div>
   );
 };
 
-export default PostDetailPage; 
+export default PostDetailPage;

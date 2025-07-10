@@ -64,9 +64,8 @@ const router = createBrowserRouter([
         element: <UserProfilePage />,
       },
       {
-        path: "post/:id", // "/post/456" 같은 동적 경로
-        // :id는 URL 파라미터 (실제 포스트 ID로 대체됨)
-        element: <PostDetailPage />,
+        path: "post/:id",
+        element: <HomePage />, 
       },
       {
         path: "*", // 위의 모든 경로에 해당하지 않는 경우 (404 페이지)

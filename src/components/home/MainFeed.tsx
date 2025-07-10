@@ -1,14 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { StoryCarousel } from '@/components/StoryCarousel';
 import { FeedPost } from '@/components/FeedPost';
 import { Post } from '@/lib/api';
+import { PostDetailModal } from '@/components/PostDetailModal';
 
 interface MainFeedProps {
   posts: Post[];
 }
 
 const MainFeed: React.FC<MainFeedProps> = ({ posts }) => {
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  
   return (
     <div className="flex-1 max-w-2xl mx-auto">
       {/* Story Carousel */}
@@ -20,12 +23,22 @@ const MainFeed: React.FC<MainFeedProps> = ({ posts }) => {
       <div className="space-y-6">
         {posts.length > 0 ? (
           posts.map((post) => (
-            <FeedPost key={post.id} post={post} />
+            <FeedPost
+              key={post.id}
+              post={post}
+              onCommentClick={() => setSelectedPostId(post.id)}
+            />
           ))
         ) : (
           <div className="text-center py-8 text-instagram-muted">게시물이 없습니다.</div>
         )}
       </div>
+      {selectedPostId !== null && (
+            <PostDetailModal
+              postId={selectedPostId}
+              onClose={() => setSelectedPostId(null)}
+            />
+          )}
     </div>
   );
 };

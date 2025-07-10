@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { X } from 'lucide-react';
 import { PostImageCarousel } from './PostImageCarousel';
 import { PostComments } from './PostComments';
 import { Post, Comment } from '@/lib/api';
@@ -8,38 +7,42 @@ import { Post, Comment } from '@/lib/api';
 interface PostDetailViewProps {
   post: Post;
   comments: Comment[];
+  onClose: () => void;
 }
 
-export const PostDetailView: React.FC<PostDetailViewProps> = ({ post, comments }) => {
-  const handleBack = () => {
-    window.history.back();
+export const PostDetailView: React.FC<PostDetailViewProps> = ({ post, comments, onClose }) => {
+  const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // 클릭 이벤트가 모달 내부가 아니라 배경에서만 발생했을 때만 onClose 호출
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-instagram-dark">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-instagram-dark border-b border-instagram-border px-4 py-3">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleBack}
-            className="text-instagram-text hover:text-instagram-muted transition-colors"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="text-lg font-semibold text-instagram-text">게시물</h1>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-65px)]">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+      onClick={handleBackgroundClick}
+    >
+      <div className="bg-instagram-dark w-full lg:w-[900px] h-full lg:h-[600px] flex rounded-lg overflow-hidden">
         {/* Left: Image Carousel */}
-        <div className="lg:flex-[3] bg-black flex items-center justify-center">
+        <div className="hidden lg:block lg:w-2/3 bg-black">
           <PostImageCarousel images={post.images || []} />
         </div>
 
-        {/* Right: Post Details & Comments */}
-        <div className="lg:flex-[2] bg-instagram-dark border-l border-instagram-border flex flex-col">
-          <PostComments post={post} comments={comments} />
+        {/* Right: Comments & Details */}
+        <div className="w-full lg:w-1/3 flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b border-instagram-border">
+            <h1 className="text-lg font-semibold text-instagram-text">댓글</h1>
+            <button onClick={onClose} className="text-gray-400 hover:text-white">
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Comments Area */}
+          <div className="flex-1 overflow-y-auto">
+            <PostComments post={post} comments={comments} />
+          </div>
         </div>
       </div>
     </div>
