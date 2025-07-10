@@ -6,8 +6,7 @@
 
 // 📦 필요한 컴포넌트들을 가져오기
 import { Outlet } from 'react-router-dom'; // 하위 페이지를 표시할 자리
-import { Toaster } from "@/components/ui/toaster"; // 토스트 알림 컴포넌트
-import { Toaster as Sonner } from "@/components/ui/sonner"; // 다른 스타일의 토스트 알림
+import { Toaster } from "@/components/ui/sonner"; // 토스트 알림 컴포넌트
 import { TooltipProvider } from "@/components/ui/tooltip"; // 툴팁 기능 제공
 import AuthWrapper from "@/components/AuthWrapper"; // 인증 상태 관리 래퍼
 
@@ -22,14 +21,10 @@ export default function Layout() {
         {/* 예: /login 경로면 LoginPage가, /profile 경로면 ProfilePage가 여기에 표시 */}
         <Outlet />
       </AuthWrapper>
-      
+
       {/* Toaster: 화면 우상단에 나타나는 알림 메시지 */}
       {/* 예: "로그인 성공!", "게시물이 저장되었습니다" 등 */}
       <Toaster />
-      
-      {/* Sonner: 다른 스타일의 알림 메시지 */}
-      {/* 더 모던한 디자인의 토스트 알림 */}
-      <Sonner />
     </TooltipProvider>
   );
 } 
