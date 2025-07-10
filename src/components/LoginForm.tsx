@@ -22,21 +22,20 @@ export const LoginForm = () => {
     try {
       // 🔄 백엔드 API 우선 시도
       console.log('🔄 백엔드 로그인 API 요청 시도...');
-      
-      // 비밀번호를 bcrypt로 해시화 (rounds: 10)
-      const hashedPassword = await bcrypt.hash(password, 10);
-      console.log('🔐 비밀번호 해시화 완료');
-      
-      const response = await api.api.signin({ username: username, password: hashedPassword } as SigninRequest);
-      
+
+      // 비밀번호를 평문으로 전송 (서버에서 해시화 처리)
+      console.log('🔄 로그인 요청 전송...');
+
+      const response = await api.api.signin({ username: username, password: password } as SigninRequest);
+
       // 응답이 HTML인지 확인 (백엔드 서버가 없을 때)
       if (typeof response.data === 'string' && (response.data as string).includes('<!DOCTYPE html>')) {
         throw new Error('백엔드 서버가 응답하지 않음');
       }
-      
+
       // API 응답에서 토큰 추출 (응답 구조에 따라 조정)
       const token = (response.data as any)?.token || response.data;
-      
+
       console.log('✅ 백엔드 로그인 성공');
       setToken(token);
       dispatch(setLogin({ 
@@ -45,20 +44,20 @@ export const LoginForm = () => {
         email: username,
         profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
       }));
-      
+
       // 로그인 성공 후 메인 페이지로 리디렉션
       window.location.href = '/';
-      
+
     } catch (error) {
       console.error('❌ 백엔드 로그인 실패, 더미 로그인 사용:', error);
-      
+
       // 🧪 백엔드 실패 시 더미 로그인
       console.log('🧪 Development: Dummy login with:', { username, password });
-      
+
       // 더미 토큰 생성
       const dummyToken = 'dummy-jwt-token-' + Date.now();
       setToken(dummyToken);
-      
+
       // 더미 사용자 정보로 로그인 처리
       dispatch(setLogin({ 
         id: 1, 
@@ -66,7 +65,7 @@ export const LoginForm = () => {
         email: username,
         profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
       }));
-      
+
       // 로그인 성공 후 메인 페이지로 리디렉션
       window.location.href = '/';
     }

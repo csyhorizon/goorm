@@ -24,8 +24,8 @@ const LoginPage: React.FC = () => {
       // 비밀번호를 bcrypt로 해시화 (rounds: 10)
       const hashedPassword = await bcrypt.hash(data.password, 10);
       console.log('🔐 비밀번호 해시화 완료');
-      
-      const result = await login({ email: data.username, password: hashedPassword }).unwrap();
+
+      const result = await login({ username: data.username, password: hashedPassword }).unwrap();
       localStorage.setItem('token', result.token);
       toast.success('로그인 성공!');
       navigate('/');
@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
               )}
             </div>
-            
+
             <div>
               <Input
                 {...register('password', { 

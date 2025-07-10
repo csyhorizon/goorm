@@ -28,7 +28,7 @@ npm run dev
 
 - **React 개발 서버**: http://localhost:8081
 - **Spring 백엔드 서버**: http://localhost:8080
-- ~~**API 프록시**: `/api` → `http://localhost:8080`~~ (현재 사용하지 않음)
+- **API 프록시**: `/api` → `http://localhost:8080` (프록시 설정 활성화됨)
 
 ## 🔐 JWT 인증 설정
 
@@ -98,15 +98,15 @@ VITE_TEST_JWT=true
 ### API 연결 테스트
 React 앱에서 API 연결이 실패하면 자동으로 연결 테스트 컴포넌트가 표시됩니다.
 
-### ~~프록시 설정~~ (현재 사용하지 않음)
-~~Vite 설정에서 `/api` 경로를 Spring 서버(8080)로 프록시합니다:~~
+### 프록시 설정
+Vite 설정에서 `/api` 경로를 Spring 서버(8080)로 프록시합니다:
 ```typescript
-// 현재 사용하지 않는 설정
+// vite.config.ts에 설정된 프록시
 proxy: {
   "/api": {
     target: "http://localhost:8080",
     changeOrigin: true,
-    rewrite: (path) => path.replace(/^\/api/, ""),
+    secure: false,
   },
 }
 ```
@@ -114,7 +114,7 @@ proxy: {
 ### 환경 변수
 - `VITE_BYPASS_AUTH`: 인증 우회 모드 (기본값: false)
 - `VITE_TEST_JWT`: JWT 테스트 모드 (기본값: true)
-- `VITE_API_BASE_URL`: API 기본 URL (기본값: http://localhost:8080/api)
+- `VITE_API_BASE_URL`: API 기본 URL (기본값: /api)
 - `VITE_APP_TITLE`: 앱 제목
 
 ## 🎨 디자인 특징

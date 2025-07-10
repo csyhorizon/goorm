@@ -20,11 +20,10 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      // 비밀번호를 bcrypt로 해시화 (rounds: 10)
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      console.log('🔐 비밀번호 해시화 완료');
-      
-      const result = await login({ email: data.username, password: hashedPassword }).unwrap();
+      // 비밀번호를 평문으로 전송 (서버에서 해시화 처리)
+      console.log('🔄 로그인 요청 전송...');
+
+      const result = await login({ username: data.username, password: data.password }).unwrap();
       localStorage.setItem('token', result.token);
       toast.success('로그인 성공!');
       navigate('/');
@@ -57,7 +56,7 @@ export default function LoginPage() {
                 <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
               )}
             </div>
-            
+
             <div>
               <Input
                 {...register('password', { 
