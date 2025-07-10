@@ -79,16 +79,16 @@ export const apiService = createApi({
   tagTypes: ['Post', 'User', 'Comment'], // 캐시 태그 타입들
   endpoints: (builder) => ({
     // 🔐 인증 관련 API 엔드포인트들
-    
+
     // 로그인
-    login: builder.mutation<AuthResponse, { email: string; password: string }>({
+    login: builder.mutation<AuthResponse, { username: string; password: string }>({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: '/auth/signin',
         method: 'POST',
-        body: credentials, // 이메일과 비밀번호 전송
+        body: credentials, // 사용자명과 비밀번호 전송
       }),
     }),
-    
+
     // 회원가입
     register: builder.mutation<AuthResponse, { username: string; email: string; password: string }>({
       query: (userData) => ({
@@ -97,7 +97,7 @@ export const apiService = createApi({
         body: userData, // 사용자명, 이메일, 비밀번호 전송
       }),
     }),
-    
+
     // 내 프로필 정보 가져오기
     getProfile: builder.query<User, void>({
       query: () => '/auth/profile',
@@ -105,19 +105,19 @@ export const apiService = createApi({
     }),
 
     // 📄 포스트 관련 API 엔드포인트들
-    
+
     // 게시물 목록 가져오기
     getPosts: builder.query<Post[], { page?: number; limit?: number }>({
       query: ({ page = 1, limit = 10 }) => `/posts?page=${page}&limit=${limit}`,
       providesTags: ['Post'], // Post 태그로 캐시 관리
     }),
-    
+
     // 특정 게시물 가져오기
     getPost: builder.query<Post, number>({
       query: (id) => `/posts/${id}`,
       providesTags: (result, error, id) => [{ type: 'Post', id }], // 특정 게시물 캐시
     }),
-    
+
     // 새 게시물 작성
     createPost: builder.mutation<Post, { content: string; images?: File[] }>({
       query: (postData) => ({
@@ -127,7 +127,7 @@ export const apiService = createApi({
       }),
       invalidatesTags: ['Post'], // 게시물 생성 후 Post 캐시 무효화
     }),
-    
+
     // 게시물 좋아요
     likePost: builder.mutation<void, number>({
       query: (postId) => ({
@@ -138,13 +138,13 @@ export const apiService = createApi({
     }),
 
     // 💬 댓글 관련 API 엔드포인트들
-    
+
     // 게시물의 댓글 목록 가져오기
     getComments: builder.query<Comment[], number>({
       query: (postId) => `/posts/${postId}/comments`,
       providesTags: (result, error, postId) => [{ type: 'Comment', id: postId }], // 특정 게시물 댓글 캐시
     }),
-    
+
     // 댓글 작성
     createComment: builder.mutation<Comment, { postId: number; content: string }>({
       query: ({ postId, content }) => ({
@@ -156,13 +156,13 @@ export const apiService = createApi({
     }),
 
     // 👤 사용자 관련 API 엔드포인트들
-    
+
     // 특정 사용자 프로필 가져오기
     getUserProfile: builder.query<User, number>({
       query: (userId) => `/users/${userId}`,
       providesTags: (result, error, id) => [{ type: 'User', id }], // 특정 사용자 캐시
     }),
-    
+
     // 내 프로필 정보 수정
     updateProfile: builder.mutation<User, { username?: string; profileImage?: File }>({
       query: (profileData) => ({
@@ -182,17 +182,17 @@ export const {
   useLoginMutation,        // 로그인 훅
   useRegisterMutation,     // 회원가입 훅
   useGetProfileQuery,      // 내 프로필 가져오기 훅
-  
+
   // 게시물 관련 훅들
   useGetPostsQuery,        // 게시물 목록 가져오기 훅
   useGetPostQuery,         // 특정 게시물 가져오기 훅
   useCreatePostMutation,   // 게시물 작성 훅
   useLikePostMutation,     // 게시물 좋아요 훅
-  
+
   // 댓글 관련 훅들
   useGetCommentsQuery,     // 댓글 목록 가져오기 훅
   useCreateCommentMutation, // 댓글 작성 훅
-  
+
   // 사용자 관련 훅들
   useGetUserProfileQuery,  // 사용자 프로필 가져오기 훅
   useUpdateProfileMutation, // 프로필 수정 훅

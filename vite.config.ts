@@ -11,6 +11,13 @@ export default defineConfig(({ mode }) => ({
     port: 8081,
     strictPort: true, // 포트 고정
     cors: true, // CORS 활성화
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [
     react(),
