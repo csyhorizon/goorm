@@ -41,14 +41,6 @@ public class ActiveUserService {
 
     }
 
-    public void updateUserLastAccess(String userId) {
-        ActiveUser user = (ActiveUser) redisTemplate.opsForHash().get(ACTIVE_USERS_KEY, userId);
-        if (user != null) {
-            user.setLastAccessTime(LocalDateTime.now());
-            redisTemplate.opsForHash().put(ACTIVE_USERS_KEY, userId, user);
-        }
-    }
-
     public void removeActiveUser(Long userId) {
         redisTemplate.opsForHash().delete(ACTIVE_USERS_KEY, String.valueOf(userId));
     }
