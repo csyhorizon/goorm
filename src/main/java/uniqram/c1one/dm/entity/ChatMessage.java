@@ -1,10 +1,7 @@
 package uniqram.c1one.dm.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import uniqram.c1one.global.BaseEntity;
 import uniqram.c1one.user.entity.Users;
 
@@ -33,5 +30,9 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false)
     private String message;
 
-    private boolean isRead;
+    private boolean isRead = false;
+
+    public void update(String message) {
+        this.message = message;
+    }
 }

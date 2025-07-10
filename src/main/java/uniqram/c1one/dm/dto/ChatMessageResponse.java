@@ -12,5 +12,6 @@ public class ChatMessageResponse {
     private Long senderId;
     private String message;
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private Boolean isRead;
 }

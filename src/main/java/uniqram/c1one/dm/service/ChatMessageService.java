@@ -62,9 +62,46 @@ public class ChatMessageService {
                         .senderName(msg.getUser().getUsername())
                         .message(msg.getMessage())
                         .createdAt(msg.getCreatedAt())
-                        .isRead(msg.isRead())
+                        .isRead(true)
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteChatMessage(Long chatRoomId, Long chatMessageId, Long senderId) {
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
+                .orElseThrow(() -> new DmException(DmErrorCode.MESSAGE_NOT_FOUND));
+
+        if(!chatMessage.getChatRoom().getId().equals(chatRoomId)) {
+            throw new DmException(DmErrorCode.WRONG_CHATROOM);
+        }
+        if(!chatMessage.getUser().getId().equals(senderId)) {
+            throw new DmException(DmErrorCode.NO_AUTHORITY);
+        }
+        chatMessageRepository.delete(chatMessage);
+    }
+
+    @Transactional
+    public ChatMessageResponse updateMessage(Long chatRoomId, Long chatMessageId, Long senderId, ChatMessageRequeset updateRequest) {
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
+                .orElseThrow(() -> new DmException(DmErrorCode.MESSAGE_NOT_FOUND));
+        if(!chatMessage.getChatRoom().getId().equals(chatRoomId)) {
+            throw new DmException(DmErrorCode.WRONG_CHATROOM);
+        }
+        if(!chatMessage.getUser().getId().equals(senderId)) {
+            throw new DmException(DmErrorCode.NO_AUTHORITY);
+        }
+
+        chatMessage.update(updateRequest.getMessage());
+        chatMessageRepository.save(chatMessage);
+
+        return ChatMessageResponse.builder()
+                .chatMessageId(chatMessageId)
+                .senderId(senderId)
+                .message(chatMessage.getMessage())
+                .modifiedAt(chatMessage.getModifiedAt())
+                .isRead(chatMessage.isRead())
+                .build();
     }
 
 }
