@@ -12,6 +12,7 @@ import uniqram.c1one.profile.entity.Profile;
 public class ProfileResponseDto {
 
     private Long id;
+    private Long userId;
 
     @Size(max = 255)
     private String bio;
@@ -22,6 +23,7 @@ public class ProfileResponseDto {
     public static ProfileResponseDto from(Profile profile) {
         return ProfileResponseDto.builder()
                 .id(profile.getId())
+                .userId(profile.getUserId().getId())
                 .bio(profile.getBio())
                 .profileImageUrl(profile.getProfileImageUrl())
                 .build();
