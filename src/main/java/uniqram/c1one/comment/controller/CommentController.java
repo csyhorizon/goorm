@@ -19,7 +19,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comments/{commentId}")
+@RequestMapping("/comments/{commentId}")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
