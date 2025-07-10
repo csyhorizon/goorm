@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DMListSidebar from '../components/DMListSidebar';
+import DMChatWindow from '../components/DMChatWindow';
 
-export default function MessagesPage() {
+export default function DMPage() {
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">메시지</h1>
-        <p className="text-gray-600">친구들과 대화하세요</p>
-      </div>
+    <div className="flex h-screen bg-black text-white">
+      <DMListSidebar onSelectRoom={setSelectedRoomId} selectedRoomId={selectedRoomId} />
+      <DMChatWindow roomId={selectedRoomId} />
     </div>
   );
-} 
+}
