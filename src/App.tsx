@@ -12,6 +12,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // Redux: 전역 상태 관리 (사용자 정보, 앱 설정 등)
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
+import { Toaster } from 'sonner';
 
 // 🗂️ 각 페이지 컴포넌트들을 가져오기
 // 파일 기반 라우팅: routes 폴더의 파일들이 자동으로 페이지가 됨
@@ -66,6 +67,7 @@ const App = () => (
   <Provider store={store}>                             {/* Redux 전역 상태 관리 */}
     <QueryClientProvider client={queryClient}>         {/* React Query API 상태 관리 */}
       <RouterProvider router={router} />               {/* 페이지 간 이동 라우팅 */}
+      <Toaster position="bottom-right" richColors duration={3000} />
     </QueryClientProvider>
   </Provider>
 );
