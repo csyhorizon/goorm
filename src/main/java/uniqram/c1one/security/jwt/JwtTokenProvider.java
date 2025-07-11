@@ -28,9 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.transaction.annotation.Transactional;
-import uniqram.c1one.security.jwt.entity.RefreshToken;
-import uniqram.c1one.security.jwt.repository.RefreshTokenRepository;
 
 @Slf4j
 @Component
@@ -62,10 +59,20 @@ public class JwtTokenProvider {
         LocalDateTime refreshTokenExpiryDateTime = now.plusSeconds(REFRESH_TOKEN_EXPIRE_TIME / 1000);
         Date refreshTokenExpires = Date.from(refreshTokenExpiryDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
+        // 인증 정보 가져오기
+        String username = authentication.getName();
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+
+        // Check if user is blacklisted
+        if (user.isBlacklisted()) {
+            throw new RuntimeException("사용자가 블랙리스트에 등록되어 있습니다.");
+        }
+
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
-                .claim("userId", userId)
+                .claim("userId", user.getId())
                 .setExpiration(accessTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -76,16 +83,6 @@ public class JwtTokenProvider {
                 .setExpiration(refreshTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
-        // 인증 정보 가져오기
-        String username = authentication.getName();
-        Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-
-        // Check if user is blacklisted
-        if (user.isBlacklisted()) {
-            throw new RuntimeException("사용자가 블랙리스트에 등록되어 있습니다.");
-        }
 
         // DB에 리프레시 토큰 저장
         saveRefreshToken(user, refreshToken, refreshTokenExpiryDateTime);
