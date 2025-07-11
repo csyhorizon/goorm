@@ -1,6 +1,7 @@
 package uniqram.c1one.profile.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.profile.dto.ProfileResponseDto;
+import uniqram.c1one.profile.dto.ProfileUpdateRequestDto;
 import uniqram.c1one.profile.entity.Profile;
 import uniqram.c1one.profile.repository.ProfileRepository;
 import uniqram.c1one.user.entity.Role;
@@ -20,6 +23,9 @@ class ProfileServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProfileService profileService;
 
     @Autowired
     private ProfileRepository profileRepository;
@@ -41,19 +47,34 @@ class ProfileServiceTest {
     }
 
     @Test
-    @DisplayName("프로필 조회 테스트 - 성공")
-    void getProfileUserTest() {
+    @DisplayName("ProfileService - 프로필 조회 성공")
+    void getProfileByIdTest() {
         // given
         Long profileId = testProfile.getId();
 
         // when
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new RuntimeException("프로필이 존재하지 않음"));
+        ProfileResponseDto dto = profileService.getProfileById(profileId);
 
         // then
-        assertNotNull(profile);
-        assertEquals("bio", profile.getBio());
-        assertEquals("ImageURI", profile.getProfileImageUrl());
-        assertEquals(testUser.getId(), profile.getUserId().getId());
+        assertNotNull(dto);
+        assertEquals("bio", dto.getBio());
+        assertEquals("ImageURI", dto.getProfileImageUrl());
+        assertEquals(testUser.getId(), dto.getUserId());
     }
+
+    @Test
+    @DisplayName("ProfileService - 프로필 업데이트 성공")
+    void updateProfileTest() {
+        // given
+        Long profileId = testProfile.getId();
+        ProfileUpdateRequestDto updateDto = new ProfileUpdateRequestDto("수정된 bio", "NewImageURI");
+
+        // when
+        ProfileResponseDto updated = profileService.updateProfile(profileId, updateDto);
+
+        // then
+        assertEquals("수정된 bio", updated.getBio());
+        assertEquals("NewImageURI", updated.getProfileImageUrl());
+    }
+
 }
