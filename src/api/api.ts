@@ -460,7 +460,7 @@ export class HttpClient<SecurityDataType = unknown> {
   ) {
     this.instance = axiosInstance || axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "/api",
+      baseURL: axiosConfig.baseURL || "", // 빈 문자열로 변경하여 URL 중복 방지
     });
     this.secure = secure;
     this.format = format;

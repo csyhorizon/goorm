@@ -2,11 +2,9 @@ import axios from 'axios';
 
 // axios 인스턴스 생성
 const api = axios.create({
-  baseURL: '/api', // vite.config.ts의 프록시 설정과 맞춤
+  baseURL: '', // Swagger API가 전체 path (/api/auth/join)를 포함하므로 baseURL은 빈 문자열
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Content-Type 헤더 제거 - Swagger API에서 명시적으로 설정하도록 함
 });
 
 // 요청 인터셉터

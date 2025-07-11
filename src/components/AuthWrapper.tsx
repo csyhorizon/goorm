@@ -22,10 +22,25 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
-  // 🔧 개발 환경 설정
-  const isDevelopment = import.meta.env.DEV;
-  const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
-  const testJWT = import.meta.env.VITE_TEST_JWT === 'true';
+  // 🔧 환경변수 설정 (.env 파일에서 로드)
+  const envConfig = {
+    isDevelopment: import.meta.env.DEV || false,
+    bypassAuth: import.meta.env.VITE_BYPASS_AUTH === 'true' || false,
+    testJWT: import.meta.env.VITE_TEST_JWT === 'true' || false,
+    // 추가 환경변수들
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+    nodeEnv: import.meta.env.NODE_ENV || 'development'
+  };
+
+  // 개발 환경 디버깅을 위한 로그
+  if (envConfig.isDevelopment) {
+    console.log('🔧 Environment Config:', {
+      isDevelopment: envConfig.isDevelopment,
+      bypassAuth: envConfig.bypassAuth,
+      testJWT: envConfig.testJWT,
+      nodeEnv: envConfig.nodeEnv
+    });
+  }
 
   // Redux 상태
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -66,7 +81,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
       try {
         // 🧪 개발 환경 시나리오 1: 인증 우회 (JWT 없이도 모든 페이지 접근 가능)
-        if (isDevelopment && bypassAuth) {
+        if (envConfig.isDevelopment && envConfig.bypassAuth) {
           console.log('🧪 Development: Auth bypassed - No JWT required');
           // 이미 사용자가 설정되어 있지 않을 때만 설정
           if (!user) {
@@ -82,7 +97,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
         }
 
         // 🧪 개발 환경 시나리오 2: JWT 테스트 (실제 JWT 검증 로직 테스트)
-        if (isDevelopment && testJWT) {
+        if (envConfig.isDevelopment && envConfig.testJWT) {
           console.log('🧪 Development: Testing JWT validation');
           const token = getToken();
           
@@ -116,7 +131,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
         }
 
         // 🚀 프로덕션 환경: 실제 JWT 검증
-        if (!isDevelopment) {
+        if (!envConfig.isDevelopment) {
           console.log('🚀 Production: Full JWT validation');
           const token = getToken();
           
@@ -135,6 +150,40 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
             setIsChecking(false);
             return;
           }
+        }
+
+        // 🔧 개발 환경에서 인증 요구 (bypassAuth=false, testJWT=false)
+        if (envConfig.isDevelopment && !envConfig.bypassAuth && !envConfig.testJWT) {
+          console.log('🔧 Development: Auth required - Checking JWT token');
+          const token = getToken();
+          
+          if (!token) {
+            console.log('❌ No JWT token found - redirecting to login');
+            navigate('/login');
+            setIsChecking(false);
+            return;
+          }
+
+          if (!validateToken(token)) {
+            console.log('❌ Invalid JWT token - clearing and redirecting to login');
+            removeToken();
+            dispatch(clearUser());
+            navigate('/login');
+            setIsChecking(false);
+            return;
+          }
+
+          // 유효한 JWT가 있으면 사용자 정보 설정
+          if (!user) {
+            dispatch(setUser({
+              id: 1,
+              username: 'auth-required-user',
+              email: 'auth@example.com',
+              profileImage: 'https://via.placeholder.com/50x50/FF6B6B/FFFFFF?text=AUTH'
+            }));
+          }
+          setIsChecking(false);
+          return;
         }
 
         // ✅ 인증된 사용자 처리
@@ -165,7 +214,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     }
 
     checkAuth();
-  }, [dispatch, navigate, location.pathname, isDevelopment, bypassAuth, testJWT]);
+  }, [dispatch, navigate, location.pathname, envConfig.isDevelopment, envConfig.bypassAuth, envConfig.testJWT]);
 
   // 🔄 로딩 중 표시
   if (isChecking) {
@@ -180,14 +229,12 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   }
 
   // ✅ 인증된 사용자 또는 로그인 페이지인 경우 자식 컴포넌트 렌더링
-  // if (isAuthenticated || user || getToken() || location.pathname === '/login' || (isDevelopment && bypassAuth)) {
-  //   return <>{children}</>;
-  // }
+  if (isAuthenticated || user || getToken() || location.pathname === '/login' || location.pathname === '/signup' || (envConfig.isDevelopment && envConfig.bypassAuth)) {
+    return <>{children}</>;
+  }
 
-  // return <Navigate to="/login" replace />;
-
-  // ✅ 개발 중 잠시 인증 막기 해제
-return <>{children}</>;
+  // 🚫 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  return <Navigate to="/login" replace />;
 };
 
 export default AuthWrapper;

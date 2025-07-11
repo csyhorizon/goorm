@@ -72,6 +72,8 @@ export default function HomePage() {
       
       // 백엔드 API 호출 (팔로잉 게시물 가져오기)
       const response = await api.posts.getFollowingRecentPosts();
+      // 백엔드 API 호출 (추천 게시물 가져오기)
+      // const response = await api.posts.getRecommendedPosts();
       
       // 응답이 HTML인지 확인 (백엔드 서버가 없을 때)
       if (typeof response.data === 'string' && (response.data as string).includes('<!DOCTYPE html>')) {

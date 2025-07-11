@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useLoginMutation } from '@/lib/api';
+import { Api, SigninRequest } from '@/api/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import { setToken } from '@/lib/auth';
+import { useDispatch } from 'react-redux';
+import { setUser } from '@/features/auth/authSlice';
 
 interface LoginForm {
     username: string;
@@ -12,8 +15,13 @@ interface LoginForm {
 }
 
 const LoginPage: React.FC = () => {
-    const [login, { isLoading }] = useLoginMutation();
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    
+    // API 클라이언트 인스턴스 생성
+    const apiClient = new Api();
+    
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -21,15 +29,105 @@ const LoginPage: React.FC = () => {
 
     const onSubmit = async (data: LoginForm) => {
         try {
-            const result = await login({
+            setIsLoading(true);
+            
+            // Swagger API 사용
+            const signinData: SigninRequest = {
                 username: data.username,
                 password: data.password
-            }).unwrap();
+            };
 
-            localStorage.setItem('token', result.token);
-            navigate('/');
-        } catch {
-            toast.error('로그인에 실패했습니다.');
+            console.log('🔄 로그인 요청 데이터:', signinData);
+            
+            const response = await apiClient.api.signin(signinData);
+            
+            console.log('📥 로그인 응답 전체:', response);
+            console.log('📥 응답 상태:', response.status);
+            
+            // 200 OK 응답 확인
+            if (response.status === 200 && response.data) {
+                const responseData = response.data as any;
+                
+                // 1. message를 console에 출력
+                if (responseData.message) {
+                    console.log('📧 백엔드 메시지:', responseData.message);
+                }
+                
+                // 2. accessToken을 JWT 토큰으로 설정
+                if (responseData.accessToken) {
+                    setToken(responseData.accessToken);
+                    console.log('✅ JWT 토큰 저장 완료');
+                    
+                    // 🔒 HTTP Only 쿠키 설정 안내
+                    // 주의: HTTP Only 쿠키는 JavaScript로 설정할 수 없습니다.
+                    // 백엔드에서 Set-Cookie 헤더로 설정해야 합니다.
+                    // 현재는 localStorage에 저장하지만, 보안을 위해서는
+                    // 백엔드에서 HTTP Only 쿠키로 토큰을 설정하는 것이 좋습니다.
+                    console.log('⚠️  보안 권장사항: HTTP Only 쿠키는 백엔드에서 Set-Cookie로 설정해야 합니다');
+                    
+                    // Redux 상태 업데이트
+                    dispatch(setUser({
+                        id: 1, // TODO: 실제 사용자 ID는 백엔드 응답에서 가져오기
+                        username: data.username,
+                        email: `${data.username}@example.com`, // TODO: 실제 이메일은 백엔드 응답에서 가져오기
+                        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
+                    }));
+                    console.log('✅ Redux 상태 업데이트 완료');
+                    
+                    // 3. redirectUrl 무시하고 index.tsx로 리다이렉트
+                    console.log('🚫 redirectUrl 무시:', responseData.redirectUrl);
+                    
+                    toast.success('로그인에 성공했습니다!', {
+                        id: 'login-success',
+                        duration: 3000,
+                    });
+                    
+                    // index.tsx로 리다이렉트 (/ 경로)
+                    navigate('/');
+                    
+                } else {
+                    console.error('❌ accessToken이 응답에 없습니다:', responseData);
+                    toast.error('서버 응답에 토큰이 없습니다.', {
+                        id: 'login-error',
+                        duration: 3000,
+                    });
+                }
+            } else {
+                console.error('❌ 응답 상태가 200이 아닙니다:', response.status);
+                toast.error('로그인 처리 중 오류가 발생했습니다.', {
+                    id: 'login-error',
+                    duration: 3000,
+                });
+            }
+            
+        } catch (error: any) {
+            console.error('🚫 로그인 오류:', error);
+            
+            // 401 Unauthorized 에러 처리
+            if (error?.response?.status === 401) {
+                const failureMessage = error?.response?.data?.message;
+                console.log('🚫 401 로그인 실패 메시지:', failureMessage);
+                
+                // 기존 로그인 실패 메시지 처리 로직 사용
+                toast.error(failureMessage || '로그인에 실패했습니다.', {
+                    id: 'login-error',
+                    duration: 3000,
+                });
+            } else {
+                // 기타 에러 처리
+                const errorMessage = 
+                    error?.response?.data?.message || 
+                    error?.data?.message || 
+                    error?.message || 
+                    '로그인에 실패했습니다.';
+                    
+                toast.error(errorMessage, {
+                    id: 'login-error',
+                    duration: 3000,
+                });
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
