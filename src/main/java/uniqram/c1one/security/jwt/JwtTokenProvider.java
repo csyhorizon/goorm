@@ -65,6 +65,7 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
+                .claim("userId", userId)
                 .setExpiration(accessTokenExpires)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
