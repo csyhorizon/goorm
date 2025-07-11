@@ -41,7 +41,7 @@ const router = createBrowserRouter([
   // 공통 레이아웃이 적용되는 페이지들
   {
     path: "/",
-
+    
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
