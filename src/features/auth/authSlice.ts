@@ -4,9 +4,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface User {
   id: number;
   username: string;
-  email: string;
   profileImage?: string;
   // 필요한 다른 사용자 정보 추가
+  role: string;
 }
 
 // 🔐 인증 상태 인터페이스

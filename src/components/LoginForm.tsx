@@ -38,11 +38,14 @@ export const LoginForm = () => {
 
       console.log('✅ 백엔드 로그인 성공');
       setToken(token);
-      dispatch(setLogin({ 
-        id: 1, 
-        username: username, 
-        email: username,
-        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
+
+      const user = response.data.user;
+
+      dispatch(setLogin({
+        id: user.id,
+        username: user.username,
+        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER',
+        role: user.role
       }));
 
       // 로그인 성공 후 메인 페이지로 리디렉션
@@ -58,12 +61,12 @@ export const LoginForm = () => {
       const dummyToken = 'dummy-jwt-token-' + Date.now();
       setToken(dummyToken);
 
-      // 더미 사용자 정보로 로그인 처리
-      dispatch(setLogin({ 
-        id: 1, 
-        username: username, 
-        email: username,
-        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER'
+      // 더미 로그인
+      dispatch(setLogin({
+        id: 1,
+        username: username,
+        profileImage: 'https://via.placeholder.com/50x50/4ECDC4/FFFFFF?text=USER',
+        role: 'USER'
       }));
 
       // 로그인 성공 후 메인 페이지로 리디렉션
