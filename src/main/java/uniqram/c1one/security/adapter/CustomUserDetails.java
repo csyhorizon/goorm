@@ -53,4 +53,6 @@ public class CustomUserDetails implements UserDetails, Serializable {
     public Long getUserId() {
         return user.getId();
     }
+
+    public String getRole() { return user.getRole().name(); }
 }
