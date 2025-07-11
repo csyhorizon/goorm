@@ -7,34 +7,81 @@ import { Settings, Camera, Plus, Grid3x3, Bookmark, User } from "lucide-react";
 const MyProfilePage = () => {
   const [activeTab, setActiveTab] = useState("posts");
 
+  // 유저 더미 데이터
   const user = {
     username: "user01",
     realName: "홍길동",
-    profileImageUrl: "https://via.placeholder.com/150x150.png?text=Profile",
+    profileImageUrl: "", // 비어 있으면 기본 이미지 사용
     stats: {
       posts: 0,
       followers: 100,
-      following: 100
+      following: 100,
+    },
+  };
+
+  // 프로필 상태들
+  const [previewImage, setPreviewImage] = useState<string | null>(user.profileImageUrl);
+  const [realName, setRealName] = useState(user.realName);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // 이미지 변경 핸들러
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleSave = () => {
+    // 여기서 서버에 저장 로직 들어갈 수 있음
+    setIsEditing(false);
   };
 
   return (
       <div className="w-full max-w-[935px] mx-auto bg-background min-h-screen px-4 pt-10">
-        {/* Profile Section */}
+        {/* 프로필 영역 */}
         <div className="flex items-center gap-16 mb-12">
-          {/* Profile Image */}
-          <Avatar className="w-40 h-40">
-            <AvatarImage src={user.profileImageUrl} alt="Profile" />
-            <AvatarFallback>Image</AvatarFallback>
-          </Avatar>
+          {/* 프로필 이미지 */}
+          <label htmlFor="avatar-upload" className="relative group cursor-pointer">
+            <Avatar className="w-40 h-40">
+              <AvatarImage
+                  src={
+                      previewImage ||
+                      "/default-avatar.svg" // 기본 이미지 경로 (public 폴더에 넣어둔 svg/png 사용)
+                  }
+                  alt="Profile"
+              />
+              <AvatarFallback>
+                <User className="w-10 h-10 text-muted-foreground" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition">
+              변경
+            </div>
+            <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+            />
+          </label>
 
-          {/* Right Side */}
+          {/* 오른쪽 영역 */}
           <div className="flex-1 space-y-4">
-            {/* Username & Buttons */}
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-2xl font-light text-profile-text">{user.username}</h2>
-              <Button variant="secondary" size="sm" className="text-sm px-4 py-1.5">
-                프로필 편집
+              <Button
+                  variant="secondary"
+                  size="sm"
+                  className="text-sm px-4 py-1.5"
+                  onClick={() => setIsEditing(!isEditing)}
+              >
+                {isEditing ? "편집 취소" : "프로필 편집"}
               </Button>
               <Button variant="secondary" size="sm" className="text-sm px-4 py-1.5">
                 보관된 스토리 보기
@@ -44,7 +91,7 @@ const MyProfilePage = () => {
               </Button>
             </div>
 
-            {/* Stats */}
+            {/* 팔로워 정보 */}
             <div className="flex gap-10 text-sm">
               <div className="flex gap-1">
                 <span className="text-profile-secondary">게시물</span>
@@ -60,12 +107,25 @@ const MyProfilePage = () => {
               </div>
             </div>
 
-            {/* Bio */}
-            <div className="font-semibold text-profile-text text-sm">{user.realName}</div>
+            {/* 이름 편집 영역 */}
+            {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <input
+                      value={realName}
+                      onChange={(e) => setRealName(e.target.value)}
+                      className="border border-gray-300 rounded-sm px-2 py-1 text-sm text-black"
+                  />
+                  <Button size="sm" onClick={handleSave}>
+                    저장
+                  </Button>
+                </div>
+            ) : (
+                <div className="font-semibold text-profile-text text-sm">{realName}</div>
+            )}
           </div>
         </div>
 
-        {/* Story Highlights */}
+        {/* 스토리 하이라이트 */}
         <div className="mb-8">
           <div className="flex gap-4 overflow-x-auto pb-2">
             <div className="flex flex-col items-center gap-2 min-w-[70px]">
@@ -77,7 +137,7 @@ const MyProfilePage = () => {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* 탭 영역 */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-transparent h-auto p-0 border-t border-border">
             {["posts", "saved", "tagged"].map((tab) => (
@@ -107,7 +167,7 @@ const MyProfilePage = () => {
             <EmptyState
                 icon={Bookmark}
                 title="저장"
-                subtitle="다시 보고 싶은 사진과 동영상을 저장하세요. 콘텐츠를 저장해도 다른 사람에게 알림이 전송되지 않으며, 저장된 콘텐츠는 회원님만 볼 수 있습니다."
+                subtitle="다시 보고 싶은 콘텐츠를 저장하세요."
                 linkText="저장된 콘텐츠 보기"
             />
           </TabsContent>
@@ -116,7 +176,7 @@ const MyProfilePage = () => {
             <EmptyState
                 icon={User}
                 title="내가 나온 사진"
-                subtitle="사람들이 회원님을 사진에 태그하면 태그된 사진이 여기에 표시됩니다."
+                subtitle="회원님이 태그된 사진이 여기에 표시됩니다."
                 linkText="친구 찾아보기"
             />
           </TabsContent>
@@ -132,19 +192,17 @@ interface EmptyStateProps {
   linkText: string;
 }
 
-const EmptyState = ({ icon: Icon, title, subtitle, linkText }: EmptyStateProps) => {
-  return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-20 h-20 rounded-full border-2 border-profile-text flex items-center justify-center mb-6">
-          <Icon className="h-10 w-10 text-profile-text" />
-        </div>
-        <h3 className="text-2xl font-light text-profile-text mb-2">{title}</h3>
-        <p className="text-profile-secondary mb-4 max-w-md">{subtitle}</p>
-        <Button variant="link" className="text-instagram-blue font-semibold p-0 h-auto">
-          {linkText}
-        </Button>
+const EmptyState = ({ icon: Icon, title, subtitle, linkText }: EmptyStateProps) => (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="w-20 h-20 rounded-full border-2 border-profile-text flex items-center justify-center mb-6">
+        <Icon className="h-10 w-10 text-profile-text" />
       </div>
-  );
-};
+      <h3 className="text-2xl font-light text-profile-text mb-2">{title}</h3>
+      <p className="text-profile-secondary mb-4 max-w-md">{subtitle}</p>
+      <Button variant="link" className="text-instagram-blue font-semibold p-0 h-auto">
+        {linkText}
+      </Button>
+    </div>
+);
 
 export default MyProfilePage;
