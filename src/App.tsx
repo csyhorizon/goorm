@@ -24,7 +24,6 @@ import MessagesPage from "./routes/messages";          // 메시지 페이지 (/
 import NotificationsPage from "./routes/notifications";// 알림 페이지 (/notifications)
 import MyProfilePage from "./routes/profile/index";    // 내 프로필 (/profile)
 import UserProfilePage from "./routes/profile/$userId";// 다른 사용자 프로필 (/profile/:userId)
-import PostDetailPage from "./routes/post/$id";        // 포스트 상세 (/post/:id)
 import NotFoundPage from "./routes/404";               // 404 에러 페이지 (/*)
 
 // 🛣️ 라우터 설정 - 어떤 URL이 어떤 컴포넌트를 보여줄지 정의
