@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLoginMutation } from '@/lib/api';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setLogin } from '@/features/auth/authSlice';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,6 +16,7 @@ interface LoginForm {
 const LoginPage: React.FC = () => {
     const [login, { isLoading }] = useLoginMutation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -26,6 +29,15 @@ const LoginPage: React.FC = () => {
                 password: data.password
             }).unwrap();
 
+            // 사용자 정보 Redux에 저장
+            dispatch(setLogin({
+                id: result.user.id,
+                username: result.user.username,
+                role: result.user.role,
+                profileImage: result.user.profileImage ?? '',
+            }));
+
+            // 토큰 저장
             localStorage.setItem('token', result.token);
             navigate('/');
         } catch {
@@ -36,7 +48,7 @@ const LoginPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-white border border-gray-300 p-8">
-                {/* 타이틀 추가 */}
+                {/* 타이틀 */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-light mb-4 text-black" style={{ fontFamily: 'cursive' }}>
                         Uniqram
