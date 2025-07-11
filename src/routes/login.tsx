@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Api, SigninRequest } from '@/api/api';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setLogin } from '@/features/auth/authSlice';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -18,10 +20,12 @@ const LoginPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
     
     // API 클라이언트 인스턴스 생성
     const apiClient = new Api();
     
+
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -36,6 +40,7 @@ const LoginPage: React.FC = () => {
                 username: data.username,
                 password: data.password
             };
+
 
             console.log('🔄 로그인 요청 데이터:', signinData);
             
@@ -128,13 +133,14 @@ const LoginPage: React.FC = () => {
             }
         } finally {
             setIsLoading(false);
+
         }
     };
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-white border border-gray-300 p-8">
-                {/* 타이틀 추가 */}
+                {/* 타이틀 */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-light mb-4 text-black" style={{ fontFamily: 'cursive' }}>
                         Uniqram
