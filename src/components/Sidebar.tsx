@@ -4,6 +4,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { RootState } from '@/app/store';
 import { removeToken } from '@/lib/auth';
 import { setLogout } from '@/features/auth/authSlice';
+import { Api } from '@/api/api';
+import customAxiosInstance from '@/lib/axios';
 import {
   Home,
   Search,
@@ -35,10 +37,27 @@ export const Sidebar = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const isAdmin = user?.role === 'ADMIN';
 
-  const handleLogout = () => {
-    removeToken();
-    dispatch(setLogout());
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    try {
+      console.log('🚪 로그아웃 처리 시작...');
+      
+      // 1. 백엔드 API 호출 (HTTP-only 쿠키 제거)
+      const apiClient = new Api(customAxiosInstance);
+      await apiClient.api.logout();
+      console.log('✅ 백엔드 로그아웃 API 호출 성공 (HTTP-only 쿠키 제거됨)');
+      
+    } catch (error) {
+      console.error('⚠️ 백엔드 로그아웃 API 실패 (계속 진행):', error);
+      // 백엔드 API 실패해도 클라이언트 로그아웃은 계속 진행
+    } finally {
+      // 2. 클라이언트 측 정리 (항상 실행)
+      console.log('🗑️ 클라이언트 인증 정보 제거 중...');
+      removeToken();           // localStorage에서 토큰 제거
+      dispatch(setLogout());   // Redux에서 사용자 정보 제거
+      
+      console.log('🚪 로그아웃 완료 - 로그인 페이지로 이동');
+      window.location.href = '/login';
+    }
   };
 
   return (
