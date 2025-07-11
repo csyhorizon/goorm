@@ -35,9 +35,10 @@ public class AuthController {
 
     // 회원가입
     @PostMapping("/join")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
+    public ResponseEntity<SimpleResponse> signup(@Valid @RequestBody SignupRequest request) {
         authService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new SimpleResponse("회원가입 성공"));
     }
 
     // 로그인
@@ -48,41 +49,50 @@ public class AuthController {
         try {
             JwtToken jwtToken = authService.signin(request);
 
-            // JWT 토큰을 쿠키에 설정
+            // 쿠키 설정
             Cookie accessTokenCookie = new Cookie("access_token", jwtToken.getAccessToken());
             accessTokenCookie.setHttpOnly(true);
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(3600); // 1시간
-
+            accessTokenCookie.setMaxAge(3600);
+            response.addCookie(accessTokenCookie);
 
             Cookie refreshTokenCookie = new Cookie("refresh_token", jwtToken.getRefreshToken());
             refreshTokenCookie.setHttpOnly(true);
             refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(14 * 24 * 3600); // 14일
-
-            response.addCookie(accessTokenCookie);
+            refreshTokenCookie.setMaxAge(14 * 24 * 3600);
             response.addCookie(refreshTokenCookie);
 
-            // 로그인 성공 시 온라인 사용자 추가
+            // 인증 처리 및 사용자 정보 반환
             Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
+
             if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
                 activeUserService.addActiveUser(userDetails, httpRequest.getRemoteAddr());
+
+                UserDto userDto = new UserDto(
+                        userDetails.getUserId(),
+                        userDetails.getUsername(),
+                        userDetails.getRole()
+                );
+
+                LoginResponse loginResponse = new LoginResponse(
+                        jwtToken.getAccessToken(),
+                        jwtToken.getRefreshToken(),
+                        "/index",
+                        "로그인 성공",
+                        userDto
+                );
+
+                return ResponseEntity.ok(loginResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("사용자 인증 정보가 올바르지 않습니다."));
             }
-
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("accessToken", jwtToken.getAccessToken());
-            responseBody.put("message", "로그인 성공");
-            responseBody.put("redirectUrl", "/index");
-
-            return ResponseEntity.ok(responseBody);
 
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("로그인 실패: " + e.getMessage()));
         }
-
-
     }
 
     @PostMapping("/refresh")
@@ -197,6 +207,15 @@ public class AuthController {
         private String accessToken;
         private String refreshToken;
         private String redirectUrl;
+        private String message;
+        private UserDto user;
     }
 
+    @Getter
+    @AllArgsConstructor
+    static class UserDto {
+        private Long id;
+        private String username;
+        private String role;
+    }
 }
