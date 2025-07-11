@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useLoginMutation } from '@/lib/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-// ✅ Input 대신 HTML input 사용으로 테스트 가능
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
@@ -38,7 +37,7 @@ const LoginPage: React.FC = () => {
   return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-sm bg-white border border-gray-300 p-8">
-          {/* 🆕 타이틀 추가 */}
+          {/* 타이틀 추가 */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-light mb-4 text-black" style={{ fontFamily: 'cursive' }}>
               Uniqram
