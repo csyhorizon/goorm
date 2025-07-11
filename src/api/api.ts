@@ -771,7 +771,7 @@ export class Api<
      */
     getFollowingRecentPosts: (params: RequestParams = {}) =>
       this.request<HomePostResponse[], any>({
-        path: `/posts/home/following`,
+        path: `/api/posts/home/following`,
         method: "GET",
         secure: true,
         ...params,

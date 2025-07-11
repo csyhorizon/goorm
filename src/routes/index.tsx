@@ -137,11 +137,11 @@ export default function HomePage() {
         {/* 백엔드 연결 상태 표시 */}
         {usingDummyData && (
           <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-            <p className="text-yellow-400 text-sm">
+            <p className="text-black text-sm">
               🧪 <strong>개발 모드:</strong> 백엔드 서버 연결 실패 - 더미 데이터 사용 중
             </p>
             {error && (
-              <p className="text-yellow-300 text-xs mt-1">
+              <p className="text-black text-xs mt-1">
                 오류: {error}
               </p>
             )}

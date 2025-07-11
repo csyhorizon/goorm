@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // axios 인스턴스 생성
 const api = axios.create({
-  baseURL: '', // Swagger API가 전체 path (/api/auth/join)를 포함하므로 baseURL은 빈 문자열
+  baseURL: 'http://localhost:8080', // 🎯 백엔드 서버로 요청 전송
   timeout: 10000,
   withCredentials: true, // 🔒 HTTP-only 쿠키를 자동으로 포함하기 위해 필수
   // Content-Type 헤더 제거 - Swagger API에서 명시적으로 설정하도록 함
