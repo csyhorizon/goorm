@@ -30,6 +30,7 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false)
     private String message;
 
+    @Builder.Default
     private boolean isRead = false;
 
     public void update(String message) {

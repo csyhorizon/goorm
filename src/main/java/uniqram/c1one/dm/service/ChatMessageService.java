@@ -3,6 +3,7 @@ package uniqram.c1one.dm.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uniqram.c1one.dm.dto.ChatMessageDto;
 import uniqram.c1one.dm.dto.ChatMessageList;
 import uniqram.c1one.dm.dto.ChatMessageRequeset;
 import uniqram.c1one.dm.dto.ChatMessageResponse;
@@ -26,7 +27,7 @@ public class ChatMessageService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ChatMessageResponse sendMessage(Long chatRoomId, Long senderId, ChatMessageRequeset requeset) {
+    public ChatMessageResponse sendMessage(Long chatRoomId, Long senderId, ChatMessageDto requeset) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new DmException(DmErrorCode.CHATROOM_NOT_FOUND));
 
