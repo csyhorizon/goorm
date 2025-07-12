@@ -58,7 +58,11 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/api/admin/signup"
+                                "/api/admin/signup",
+                                "/ws-chat/**",
+                                "/ws-chat",
+                                "/topic/**", //추가한 부분
+                                "/app/**" //추가한 부분
                         ).permitAll()
                         .requestMatchers("index.html", "/index").authenticated()
                         .requestMatchers("/api/user/**").hasRole("USER")

@@ -37,7 +37,7 @@ public class ChatRoomController {
     @PostMapping("/{chatRoomId}/messages")
     public ResponseEntity<ChatMessageResponse> sendMessage(
             @PathVariable("chatRoomId") Long chatRoomId,
-            @RequestBody ChatMessageRequeset requeset,
+            @RequestBody ChatMessageDto requeset,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long senderId = userDetails.getUserId();
         return ResponseEntity.ok(chatMessageService.sendMessage(chatRoomId, senderId, requeset));
