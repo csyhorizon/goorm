@@ -235,38 +235,31 @@ public class PostService {
             throw new PostException(PostErrorCode.NO_AUTHORITY);
         }
 
-        // 현재 이미지 리스트
         List<PostMedia> currentMedia = postMediaRepository.findByPostIdOrderByIdAsc(postId);
 
-        // 요청에서 남길 이미지 URL
         List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null
                 ? postUpdateRequest.getRemainImageUrls().stream()
                 .filter(url -> url != null && !url.trim().isEmpty())
                 .toList()
                 : List.of();
 
-        // 삭제 대상 이미지
         List<PostMedia> deleteMedia = currentMedia.stream()
                 .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
                 .toList();
 
         int afterDeletionCount = remainUrls.size();
 
-        // 최소 3개 유지 제한
         if (afterDeletionCount < 3) {
             throw new PostException(PostErrorCode.IMAGE_MINIMUM_REQUIRED);
         }
 
-        // 실제 삭제 수행
         for (PostMedia media : deleteMedia) {
             s3Service.deleteFile(media.getMediaUrl());
         }
         postMediaRepository.deleteAll(deleteMedia);
 
-        // 내용, 위치 업데이트
         post.update(postUpdateRequest.getContent(), postUpdateRequest.getLocation());
 
-        // 최종 이미지 리스트 조회
         List<String> mediaUrls = postMediaRepository.findByPostIdOrderByIdAsc(postId)
                 .stream()
                 .map(PostMedia::getMediaUrl)
