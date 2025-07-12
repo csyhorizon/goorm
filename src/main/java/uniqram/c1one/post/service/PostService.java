@@ -18,6 +18,7 @@ import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.*;
 import uniqram.c1one.post.exception.PostErrorCode;
 import uniqram.c1one.post.exception.PostException;
+import uniqram.c1one.post.repository.BookmarkRepository;
 import uniqram.c1one.post.repository.PostLikeRepository;
 import uniqram.c1one.post.repository.PostMediaRepository;
 import uniqram.c1one.post.repository.PostRepository;
@@ -40,6 +41,7 @@ public class PostService {
     private final LikeCountService likeCountService;
     private final S3Service s3Service;
     private final FollowRepository followRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     @Transactional
     public PostResponse createPost(Long userId, PostCreateRequest postCreateRequest) {
@@ -104,6 +106,8 @@ public class PostService {
         // 본인 좋아요 여부
         Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(postIds, userId));
 
+        Set<Long> bookmarkedPostIdSet = new HashSet<>(bookmarkRepository.findPostIdsBookmarkedByUser(postIds, userId));
+
         // 댓글 조회
         Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(postIds).stream()
                 .collect(Collectors.groupingBy(CommentResponse::getPostId));
@@ -113,9 +117,10 @@ public class PostService {
             int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
             boolean likedByMe = likedPostIdSet.contains(post.getId());
+            boolean bookmarkedByMe = bookmarkedPostIdSet.contains(post.getId());
             List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
-            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, bookmarkedByMe, comments);
         }).toList();
     }
 
@@ -165,6 +170,8 @@ public class PostService {
         // 본인 좋아요 여부
         Set<Long> likedPostIdSet = new HashSet<>(postLikeRepository.findPostIdsLikedByUser(combinedPostIds, userId));
 
+        Set<Long> bookmarkedPostIdSet = new HashSet<>(bookmarkRepository.findPostIdsBookmarkedByUser(combinedPostIds, userId));
+
         // 댓글 조회
         Map<Long, List<CommentResponse>> commentMap = commentRepository.findCommentsByPostIds(combinedPostIds).stream()
                 .collect(Collectors.groupingBy(CommentResponse::getPostId));
@@ -174,9 +181,10 @@ public class PostService {
             int likeCount = likeCountMap.getOrDefault(post.getId(), 0);
             List<LikeUserDto> likeUsers = likeUsersMap.getOrDefault(post.getId(), List.of());
             boolean likedByMe = likedPostIdSet.contains(post.getId());
+            boolean bookmarkedByMe = bookmarkedPostIdSet.contains(post.getId());
             List<CommentResponse> comments = commentMap.getOrDefault(post.getId(), List.of());
 
-            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+            return HomePostResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, bookmarkedByMe, comments);
         }).toList();
     }
 
@@ -220,9 +228,11 @@ public class PostService {
 
         boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(postId, userId);
 
+        boolean bookmarkedByMe = bookmarkRepository.existsByUserIdAndPostId(userId, postId);
+
         List<CommentListResponse> comments = commentRepository.findCommentsByPostId(postId);
 
-        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, comments);
+        return PostDetailResponse.from(post, mediaUrls, likeCount, likeUsers, likedByMe, bookmarkedByMe, comments);
     }
 
     @Transactional

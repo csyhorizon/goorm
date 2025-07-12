@@ -28,6 +28,7 @@ import uniqram.c1one.post.dto.*;
 import uniqram.c1one.post.entity.Post;
 import uniqram.c1one.post.entity.PostMedia;
 import uniqram.c1one.post.exception.PostException;
+import uniqram.c1one.post.repository.BookmarkRepository;
 import uniqram.c1one.post.repository.PostLikeRepository;
 import uniqram.c1one.post.repository.PostMediaRepository;
 import uniqram.c1one.post.repository.PostRepository;
@@ -61,6 +62,9 @@ public class PostServiceTest {
 
     @Mock
     private FollowRepository followRepository;
+
+    @Mock
+    private BookmarkRepository bookmarkRepository;
 
     @Mock
     private S3Service s3Service;
@@ -140,16 +144,16 @@ public class PostServiceTest {
 
         List<Long> followingIds = List.of(2L, 3L);
 
-        List<Post> postList = List.of(
-                Post.of(Users.builder().id(2L).build(), "내용1", "서울"),
-                Post.of(Users.builder().id(3L).build(), "내용2", "부산")
-        );
-        ReflectionTestUtils.setField(postList.get(0), "id", 1L);
-        ReflectionTestUtils.setField(postList.get(1), "id", 2L);
+        Post post1 = Post.of(Users.builder().id(2L).build(), "내용1", "서울");
+        Post post2 = Post.of(Users.builder().id(3L).build(), "내용2", "부산");
+        ReflectionTestUtils.setField(post1, "id", 1L);
+        ReflectionTestUtils.setField(post2, "id", 2L);
+
+        List<Post> postList = List.of(post1, post2);
 
         List<PostMedia> mediaList = List.of(
-                PostMedia.of(postList.get(0), "url1"),
-                PostMedia.of(postList.get(1), "url2")
+                PostMedia.of(post1, "url1"),
+                PostMedia.of(post2, "url2")
         );
 
         List<LikeUserDto> likeUserList = List.of(
@@ -159,6 +163,7 @@ public class PostServiceTest {
         );
 
         List<Long> likedPostIds = List.of(1L);
+        List<Long> bookmarkedPostIds = List.of(2L);
 
         when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(followingIds);
         when(postRepository.findRecentPostsByUserIds(eq(followingIds), any(), any())).thenReturn(postList);
@@ -168,6 +173,7 @@ public class PostServiceTest {
         when(postLikeRepository.findLikeUsersByPostIds(anyList())).thenReturn(likeUserList);
         when(postLikeRepository.findPostIdsLikedByUser(anyList(), eq(userId))).thenReturn(likedPostIds);
         when(commentRepository.findCommentsByPostIds(anyList())).thenReturn(List.of());
+        when(bookmarkRepository.findPostIdsBookmarkedByUser(anyList(), eq(userId))).thenReturn(bookmarkedPostIds);
 
         // when
         List<HomePostResponse> responses = postService.getFollowingRecentPosts(userId);
@@ -178,12 +184,14 @@ public class PostServiceTest {
         assertEquals(1L, responses.get(0).getPostId());
         assertEquals(3, responses.get(0).getLikeCount());
         assertTrue(responses.get(0).isLikedByMe());
+        assertFalse(responses.get(0).isBookmarkedByMe());
         assertEquals(List.of("url1"), responses.get(0).getMediaUrls());
         assertEquals(2, responses.get(0).getLikeUsers().size());
 
         assertEquals(2L, responses.get(1).getPostId());
         assertEquals(5, responses.get(1).getLikeCount());
         assertFalse(responses.get(1).isLikedByMe());
+        assertTrue(responses.get(1).isBookmarkedByMe());
         assertEquals(List.of("url2"), responses.get(1).getMediaUrls());
         assertEquals(1, responses.get(1).getLikeUsers().size());
 
@@ -192,6 +200,7 @@ public class PostServiceTest {
         verify(postMediaRepository).findByPostIdIn(anyList());
         verify(postLikeRepository).findLikeUsersByPostIds(anyList());
         verify(postLikeRepository).findPostIdsLikedByUser(anyList(), eq(userId));
+        verify(bookmarkRepository).findPostIdsBookmarkedByUser(anyList(), eq(userId));
     }
 
     @Test
@@ -202,6 +211,7 @@ public class PostServiceTest {
 
         when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(List.of(2L, 3L));
         when(postRepository.findRecentPostsByUserIds(anyList(), any(), any())).thenReturn(Collections.emptyList());
+        when(bookmarkRepository.findPostIdsBookmarkedByUser(anyList(), eq(userId))).thenReturn(Collections.emptyList());
 
         // when
         List<HomePostResponse> responses = postService.getFollowingRecentPosts(userId);
@@ -224,9 +234,8 @@ public class PostServiceTest {
         Post post = Post.of(writer, "추천글1", "서울");
         ReflectionTestUtils.setField(post, "id", 10L);
 
-        Page<Post> recommendedPostPage = new PageImpl<>(List.of(post), PageRequest.of(0, 5), 1);
-
         when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+
         when(postMediaRepository.findByPostIdIn(anyList())).thenReturn(List.of());
         when(likeCountService.getPostLikeCount(10L)).thenReturn(0);
         when(postLikeRepository.findLikeUsersByPostIds(List.of(10L))).thenReturn(List.of());
@@ -235,6 +244,8 @@ public class PostServiceTest {
         when(postRepository.findTopLikedPosts(anyList(), any(Pageable.class))).thenReturn(List.of(post));
         when(postRepository.findRandomPosts(anyList(), anyList(), any(Pageable.class))).thenReturn(List.of());
 
+        when(bookmarkRepository.findPostIdsBookmarkedByUser(List.of(10L), userId))
+                .thenReturn(List.of());
 
         // when
         List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
@@ -243,7 +254,6 @@ public class PostServiceTest {
         assertEquals(1, responseList.size());
         assertEquals(10L, responseList.get(0).getPostId());
     }
-
 
     @Test
     @DisplayName("추천 게시물 조회 실패 - 추천 게시물 없는 경우 빈 리스트 반환")
@@ -255,6 +265,7 @@ public class PostServiceTest {
         Page<Post> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
 
         when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
+        when(bookmarkRepository.findPostIdsBookmarkedByUser(anyList(), eq(userId))).thenReturn(Collections.emptyList());
 
         // when
         List<HomePostResponse> responseList = postService.getRecommendedPosts(userId);
@@ -279,6 +290,7 @@ public class PostServiceTest {
         when(likeCountService.getPostLikeCount(postId)).thenReturn(3);
         when(postLikeRepository.findLikeUsersByPostId(postId)).thenReturn(List.of());
         when(postLikeRepository.existsByPostIdAndUserId(postId, userId)).thenReturn(true);
+        when(bookmarkRepository.existsByUserIdAndPostId(userId, postId)).thenReturn(true);
         when(commentRepository.findCommentsByPostId(postId)).thenReturn(List.of());
 
         PostDetailResponse response = postService.getPostDetail(userId, postId);
@@ -286,6 +298,7 @@ public class PostServiceTest {
         assertEquals(postId, response.getPostId());
         assertEquals(3, response.getLikeCount());
         assertTrue(response.isLikedByMe());
+        assertTrue(response.isBookmarkedByMe());
         assertEquals(List.of("url1", "url2"), response.getMediaUrls());
     }
 
