@@ -45,7 +45,7 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@Valid @RequestBody SigninRequest request,
+    public ResponseEntity<LoginResponse> signin(@Valid @RequestBody SigninRequest request,
                                     HttpServletResponse response,
                                     HttpServletRequest httpRequest) {
         try {
@@ -68,7 +68,6 @@ public class AuthController {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
 
             if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-
                 if (userDetails.isBlacklisted()) {
                     throw new AuthException(AuthErrorCode.USER_BLACKLISTED);
                 }
@@ -91,16 +90,14 @@ public class AuthController {
 
                 return ResponseEntity.ok(loginResponse);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new ErrorResponse("사용자 인증 정보가 올바르지 않습니다."));
+                throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS);
             }
 
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("로그인 실패: " + e.getMessage()));
+            throw new AuthException(AuthErrorCode.SIGNIN_FAILED);
         }
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken,
