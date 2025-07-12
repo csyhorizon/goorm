@@ -236,6 +236,7 @@ public class PostService {
         }
 
         List<PostMedia> currentMedia = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+        int currentCount = currentMedia.size();
 
         List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null
                 ? postUpdateRequest.getRemainImageUrls().stream()
@@ -249,7 +250,11 @@ public class PostService {
 
         int afterDeletionCount = remainUrls.size();
 
-        if (afterDeletionCount < 3) {
+        if (currentCount <= 2 && !deleteMedia.isEmpty()) {
+            throw new PostException(PostErrorCode.IMAGE_MINIMUM_REQUIRED);
+        }
+
+        if (currentCount >= 3 && afterDeletionCount < 2) {
             throw new PostException(PostErrorCode.IMAGE_MINIMUM_REQUIRED);
         }
 
