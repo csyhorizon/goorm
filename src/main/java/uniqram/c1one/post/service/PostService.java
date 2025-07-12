@@ -235,8 +235,8 @@ public class PostService {
             throw new PostException(PostErrorCode.NO_AUTHORITY);
         }
 
-        // 기존 이미지에서 특정 이미지 삭제
         List<PostMedia> currentMedia = postMediaRepository.findByPostIdOrderByIdAsc(postId);
+
         List<String> remainUrls = postUpdateRequest.getRemainImageUrls() != null
                 ? postUpdateRequest.getRemainImageUrls().stream()
                 .filter(url -> url != null && !url.trim().isEmpty())
@@ -247,30 +247,16 @@ public class PostService {
                 .filter(pm -> !remainUrls.contains(pm.getMediaUrl()))
                 .toList();
 
-        for (PostMedia media: deleteMedia) {
-            String mediaUrl = media.getMediaUrl();
-            s3Service.deleteFile(mediaUrl);
+        int afterDeletionCount = remainUrls.size();
+
+        if (afterDeletionCount < 3) {
+            throw new PostException(PostErrorCode.IMAGE_MINIMUM_REQUIRED);
         }
 
+        for (PostMedia media : deleteMedia) {
+            s3Service.deleteFile(media.getMediaUrl());
+        }
         postMediaRepository.deleteAll(deleteMedia);
-
-        // 새 이미지 등록
-        if (postUpdateRequest.getNewImageUrls() != null && !postUpdateRequest.getNewImageUrls().isEmpty()) {
-            List<PostMedia> newMediaList = postUpdateRequest.getNewImageUrls().stream()
-                    .filter(url -> url != null && !url.trim().isEmpty())
-                    .map(url -> PostMedia.of(post, url))
-                    .toList();
-            postMediaRepository.saveAll(newMediaList);
-        }
-
-        // 최종 이미지 개수 확인
-        int finalImageCount = postMediaRepository.findByPostIdOrderByIdAsc(postId).stream()
-                .filter(pm -> pm.getMediaUrl() != null && !pm.getMediaUrl().trim().isEmpty())
-                .toList()
-                .size();
-        if (finalImageCount == 0) {
-            throw new PostException(PostErrorCode.IMAGE_REQUIRED);
-        }
 
         post.update(postUpdateRequest.getContent(), postUpdateRequest.getLocation());
 
