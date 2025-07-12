@@ -111,32 +111,42 @@ const LoginPage: React.FC = () => {
             }
 
         } catch (error: any) {
-            console.error('🚫 로그인 오류:', error);
+        console.error('🚫 로그인 오류:', error);
 
-            // 401 Unauthorized 에러 처리
-            if (error?.response?.status === 401) {
-                const failureMessage = error?.response?.data?.message;
-                console.log('🚫 401 로그인 실패 메시지:', failureMessage);
+        const status = error?.response?.status;
+        const failureMessage = error?.response?.data?.message;
 
-                // 기존 로그인 실패 메시지 처리 로직 사용
-                toast.error(failureMessage || '로그인에 실패했습니다.', {
-                    id: 'login-error',
-                    duration: 3000,
-                });
-            } else {
-                // 기타 에러 처리
-                const errorMessage =
-                    error?.response?.data?.message ||
-                    error?.data?.message ||
-                    error?.message ||
-                    '로그인에 실패했습니다.';
+        if (status === 401) {
+            console.log('🚫 401 로그인 실패 메시지:', failureMessage);
+            toast.error(failureMessage || '로그인에 실패했습니다.', {
+                id: 'login-error',
+                duration: 3000,
+            });
+        }
 
-                toast.error(errorMessage, {
-                    id: 'login-error',
-                    duration: 3000,
-                });
-            }
-        } finally {
+        // ✅ 정지된 계정 응답 처리 (403 Forbidden)
+        else if (status === 403) {
+            console.log('🚫 403 Forbidden - 블랙리스트:', failureMessage);
+            toast.error('🚫 해당 계정은 관리자에 의해 정지되었습니다.', {
+                id: 'blacklist-error',
+                duration: 3000,
+            });
+        }
+
+        // ✅ 그 외의 에러 처리
+        else {
+            const errorMessage =
+                failureMessage ||
+                error?.data?.message ||
+                error?.message ||
+                '로그인에 실패했습니다.';
+
+            toast.error(errorMessage, {
+                id: 'login-error',
+                duration: 3000,
+            });
+        }
+    } finally {
             setIsLoading(false);
 
         }

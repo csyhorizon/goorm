@@ -67,8 +67,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <Provider store={store}>                             {/* Redux 전역 상태 관리 */}
     <QueryClientProvider client={queryClient}>         {/* React Query API 상태 관리 */}
-      <RouterProvider router={router} />               {/* 페이지 간 이동 라우팅 */}
       <Toaster position="bottom-right" richColors duration={3000} />
+      <RouterProvider router={router} />               {/* 페이지 간 이동 라우팅 */}
     </QueryClientProvider>
   </Provider>
 );
