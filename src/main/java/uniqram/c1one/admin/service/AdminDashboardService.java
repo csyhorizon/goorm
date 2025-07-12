@@ -19,7 +19,7 @@ public class AdminDashboardService {
     private final ActiveUserService activeUserService;
 
     public DashboardResponse getDashboardStats() {
-        long userCount = userRepository.count();
+        long userCount = userRepository.countByBlacklistedFalse();
         long postCount = getApproxCount("post:*");
         long commentCount = getApproxCount("comment:*");
         long postLikeCount = getTotalLikeCount("post:like:*");

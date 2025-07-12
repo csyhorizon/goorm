@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import uniqram.c1one.auth.dto.JwtToken;
 import uniqram.c1one.auth.dto.SigninRequest;
 import uniqram.c1one.auth.dto.SignupRequest;
+import uniqram.c1one.auth.exception.AuthErrorCode;
+import uniqram.c1one.auth.exception.AuthException;
 import uniqram.c1one.auth.service.AuthService;
 
 import org.springframework.http.HttpStatus;
@@ -66,6 +68,11 @@ public class AuthController {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
 
             if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+
+                if (userDetails.isBlacklisted()) {
+                    throw new AuthException(AuthErrorCode.USER_BLACKLISTED);
+                }
+
                 activeUserService.addActiveUser(userDetails, httpRequest.getRemoteAddr());
 
                 UserDto userDto = new UserDto(
