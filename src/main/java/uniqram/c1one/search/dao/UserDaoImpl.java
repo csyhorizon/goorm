@@ -20,7 +20,8 @@ public class UserDaoImpl implements UserDao {
 	public List<UserSearchResultDto> findUserByName(String username) {
 		
 		// 유저명을 정확히 검색해야함 LIKE 처리하지 않음
-		String sql = "SELECT id, username FROM `user` WHERE username = :username";
+		// role = 'admin' 인 경우 관리자 계정으로 검색에서 제외시킴
+		String sql = "SELECT user_id, username FROM `users` WHERE username = :username AND role != 'admin'";
 		
 		Query nativeQuery = em.createNativeQuery(sql);
 		nativeQuery.setParameter("username", username);
