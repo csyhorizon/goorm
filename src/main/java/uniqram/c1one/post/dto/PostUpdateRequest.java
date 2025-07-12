@@ -13,9 +13,6 @@ public class PostUpdateRequest {
     private String content;
     private String location;
 
-    // 기존 이미지
+    // 삭제 후 남길 이미지
     private List<String> remainImageUrls;
-
-    // 새로 추가할 이미지
-    private List<String> newImageUrls;
 }

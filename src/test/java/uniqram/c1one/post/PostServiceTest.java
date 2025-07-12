@@ -303,7 +303,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시물 수정 성공")
+    @DisplayName("게시물 수정 성공 - 이미지 3개 이상 유지하고 일부 삭제")
     void updatePost_success() {
         Long userId = 1L;
         Long postId = 2L;
@@ -313,27 +313,29 @@ public class PostServiceTest {
 
         List<PostMedia> currentMedia = List.of(
                 PostMedia.of(post, "url1"),
-                PostMedia.of(post, "url2")
+                PostMedia.of(post, "url2"),
+                PostMedia.of(post, "url3"),
+                PostMedia.of(post, "url4")
         );
 
         PostUpdateRequest request = PostUpdateRequest.builder()
                 .content("수정된 내용")
                 .location("부산")
-                .remainImageUrls(List.of("url1"))
-                .newImageUrls(List.of("url3"))
+                .remainImageUrls(List.of("url1", "url2", "url3")) // url4 삭제 요청
                 .build();
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(currentMedia)
                 .thenReturn(List.of(
                         PostMedia.of(post, "url1"),
+                        PostMedia.of(post, "url2"),
                         PostMedia.of(post, "url3")
                 ));
 
         PostResponse response = postService.updatePost(userId, postId, request);
 
         assertEquals(postId, response.getPostId());
-        assertEquals(List.of("url1", "url3"), response.getMediaUrls());
+        assertEquals(List.of("url1", "url2", "url3"), response.getMediaUrls());
     }
 
     @Test
@@ -351,13 +353,39 @@ public class PostServiceTest {
         PostUpdateRequest request = PostUpdateRequest.builder()
                 .content("수정")
                 .location("부산")
-                .remainImageUrls(List.of("url1"))
-                .newImageUrls(List.of())
+                .remainImageUrls(List.of("url1", "url2", "url3"))
                 .build();
 
         assertThrows(PostException.class, () -> postService.updatePost(userId, postId, request));
 
         verify(postRepository).findById(postId);
+    }
+
+    @Test
+    @DisplayName("게시물 수정 실패 - 최소 이미지 수 미달")
+    void updatePost_fail_minImageRequired() {
+        Long userId = 1L;
+        Long postId = 2L;
+        Users user = Users.builder().id(userId).build();
+        Post post = Post.of(user, "내용", "서울");
+        ReflectionTestUtils.setField(post, "id", postId);
+
+        List<PostMedia> currentMedia = List.of(
+                PostMedia.of(post, "url1"),
+                PostMedia.of(post, "url2"),
+                PostMedia.of(post, "url3")
+        );
+
+        PostUpdateRequest request = PostUpdateRequest.builder()
+                .content("수정된 내용")
+                .location("부산")
+                .remainImageUrls(List.of("url1", "url2"))
+                .build();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(postMediaRepository.findByPostIdOrderByIdAsc(postId)).thenReturn(currentMedia);
+
+        assertThrows(PostException.class, () -> postService.updatePost(userId, postId, request));
     }
 
     @Test
