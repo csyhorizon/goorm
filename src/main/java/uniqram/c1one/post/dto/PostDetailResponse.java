@@ -22,6 +22,8 @@ public class PostDetailResponse {
     private List<LikeUserDto> likeUsers;
     private boolean likedByMe;
 
+    private boolean bookmarkedByMe;
+
     private List<CommentListResponse> comments;
 
     public static PostDetailResponse from(Post post,
@@ -29,6 +31,7 @@ public class PostDetailResponse {
                                           int likeCount,
                                           List<LikeUserDto> likeUsers,
                                           boolean likedByMe,
+                                          boolean bookmarkedByMe,
                                           List<CommentListResponse> comments ) {
         return PostDetailResponse.builder()
                 .postId(post.getId())
@@ -38,6 +41,7 @@ public class PostDetailResponse {
                 .likeCount(likeCount)
                 .likeUsers(likeUsers)
                 .likedByMe(likedByMe)
+                .bookmarkedByMe(bookmarkedByMe)
                 .comments(comments)
                 .memberId(post.getUser().getId())
                 .username(post.getUser().getUsername())
