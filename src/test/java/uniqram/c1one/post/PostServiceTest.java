@@ -360,9 +360,8 @@ public class PostServiceTest {
 
         verify(postRepository).findById(postId);
     }
-
     @Test
-    @DisplayName("게시물 수정 실패 - 최소 이미지 수 미달")
+    @DisplayName("게시물 수정 실패 - 최소 이미지 수 미달 (삭제 후 1개 남음)")
     void updatePost_fail_minImageRequired() {
         Long userId = 1L;
         Long postId = 2L;
@@ -379,7 +378,7 @@ public class PostServiceTest {
         PostUpdateRequest request = PostUpdateRequest.builder()
                 .content("수정된 내용")
                 .location("부산")
-                .remainImageUrls(List.of("url1", "url2"))
+                .remainImageUrls(List.of("url1"))
                 .build();
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
