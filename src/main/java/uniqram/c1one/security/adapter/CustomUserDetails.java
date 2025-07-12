@@ -55,4 +55,8 @@ public class CustomUserDetails implements UserDetails, Serializable {
     }
 
     public String getRole() { return user.getRole().name(); }
+
+    public boolean isBlacklisted() {
+        return user.isBlacklisted();
+    }
 }
