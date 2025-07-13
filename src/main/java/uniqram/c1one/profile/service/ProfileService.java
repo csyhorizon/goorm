@@ -22,6 +22,12 @@ public class ProfileService {
     private final S3Service s3Service;
     private final UserRepository userRepository;
 
+    /**
+     * 프로필 생성
+     *
+     * @param userId 기반의 프로필 생성
+     * @return 저장된 프로필 정보
+     */
     @Transactional
     public ProfileResponseDto createProfile(Long userId) {
         Users user = userRepository.findById(userId)
@@ -37,16 +43,14 @@ public class ProfileService {
     }
 
     /**
-     * 사용자 ID를 기반으로 프로필을 조회합니다.
-     * 메서드 이름을 getProfileByUserId로 변경하여 의미를 명확히 합니다.
+     * UserId 기반 프로필 조회
      *
      * @param userId 프로필을 조회할 사용자의 ID
      * @return 조회된 프로필의 응답 DTO
      */
     @Transactional(readOnly = true)
-    public ProfileResponseDto getProfileByUserId(Long userId) { // 메서드 이름 변경
+    public ProfileResponseDto getProfileByUserId(Long userId) {
 
-        // Users의 userId를 기준으로 Profile을 조회합니다.
         final Profile profile = profileRepository.findByUserId_Id(userId)
                 .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
@@ -54,7 +58,7 @@ public class ProfileService {
     }
 
     /**
-     * 사용자 ID를 기반으로 프로필 이미지를 업데이트합니다.
+     * 사용자 ID 기반 이미지 수정
      *
      * @param userId 프로필 이미지를 업데이트할 사용자의 ID
      * @param profileImage 새로운 프로필 이미지 파일
@@ -77,7 +81,7 @@ public class ProfileService {
     }
 
     /**
-     * 사용자 ID를 기반으로 프로필 정보를 업데이트합니다.
+     * 사용자 ID를 기반으로 프로필 정보를 업데이트
      *
      * @param userId 프로필 정보를 업데이트할 사용자의 ID
      * @param profileUpdateRequestDto 업데이트할 프로필 정보 DTO
