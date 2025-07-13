@@ -28,7 +28,7 @@ public class ProfileController {
 
     @GetMapping("/profiles/{userId}")
     public ProfileResponseDto getProfile(@PathVariable Long userId) {
-        return profileService.getProfileById(userId);
+        return profileService.getProfileByUserId(userId);
     }
 
     @PatchMapping("/profiles/image")
