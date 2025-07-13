@@ -5,6 +5,40 @@ import { Heart, MessageSquare, Plus, MoreHorizontal, Bookmark } from 'lucide-rea
 import { HomePostResponse } from '@/lib/postApi';
 import { PostDetailModal } from './PostDetailModal';
 
+function formatTimeAgo(dateString: string) {
+  if (!dateString) return '';  // null, undefined, 빈값 바로 처리
+
+  const date = new Date(dateString);
+  const now = new Date();
+
+  if (isNaN(date.getTime())) {
+    // Invalid Date일 경우 아무것도 안 뜨게
+    console.warn('❌ Invalid date string:', dateString);
+    return '';
+  }
+
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  const intervals = [
+    { label: '년', seconds: 31536000 },
+    { label: '개월', seconds: 2592000 },
+    { label: '일', seconds: 86400 },
+    { label: '시간', seconds: 3600 },
+    { label: '분', seconds: 60 },
+    { label: '초', seconds: 1 },
+  ];
+
+  for (const interval of intervals) {
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      return `${count}${interval.label} 전`;
+    }
+  }
+
+  return '방금 전';
+}
+
+
 interface FeedPostProps {
   post: HomePostResponse;
   onCommentClick?: () => void;
@@ -52,7 +86,9 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onCommentClick, onBook
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 story-ring rounded-full p-0.5">
-              <div className="w-full h-full bg-instagram-dark rounded-full p-0.5">
+              <div className="w-full h-full bg-instagram-dark rounded-full p-0.5"
+              onClick={() => navigate(`/profile/${post.memberId}`)}
+              >
                 <img
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=32&h=32&fit=crop&crop=face"
                   alt={post.username || 'User'}
@@ -62,11 +98,14 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onCommentClick, onBook
             </div>
             <div>
               <div className="flex items-center space-x-1">
-                <span className="font-semibold text-sm text-white">
+                <span className="font-semibold text-sm text-white"
+                onClick={() => navigate(`/profile/${post.memberId}`)}>
                   {post.username || 'Unknown User'}
                 </span>
                 <span className="text-gray-400">•</span>
-                <span className="text-sm text-gray-400">방금 전</span>
+                <span className="text-sm text-gray-400">
+                  {post.createdAt ? formatTimeAgo(post.createdAt) : '방금 전'}
+                </span>
               </div>
               <span className="text-xs text-gray-400">{post.location || ''}</span>
             </div>

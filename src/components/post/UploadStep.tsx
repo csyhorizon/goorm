@@ -31,7 +31,7 @@ const UploadStep = ({ setStep, setFile, setPreviewUrl, setMediaUrls }) => {
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <h2 className="text-lg font-semibold mb-4">사진 업로드</h2>
+      <h2 className="text-lg font-semibold mb-4 text-black">사진 업로드</h2>
 
       {localPreviews.length > 0 ? (
         <div className="grid grid-cols-3 gap-2 mb-4">

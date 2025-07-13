@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGetPostDetail } from '@/lib/postApi';
 import { PostDetailView } from './PostDetailView';
 import PostEditModal from './post/PostEditModal'; // ✅ 추가
@@ -6,6 +6,14 @@ import PostEditModal from './post/PostEditModal'; // ✅ 추가
 export const PostDetailModal = ({ postId, onClose }) => {
   const { data: post, isLoading, error } = useGetPostDetail(Number(postId));
   const [isEditOpen, setIsEditOpen] = useState(false); // ✅ Edit modal 상태
+
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
 
   if (isLoading) {
     return (
