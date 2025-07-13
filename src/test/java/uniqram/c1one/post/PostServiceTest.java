@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -147,7 +148,9 @@ public class PostServiceTest {
         Post post1 = Post.of(Users.builder().id(2L).build(), "내용1", "서울");
         Post post2 = Post.of(Users.builder().id(3L).build(), "내용2", "부산");
         ReflectionTestUtils.setField(post1, "id", 1L);
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now().minusDays(1));
         ReflectionTestUtils.setField(post2, "id", 2L);
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now().minusHours(3));
 
         List<Post> postList = List.of(post1, post2);
 
@@ -233,6 +236,7 @@ public class PostServiceTest {
         Users writer = Users.builder().id(4L).build();
         Post post = Post.of(writer, "추천글1", "서울");
         ReflectionTestUtils.setField(post, "id", 10L);
+        ReflectionTestUtils.setField(post, "createdAt", LocalDateTime.now());
 
         when(followRepository.findFollowerIdsByUserId(userId)).thenReturn(new ArrayList<>(List.of(2L, 3L)));
 

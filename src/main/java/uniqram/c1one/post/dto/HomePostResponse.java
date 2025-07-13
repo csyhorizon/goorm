@@ -5,7 +5,6 @@ import lombok.Getter;
 import uniqram.c1one.comment.dto.CommentResponse;
 import uniqram.c1one.post.entity.Post;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -27,7 +26,7 @@ public class HomePostResponse {
 
     private List<CommentResponse> comments;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public static HomePostResponse from(Post post,
                                         List<String> mediaUrl,
@@ -48,7 +47,7 @@ public class HomePostResponse {
                 .comments(comments)
                 .memberId(post.getUser().getId())
                 .username(post.getUser().getUsername())
-                .createdAt(post.getCreatedAt())
+                .createdAt(post.getCreatedAt().toString())
                 .build();
     }
 }
