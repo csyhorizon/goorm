@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import uniqram.c1one.auth.dto.JwtToken;
@@ -29,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -39,6 +41,7 @@ public class AuthController {
     @PostMapping("/join")
     public ResponseEntity<SimpleResponse> signup(@Valid @RequestBody SignupRequest request) {
         authService.signup(request);
+        log.info("/api/auth/join 에 요청이 들어옴");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SimpleResponse("회원가입 성공"));
     }
@@ -48,6 +51,9 @@ public class AuthController {
     public ResponseEntity<LoginResponse> signin(@Valid @RequestBody SigninRequest request,
                                     HttpServletResponse response,
                                     HttpServletRequest httpRequest) {
+        
+        log.info("/api/auth/signin 에 요청이 들어옴");
+        
         try {
             JwtToken jwtToken = authService.signin(request);
 
