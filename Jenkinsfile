@@ -15,6 +15,8 @@ pipeline {
         DB_URL = "${env.DB_URL}"
         DB_USERNAME = "${env.DB_USERNAME}"
         JWT_EXPIRATION_MS = "${env.JWT_EXPIRATION_MS}"
+
+        AWS_REGION = "${env.AWS_REGION}"
     }
 
     tools {
@@ -33,7 +35,9 @@ pipeline {
                 script {
                     withCredentials([
                         string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD_ENV'),
-                        string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_ENV')
+                        string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_ENV'),
+                        string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ENV'),
+                        string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_KEY_ENV')
                     ]) {
                         if (isUnix()) {
                             sh "DB_URL=\"${env.DB_URL}\" " +
@@ -41,11 +45,19 @@ pipeline {
                                "DB_PASSWORD=\"${DB_PASSWORD_ENV}\" " +
                                "JWT_SECRET=\"${JWT_SECRET_ENV}\" " +
                                "JWT_EXPIRATION_MS=\"${env.JWT_EXPIRATION_MS}\" " +
+                               "AWS_ACCESS_KEY=\"${AWS_ACCESS_KEY_ENV}\" " +
+                               "AWS_SECRET_KEY=\"${AWS_SECRET_KEY_ENV}\" " +
+                               "AWS_REGION=\"${env.AWS_REGION}\" " +
+                               "BUCKET_NAME=\"${params.BUCKET_NAME}\" " +
                                "./gradlew clean build --no-daemon"
                         } else {
                             bat "set DB_URL=\"%DB_URL%\" && set DB_USERNAME=\"%DB_USERNAME%\" && ^" +
                                 "set DB_PASSWORD=\"%DB_PASSWORD_ENV%\" && set JWT_SECRET=\"%JWT_SECRET_ENV%\" && ^" +
                                 "set JWT_EXPIRATION_MS=\"%JWT_EXPIRATION_MS%\" && ^" +
+                                "set AWS_ACCESS_KEY=\"%AWS_ACCESS_KEY_ENV%\" && ^" +
+                                "set AWS_SECRET_KEY=\"%AWS_SECRET_KEY_ENV%\" && ^" +
+                                "set AWS_REGION=\"%AWS_REGION%\" && ^" +
+                                "set BUCKET_NAME=\"%BUCKET_NAME%\" && ^" +
                                 "gradlew.bat clean build"
                         }
                     }
@@ -80,7 +92,9 @@ pipeline {
                             withCredentials([
                                 string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD_ENV'),
                                 string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_ENV'),
-                                sshUserPrivateKey(credentialsId: 'my-gcp-ssh-key', keyFileVariable: 'SSH_KEY_PATH')
+                                sshUserPrivateKey(credentialsId: 'my-gcp-ssh-key', keyFileVariable: 'SSH_KEY_PATH'),
+                                string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_DEPLOY'),
+                                string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_KEY_DEPLOY')
                             ]) {
                                 sh """
                                 ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_PATH} ${env.DEPLOY_SERVER_USER}@${env.DEPLOY_SERVER_IP} << EOF
@@ -99,11 +113,18 @@ pipeline {
                                     docker run -d \\
                                        -p ${env.APP_PORT}:${env.APP_PORT} \\
                                        --name ${env.APP_CONTAINER_NAME} \\
+                                       --network c1one-network \\
                                        -e DB_URL="${env.DB_URL}" \\
                                        -e DB_USERNAME="${env.DB_USERNAME}" \\
                                        -e DB_PASSWORD="${DB_PASSWORD_ENV}" \\
                                        -e JWT_SECRET="${JWT_SECRET_ENV}" \\
                                        -e JWT_EXPIRATION_MS="${env.JWT_EXPIRATION_MS}" \\
+                                       -e AWS_ACCESS_KEY="${AWS_ACCESS_KEY_DEPLOY}" \\
+                                       -e AWS_SECRET_KEY="${AWS_SECRET_KEY_DEPLOY}" \\
+                                       -e AWS_REGION="${env.AWS_REGION}" \\
+                                       -e BUCKET_NAME="${params.BUCKET_NAME}" \\
+                                       -e SPRING_DATA_REDIS_HOST="c1one-redis" \\
+                                       -e SPRING_DATA_REDIS_PORT="6379" \\
                                        ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                                     echo "Deployment script finished."
