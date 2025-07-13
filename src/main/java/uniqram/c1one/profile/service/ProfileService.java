@@ -51,7 +51,7 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfileByUserId(Long userId) {
 
-        final Profile profile = profileRepository.findByUserId_Id(userId)
+        final Profile profile = profileRepository.findProfileWithUserByUserId(userId)
                 .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
         return ProfileResponseDto.from(profile);
@@ -65,9 +65,9 @@ public class ProfileService {
      * @return 업데이트된 프로필의 응답 DTO
      */
     @Transactional
-    public ProfileResponseDto updateProfileImage(Long userId, MultipartFile profileImage) { // profileId -> userId
+    public ProfileResponseDto updateProfileImage(Long userId, MultipartFile profileImage) {
         // userId를 사용하여 프로필을 찾습니다.
-        Profile profile = profileRepository.findByUserId_Id(userId) // findById -> findByUserId_Id
+        Profile profile = profileRepository.findByUserId_Id(userId)
                 .orElseThrow(() -> new ProfileException(ProfileErrorCode.PROFILE_NOT_FOUND));
 
         if (profile.getProfileImageUrl() != null) {
