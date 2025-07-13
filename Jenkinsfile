@@ -123,6 +123,8 @@ pipeline {
                                        -e AWS_SECRET_KEY="${AWS_SECRET_KEY_DEPLOY}" \\
                                        -e AWS_REGION="${env.AWS_REGION}" \\
                                        -e BUCKET_NAME="${params.BUCKET_NAME}" \\
+                                       -e SPRING_DATA_REDIS_HOST="c1one-redis" \\
+                                       -e SPRING_DATA_REDIS_PORT="6379" \\
                                        ${env.DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                                     echo "Deployment script finished."
