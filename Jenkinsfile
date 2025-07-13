@@ -113,6 +113,7 @@ pipeline {
                                     docker run -d \\
                                        -p ${env.APP_PORT}:${env.APP_PORT} \\
                                        --name ${env.APP_CONTAINER_NAME} \\
+                                       --network c1one-network \\
                                        -e DB_URL="${env.DB_URL}" \\
                                        -e DB_USERNAME="${env.DB_USERNAME}" \\
                                        -e DB_PASSWORD="${DB_PASSWORD_ENV}" \\
