@@ -297,6 +297,7 @@ export interface HomePostResponse {
   likeCount?: number;
   likeUsers?: LikeUserDto[];
   likedByMe?: boolean;
+  bookmarkedByMe?:boolean,
   comments?: CommentResponse[];
 }
 
@@ -769,13 +770,13 @@ export class Api<
      * @request GET:/posts/home/following
      * @secure
      */
-    getFollowingRecentPosts: (params: RequestParams = {}) =>
-      this.request<HomePostResponse[], any>({
-        path: `/api/posts/home/following`,
-        method: "GET",
-        secure: true,
-        ...params,
-      }),
+    // getFollowingRecentPosts: (params: RequestParams = {}) =>
+    //   this.request<HomePostResponse[], any>({
+    //     path: `/api/posts/home/following`,
+    //     method: "GET",
+    //     secure: true,
+    //     ...params,
+    //   }),
   };
   comments = {
     /**
