@@ -12,6 +12,7 @@ import uniqram.c1one.profile.exception.ProfileErrorCode;
 import uniqram.c1one.profile.exception.ProfileException;
 import uniqram.c1one.profile.repository.ProfileRepository;
 import uniqram.c1one.user.entity.Users;
+import uniqram.c1one.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -19,15 +20,19 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final S3Service s3Service;
+    private final UserRepository userRepository;
 
     @Transactional
-    public Profile createProfile(Users user) {
-        Profile profile = Profile.builder()
+    public ProfileResponseDto createProfile(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new ProfileException(ProfileErrorCode.USER_NOT_FOUND));
+        final Profile profile = Profile.builder()
                 .userId(user)
                 .bio("")
                 .profileImageUrl(null)
                 .build();
-        return profileRepository.save(profile);
+        final Profile savedProfile = profileRepository.save(profile);
+        return ProfileResponseDto.from(savedProfile);
     }
 
     @Transactional(readOnly = true)
