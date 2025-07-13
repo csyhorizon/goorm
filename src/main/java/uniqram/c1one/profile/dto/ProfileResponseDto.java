@@ -13,6 +13,7 @@ public class ProfileResponseDto {
 
     private Long id;
     private Long userId;
+    private String userName;
 
     @Size(max = 255)
     private String bio;
@@ -24,6 +25,7 @@ public class ProfileResponseDto {
         return ProfileResponseDto.builder()
                 .id(profile.getId())
                 .userId(profile.getUserId().getId())
+                .userName(profile.getUserId().getUsername())
                 .bio(profile.getBio())
                 .profileImageUrl(profile.getProfileImageUrl())
                 .build();
