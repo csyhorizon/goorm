@@ -64,7 +64,7 @@ class AdminControllerTest {
                 .get("accessToken").asText();
         accessTokenCookie = new Cookie("access_token", token);
 
-        MvcResult allUsersResult = mockMvc.perform(get("/admin/users")
+        MvcResult allUsersResult = mockMvc.perform(get("/api/admin/users")
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -85,7 +85,7 @@ class AdminControllerTest {
     @Test
     @DisplayName("전체 사용자 조회 성공")
     void getAllUsers() throws Exception {
-        mockMvc.perform(get("/admin/users")
+        mockMvc.perform(get("/api/admin/users")
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(totalUserCount));
@@ -94,7 +94,7 @@ class AdminControllerTest {
     @Test
     @DisplayName("블랙리스트 등록 성공")
     void blacklistUser() throws Exception {
-        mockMvc.perform(post("/admin/users/blacklist/" + user1Id)
+        mockMvc.perform(post("/api/admin/users/blacklist/" + user1Id)
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.blacklisted").value(true));
@@ -103,11 +103,11 @@ class AdminControllerTest {
     @Test
     @DisplayName("블랙리스트 해제 성공")
     void unblacklistUser() throws Exception {
-        mockMvc.perform(post("/admin/users/blacklist/" + user1Id)
+        mockMvc.perform(post("/api/admin/users/blacklist/" + user1Id)
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/admin/users/unblacklist/" + user1Id)
+        mockMvc.perform(post("/api/admin/users/unblacklist/" + user1Id)
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.blacklisted").value(false));
@@ -116,7 +116,7 @@ class AdminControllerTest {
     @Test
     @DisplayName("온라인 사용자 조회 성공")
     void getOnlineUsers() throws Exception {
-        MvcResult result = mockMvc.perform(get("/admin/users/online")
+        MvcResult result = mockMvc.perform(get("/api/admin/users/online")
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -128,7 +128,7 @@ class AdminControllerTest {
     @Test
     @DisplayName("관리자 대시보드 통계 조회 성공")
     void getDashboardStats() throws Exception {
-        mockMvc.perform(get("/admin/dashboard")
+        mockMvc.perform(get("/api/admin/dashboard")
                         .cookie(accessTokenCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userCount").value(totalUserCount));
