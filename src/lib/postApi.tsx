@@ -16,6 +16,7 @@ export interface HomePostResponse {
     bookmarkedByMe: boolean; 
   
     comments: CommentResponse[];
+    createdAt: string;
 }
 
 export interface LikeUserDto {

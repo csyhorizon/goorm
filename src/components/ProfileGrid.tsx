@@ -1,4 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { PostDetailModal } from '@/components/PostDetailModal';
+
+const S3_BASE_URL =
+  import.meta.env.VITE_S3_BASE_URL ||
+  'https://uniqrambucket.s3.ap-northeast-2.amazonaws.com/';
 
 interface PostItem {
   postId: number;
@@ -15,6 +20,16 @@ export const ProfileGrid: React.FC<ProfileGridProps> = ({
   type = 'posts',
   posts = [],
 }) => {
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+  const handleOpenPostDetail = (postId: number) => {
+    setSelectedPostId(postId);
+  };
+
+  const handleClosePostDetail = () => {
+    setSelectedPostId(null);
+  };
+
   if (type !== 'posts') {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-instagram-muted">
@@ -38,19 +53,32 @@ export const ProfileGrid: React.FC<ProfileGridProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-3 gap-1">
-      {posts.map((post) => (
-        <div
-          key={post.postId}
-          className="relative w-full pt-[100%] bg-gray-900 overflow-hidden"
-        >
-          <img
-            src={post.representativeImageUrl}
-            alt={`Post ${post.postId}`}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-      ))}
+    <div className="relative">
+      <div className="grid grid-cols-3 gap-1">
+        {posts.map((post) => {
+          const imageUrl = post.representativeImageUrl.startsWith('http')
+            ? post.representativeImageUrl
+            : `${S3_BASE_URL}${post.representativeImageUrl}`;
+
+          return (
+            <div
+              key={post.postId}
+              className="relative w-full pt-[100%] bg-gray-900 overflow-hidden cursor-pointer"
+              onClick={() => handleOpenPostDetail(post.postId)}
+            >
+              <img
+                src={imageUrl}
+                alt={`Post ${post.postId}`}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {selectedPostId && (
+        <PostDetailModal postId={selectedPostId} onClose={handleClosePostDetail} />
+      )}
     </div>
   );
 };

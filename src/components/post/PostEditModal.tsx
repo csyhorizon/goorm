@@ -24,6 +24,8 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
   const [location, setLocation] = useState(initialLocation);
   const [remainImageUrls, setRemainImageUrls] = useState(initialImages);
 
+  const S3_BASE_URL = 'https://uniqrambucket.s3.ap-northeast-2.amazonaws.com/';
+
   const mutation = useMutation({
     mutationFn: (data: PostUpdateRequest) => updatePost(postId, data),
     onSuccess: () => {
@@ -55,7 +57,6 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
 
     const imagesChanged = remainImageUrls.length !== initialImages.length;
 
-    // ⚠️ 이미지가 3개 이상이고, 삭제 시도를 한 경우에만 최소 2개 체크
     if (initialImages.length >= 3 && imagesChanged && remainImageUrls.length < 2) {
       alert('이미지는 최소 2장 이상 남겨야 합니다.');
       return;
@@ -64,7 +65,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
     mutation.mutate({
       content,
       location,
-      remainImageUrls, // 서버에서 newImageUrls 비활성화 됐으니 이것만 보냄
+      remainImageUrls,
     });
   };
 
@@ -74,13 +75,13 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-500">
           ✕
         </button>
-        <h2 className="text-xl font-semibold mb-4">게시물 수정</h2>
+        <h2 className="text-xl font-semibold mb-4 text-white">게시물 수정</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-black bg-white"
             rows={3}
             placeholder="내용을 수정하세요"
           />
@@ -88,12 +89,13 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-black bg-white"
             placeholder="위치"
           />
 
           <div className="grid grid-cols-3 gap-2">
             {initialImages.map((url) => {
+              const fullUrl = url.startsWith('http') ? url : `${S3_BASE_URL}${url}`;
               const isActive = remainImageUrls.includes(url);
               return (
                 <div
@@ -103,7 +105,7 @@ const PostEditModal: React.FC<PostEditModalProps> = ({
                   }`}
                   onClick={() => handleImageToggle(url)}
                 >
-                  <img src={url} alt="media" className="object-cover w-full h-24 rounded" />
+                  <img src={fullUrl} alt="media" className="object-cover w-full h-24 rounded" />
                   {!isActive && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-sm">
                       삭제됨

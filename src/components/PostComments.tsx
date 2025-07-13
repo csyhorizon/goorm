@@ -4,7 +4,8 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { HomePostResponse, CommentResponse, deletePost } from '@/lib/postApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import PostEditModal from './post/PostEditModal'; // ✅ PostEditModal import
+import PostEditModal from './post/PostEditModal';
+import { useAuth } from '@/hooks/useAuth'; // ✅ auth 훅 가져오기
 
 interface PostCommentsProps {
   post: HomePostResponse;
@@ -13,11 +14,13 @@ interface PostCommentsProps {
 }
 
 export const PostComments: React.FC<PostCommentsProps> = ({ post, comments, onClose }) => {
+  const auth = useAuth();
+  const currentUserId = auth?.userId; // ✅ 현재 로그인한 사용자 ID
   const [liked, setLiked] = useState(post.likedByMe || false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
   const [newComment, setNewComment] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false); // ✅ 수정 모달 상태 추가
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -54,7 +57,6 @@ export const PostComments: React.FC<PostCommentsProps> = ({ post, comments, onCl
 
   return (
     <div className="flex flex-col h-full relative">
-      {/* ✅ PostEditModal 연결 */}
       {isEditOpen && (
         <PostEditModal
           postId={post.postId}
@@ -86,24 +88,27 @@ export const PostComments: React.FC<PostCommentsProps> = ({ post, comments, onCl
           </div>
         </div>
 
-        <button
-          className="text-instagram-muted hover:text-instagram-text"
-          onClick={(e) => {
-            e.stopPropagation();
-            setMenuOpen((prev) => !prev);
-          }}
-        >
-          <MoreHorizontal size={20} />
-        </button>
+        {/* ✅ 내 게시물일 때만 점세개 버튼 보여주기 */}
+        {currentUserId === post.memberId && (
+          <button
+            className="text-instagram-muted hover:text-instagram-text"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen((prev) => !prev);
+            }}
+          >
+            <MoreHorizontal size={20} />
+          </button>
+        )}
 
-        {/* 메뉴 팝업 */}
-        {menuOpen && (
+        {/* ✅ 내 게시물일 때만 메뉴 렌더링 */}
+        {currentUserId === post.memberId && menuOpen && (
           <div className="absolute top-10 right-4 bg-gray-600 border rounded shadow p-2 z-50">
             <button
               className="block w-full text-left px-4 py-2 hover:bg-gray-600 text-gray-100"
               onClick={() => {
-                setIsEditOpen(true); // ✅ 수정 모달 열기
-                setMenuOpen(false);  // 메뉴 닫기
+                setIsEditOpen(true);
+                setMenuOpen(false);
               }}
             >
               수정하기
