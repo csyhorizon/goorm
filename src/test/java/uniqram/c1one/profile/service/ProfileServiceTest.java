@@ -50,10 +50,10 @@ class ProfileServiceTest {
     @DisplayName("ProfileService - 프로필 조회 성공")
     void getProfileByIdTest() {
         // given
-        Long profileId = testProfile.getId();
+        Long profileId = testProfile.getUserId().getId();
 
         // when
-        ProfileResponseDto dto = profileService.getProfileById(profileId);
+        ProfileResponseDto dto = profileService.getProfileByUserId(profileId);
 
         // then
         assertNotNull(dto);
@@ -66,7 +66,7 @@ class ProfileServiceTest {
     @DisplayName("ProfileService - 프로필 업데이트 성공")
     void updateProfileTest() {
         // given
-        Long profileId = testProfile.getId();
+        Long profileId = testProfile.getUserId().getId();
         ProfileUpdateRequestDto updateDto = new ProfileUpdateRequestDto("수정된 bio", "NewImageURI");
 
         // when
