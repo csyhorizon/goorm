@@ -19,4 +19,11 @@ public class FindUserImpl implements FindUser {
 	public List<UserSearchResultDto> findUser(String username) {
 		return userDao.findUserByName(username);
 	}
+	
+	@Override
+	public Optional<UserSearchResultDto> findUserByUserId(Long userId) {
+		return userDao.findUserByUserId(userId);
+	}
+	
+	
 }
