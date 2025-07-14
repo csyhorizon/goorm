@@ -12,7 +12,7 @@ public class UserSearchResultDto {
 	
 	private String username;
 	
-	protected UserSearchResultDto(){}
+	public UserSearchResultDto(){}
 	
 	@Builder
 	public UserSearchResultDto(Long userid, String username) {

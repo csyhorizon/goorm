@@ -3,6 +3,7 @@ package uniqram.c1one.search.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import uniqram.c1one.security.adapter.CustomUserDetails;
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
-@Tag(name ="SearchController", description = "검색 관련 API")
+@Tag(name = "SearchController", description = "검색 관련 API")
 public class SearchController {
 	
 	private final FindUser            findUser;
@@ -31,7 +32,7 @@ public class SearchController {
 	@Operation(
 		summary = "키워드로 검색",
 		description = "유저가 무엇을 어떻게 검색했느냐에 따라 다르게 매핑"
-			+ "keyword string formatting 에 따라 (일단 username 만 구현함 추후 수정)" 
+			+ "keyword string formatting 에 따라 (일단 username 만 구현함 추후 수정)"
 			+ "!! 관리자 계정은 조회 불가능하게 막음 !!"
 	)
 	@GetMapping("/{searchKeyword}")
@@ -53,9 +54,28 @@ public class SearchController {
 	}
 	
 	@Operation(
-		summary = "작업중",
-		description = "미구현으로 사용 금지"
+		summary = "유저 아이디로 검색"
 	)
+	@GetMapping("/userid/{searchKeyword}")
+	ResponseEntity<UserSearchResultDto> searchResultByUserId(@PathVariable(name = "searchKeyword") String searchKeyword,
+	                                                         @AuthenticationPrincipal CustomUserDetails currentUser) {
+		
+		Optional<UserSearchResultDto> result = findUser.findUserByUserId(Long.parseLong(searchKeyword));
+		
+		if (result.isPresent()) {
+			UserSearchResultDto userSearchResultDto = result.get();
+			return ResponseEntity.ok(userSearchResultDto);
+		}
+		else {
+			UserSearchResultDto userSearchResultDto = UserSearchResultDto.builder()
+			                                                             .userid(0L)
+			                                                             .username("테스트용유저입니다.")
+			                                                             .build();
+			
+			return ResponseEntity.ok(userSearchResultDto);
+		}
+	}
+	
 	@GetMapping("/search-history")
 	ResponseEntity<SearchHistoryDto> searchHistory() {
 		
