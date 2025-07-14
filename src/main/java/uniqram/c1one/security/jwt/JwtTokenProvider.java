@@ -5,6 +5,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,15 +36,17 @@ public class JwtTokenProvider {
     private final Key key;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();      // 1시간
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(14).toMillis();    // 14일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository, RefreshTokenRepository refreshTokenRepository) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, RedisTemplate<String, String> redisTemplate) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Transactional
@@ -170,6 +173,11 @@ public class JwtTokenProvider {
                     .build();
             refreshTokenRepository.save(refreshToken);
         }
+        redisTemplate.opsForValue().set(
+                "refresh_token:" + user.getUsername(),
+                token,
+                Duration.between(LocalDateTime.now(), expiryDate)
+        );
     }
 
     @Transactional
