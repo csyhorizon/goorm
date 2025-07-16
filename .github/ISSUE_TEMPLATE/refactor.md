@@ -2,7 +2,7 @@
 name: Refactor
 about: 코드 리펙토링
 title: "[Refactor] "
-labels: ''
+labels: refactor
 assignees: ''
 
 ---
