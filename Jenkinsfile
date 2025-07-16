@@ -22,13 +22,13 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
-            stage('Cleanup Workspace') {
-                steps {
-                    // 이전 작업 공간의 내용을 깨끗하게 삭제합니다.
-                    cleanWs()
-                }
+        stage('Cleanup Workspace') {
+            steps {
+                cleanWs()
             }
+        }
+
+        stage('Clone Repository') {
             steps {
                 withCredentials([
                     string(credentialsId: env.GITHUB_REPO_URL_CREDENTIAL_ID, variable: 'REPO_URL'),
