@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength */
 pipeline {
     agent any
 
@@ -75,7 +76,7 @@ docker run -d \\
 docker image prune -f
 EOF
                 '''
-                    }
+                }
                 }
             }
         }
@@ -90,21 +91,27 @@ EOF
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
                     def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
 
+                    // 1. 빌드 원인 목록을 가져와서 쉼표로 구분된 문자열로 만듭니다.
+                    def causes = currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')
+
                     sh """
-                    curl -H "Content-Type: application/json" -X POST -d '{
-                        "username": "Jenkins CI/CD",
-                        "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
-                        "embeds": [
-                            {
-                                "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                                "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n트리거: ${currentBuild.cause}\\n자세히 보기: ${env.BUILD_URL}",
-                                "color": ${statusColor},
-                                "timestamp": "${new Date().toISOString()}"
-                            }
-                        ]
-                    }' ${DISCORD_WEBHOOK_URL}
+                curl -H "Content-Type: application/json" -X POST -d '{
+                    "username": "Jenkins CI/CD",
+                    "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
+                    "embeds": [
+                        {
+                            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+
+                            // 2. ${currentBuild.cause} 대신 가공된 ${causes} 변수를 사용합니다.
+                            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n트리거: ${causes}\\n자세히 보기: ${env.BUILD_URL}",
+
+                            "color": ${statusColor},
+                            "timestamp": "${new Date().toISOString()}"
+                        }
+                    ]
+                }' ${DISCORD_WEBHOOK_URL}
                 """
-                    }
+                }
                 }
             }
         }
