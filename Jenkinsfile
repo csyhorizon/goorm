@@ -1,51 +1,52 @@
-agent any
+Pipeline {
+    agent any
 
-environment {
-    GCP_SSH_CREDENTIAL_ID = 'gcp-ssh-key-credential'
-    JWT_SECRET_CREDENTIAL_ID = 'jwt-secret-text'
-    DISCORD_WEBHOOK_URL_CREDENTIAL_ID = 'DISCORD_WEBHOOK_URL'
-    SPRING_BOOT_API_URL_CREDENTIAL_ID = 'spring-boot-api-url'
-    KAKAO_MAP_APP_KEY_CREDENTIAL_ID = 'kakao-map-app-key'
+    environment {
+        GCP_SSH_CREDENTIAL_ID = 'gcp-ssh-key-credential'
+        JWT_SECRET_CREDENTIAL_ID = 'jwt-secret-text'
+        DISCORD_WEBHOOK_URL_CREDENTIAL_ID = 'DISCORD_WEBHOOK_URL'
+        SPRING_BOOT_API_URL_CREDENTIAL_ID = 'spring-boot-api-url'
+        KAKAO_MAP_APP_KEY_CREDENTIAL_ID = 'kakao-map-app-key'
 
-    GITHUB_REPO_URL_CREDENTIAL_ID = 'github-repo-url'
-    GITHUB_BRANCH_CREDENTIAL_ID = 'github-branch'
+        GITHUB_REPO_URL_CREDENTIAL_ID = 'github-repo-url'
+        GITHUB_BRANCH_CREDENTIAL_ID = 'github-branch'
 
-    GCP_VM_USER = 'your-vm-user'
-    GCP_VM_HOST = 'your-vm-ip-address-or-hostname'
+        GCP_VM_USER = 'your-vm-user'
+        GCP_VM_HOST = 'your-vm-ip-address-or-hostname'
 
-    DOCKER_IMAGE_NAME = 'seot-frontend'
-    DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
-}
+        DOCKER_IMAGE_NAME = 'seot-frontend'
+        DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
+    }
 
-stages {
-    stage('Clone Repository') {
-        steps {
-            withCredentials([
+    stages {
+        stage('Clone Repository') {
+            steps {
+                withCredentials([
                 string(credentialsId: env.GITHUB_REPO_URL_CREDENTIAL_ID, variable: 'REPO_URL'),
                 string(credentialsId: env.GITHUB_BRANCH_CREDENTIAL_ID, variable: 'REPO_BRANCH')
             ]) {
-                git branch: "${REPO_BRANCH}", url: "${REPO_URL}"
+                    git branch: "${REPO_BRANCH}", url: "${REPO_URL}"
+            }
             }
         }
-    }
 
-    stage('Build Docker Image') {
-        steps {
-            script {
-                sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                }
             }
         }
-    }
 
-    stage('Deploy to VM') {
-        steps {
-            sshagent(credentials: [env.GCP_SSH_CREDENTIAL_ID]) {
-                withCredentials([
+        stage('Deploy to VM') {
+            steps {
+                sshagent(credentials: [env.GCP_SSH_CREDENTIAL_ID]) {
+                    withCredentials([
                     string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
                     string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
                     string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
                 ]) {
-                    sh """
+                        sh """
                         ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << 'EOF'
                             docker stop ${DOCKER_IMAGE_NAME} || true
                             docker rm ${DOCKER_IMAGE_NAME} || true
@@ -63,21 +64,21 @@ stages {
                         EOF
                     """
                 }
+                }
             }
         }
     }
-}
 
-post {
-    always {
-        echo "Pipeline finished. Status: ${currentBuild.result}"
+    post {
+        always {
+            echo "Pipeline finished. Status: ${currentBuild.result}"
 
-        withCredentials([string(credentialsId: env.DISCORD_WEBHOOK_URL_CREDENTIAL_ID, variable: 'DISCORD_WEBHOOK_URL')]) {
-            script {
-                def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
-                def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
+            withCredentials([string(credentialsId: env.DISCORD_WEBHOOK_URL_CREDENTIAL_ID, variable: 'DISCORD_WEBHOOK_URL')]) {
+                script {
+                    def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
+                    def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
 
-                sh """
+                    sh """
                     curl -H "Content-Type: application/json" -X POST -d '{
                         "username": "Jenkins CI/CD",
                         "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
@@ -91,7 +92,8 @@ post {
                         ]
                     }' ${DISCORD_WEBHOOK_URL}
                 """
+                    }
+                }
             }
         }
     }
-}
