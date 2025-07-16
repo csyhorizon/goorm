@@ -22,12 +22,6 @@ pipeline {
     }
 
     stages {
-        stage('Cleanup Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-
         stage('Clone Repository') {
             steps {
                 withCredentials([
