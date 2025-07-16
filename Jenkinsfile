@@ -91,7 +91,6 @@ EOF
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
                     def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
 
-                    // 1. 빌드 원인 목록을 가져와서 쉼표로 구분된 문자열로 만듭니다.
                     def causes = currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')
 
                     sh """
