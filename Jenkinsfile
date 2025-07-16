@@ -38,6 +38,23 @@ pipeline {
             }
         }
 
+        stage('SSH 직접 연결 테스트') {
+            steps {
+                script {
+                    echo '진단 시작: 하드코딩된 값으로 SSH 연결을 시도합니다.'
+                    try {
+                        sshagent(credentials: ['gcp-ssh-key-credential']) {
+                            sh 'ssh -o StrictHostKeyChecking=no -v user@34.47.77.158 "echo \\"SSH 연결 테스트 성공!\\""'
+                        }
+                    } catch (Exception e) {
+                        echo '진단 실패: SSH 키 자체 또는 서버의 authorized_keys 파일에 문제가 있습니다.'
+                        error '테스트 실패'
+                    }
+                    echo '진단 성공: SSH 키와 서버 설정은 정상입니다. credentials() 함수로 불러온 변수 값을 확인해야 합니다.'
+                }
+            }
+        }
+
         stage('Deploy to VM') {
             steps {
                 sshagent(credentials: [env.GCP_SSH_CREDENTIAL_ID]) {
