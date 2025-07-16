@@ -14,7 +14,9 @@ pipeline {
         GCP_VM_USER = credentials('host-vm-user')
         GCP_VM_HOST = credentials('host-vm-ip-address-or-hostname')
 
-        DOCKER_IMAGE_NAME = 'seot-frontend'
+        DOCKERHUB_CREDENTIAL_ID = 'dockerhub-credential'
+        DOCKERHUB_USERNAME = 'chinoel'
+        DOCKER_IMAGE_NAME = "${env.DOCKERHUB_USERNAME}/seot-frontend"
         DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
@@ -34,6 +36,15 @@ pipeline {
             steps {
                 script {
                     sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker login -u '${DOCKER_USER}' -p '${DOCKER_PASSWORD}'"
+                    sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                 }
             }
         }
