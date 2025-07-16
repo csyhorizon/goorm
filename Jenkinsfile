@@ -61,12 +61,14 @@ pipeline {
                         ssh-keygen -R ${GCP_VM_HOST}
 
                         ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
-                            docker stop ${DOCKER_IMAGE_NAME} || true
-                            docker rm ${DOCKER_IMAGE_NAME} || true
+                            docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+
+                            docker stop seot-frontend || true
+                            docker rm seot-frontend || true
 
                             docker run -d \\
                                 -p 3000:3000 \\
-                                --name ${DOCKER_IMAGE_NAME} \\
+                                --name seot-frontend \\
                                 --network seot \\
                                 -e "JWT_SECRET=${JWT_SECRET}" \\
                                 -e "NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL=${NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}" \\
