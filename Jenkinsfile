@@ -45,10 +45,13 @@ pipeline {
                     echo '--- 1. 현재 사용 중인 Dockerfile 내용 확인 ---'
                     sh 'cat Dockerfile'
 
-                    echo '--- 2. 캐시 없이 Docker 이미지 새로 빌드 ---'
+                    echo "--- 2. Git DB의 실제 Dockerfile 내용 (git show 명령어) ---"
+                    sh 'git show HEAD:Dockerfile'
+
+                    echo '--- 3. 캐시 없이 Docker 이미지 새로 빌드 ---'
                     sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
 
-                    echo '--- 3. 빌드된 이미지 내부 확인 ---'
+                    echo '--- 4. 빌드된 이미지 내부 확인 ---'
                     sh "docker run --rm ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ls -l /app/node_modules/.bin"
                 }
             }
