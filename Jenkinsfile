@@ -89,22 +89,23 @@ EOF
                 script {
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
                     def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
+                    def nowIso = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
 
                     sh """
-curl -H "Content-Type: application/json" -X POST -d '{
-    "username": "Jenkins CI/CD",
-    ...
-    "embeds": [
-        {
-            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n자세히 보기: ${env.BUILD_URL}",
-            "color": ${statusColor},
-            "timestamp": "${new Date().toISOString()}"
-        }
-    ]
-}' ${DISCORD_WEBHOOK_URL}
-"""
-}
+                curl -H "Content-Type: application/json" -X POST -d '{
+                    "username": "Jenkins CI/CD",
+                    "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
+                    "embeds": [
+                        {
+                            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n자세히 보기: ${env.BUILD_URL}",
+                            "color": ${statusColor},
+                            "timestamp": "${nowIso}"
+                        }
+                    ]
+                }' ${DISCORD_WEBHOOK_URL}
+                """
+                }
                 }
             }
         }
