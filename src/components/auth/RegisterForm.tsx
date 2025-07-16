@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // 로그인 페이지로 이동 링크를 위해 Link 임포트 (만약 없다면 추가)
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -42,8 +41,9 @@ export default function RegisterForm() {
         router.push('/auth/login');
       }, 2000);
 
-    } catch (err: any) {
-      setError(err.message || '알 수 없는 오류 발생');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류 발생';
+      setError(errorMessage);
       console.error('클라이언트 측 회원가입 에러:', err);
     } finally {
       setLoading(false);
