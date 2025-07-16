@@ -56,7 +56,7 @@ pipeline {
                     withCredentials([
                         string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
                         string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
-                        // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
+                    // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
                     ]) {
                         sh '''
                         ssh-keygen -R ${GCP_VM_HOST}
@@ -89,24 +89,23 @@ EOF
                 script {
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
                     def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
-                    def causes = currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')
 
                     sh """
-                    curl -H "Content-Type: application/json" -X POST -d '{
-                        "username": "Jenkins CI/CD",
-                        "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
-                        "embeds": [
-                            {
-                                "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                                "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n트리거: ${causes}\\n자세히 보기: ${env.BUILD_URL}",
-                                "color": ${statusColor},
-                                "timestamp": "${new Date().toISOString()}"
-                            }
-                        ]
-                    }' ${DISCORD_WEBHOOK_URL}
-                    """
+curl -H "Content-Type: application/json" -X POST -d '{
+    "username": "Jenkins CI/CD",
+    ...
+    "embeds": [
+        {
+            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n자세히 보기: ${env.BUILD_URL}",
+            "color": ${statusColor},
+            "timestamp": "${new Date().toISOString()}"
+        }
+    ]
+}' ${DISCORD_WEBHOOK_URL}
+"""
+}
                 }
             }
         }
     }
-}
