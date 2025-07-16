@@ -44,7 +44,7 @@ pipeline {
                     withCredentials([
                     string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
                     string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
-                    string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
+                    // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
                 ]) {
                         sh """
                         ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << 'EOF'
@@ -57,7 +57,6 @@ pipeline {
                                 --network seot \\
                                 -e "JWT_SECRET=${JWT_SECRET}" \\
                                 -e "NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL=${NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}" \\
-                                -e "NEXT_PUBLIC_KAKAO_MAP_APP_KEY=${NEXT_PUBLIC_KAKAO_MAP_APP_KEY}" \\
                                 ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                             docker image prune -f
