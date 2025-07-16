@@ -2,6 +2,10 @@
 pipeline {
     agent any
 
+    options {
+        wipeWorkspace()
+    }
+
     environment {
         GCP_SSH_CREDENTIAL_ID = 'gcp-ssh-key-credential'
         JWT_SECRET_CREDENTIAL_ID = 'jwt-secret-text'
