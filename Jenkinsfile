@@ -11,8 +11,8 @@ pipeline {
         GITHUB_REPO_URL_CREDENTIAL_ID = 'github-repo-url'
         GITHUB_BRANCH_CREDENTIAL_ID = 'github-branch'
 
-        GCP_VM_USER = 'your-vm-user'
-        GCP_VM_HOST = 'your-vm-ip-address-or-hostname'
+        GCP_VM_USER = 'host-vm-user'
+        GCP_VM_HOST = 'host-vm-ip-address-or-hostname'
 
         DOCKER_IMAGE_NAME = 'seot-frontend'
         DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
