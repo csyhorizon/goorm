@@ -25,11 +25,11 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 withCredentials([
-                string(credentialsId: env.GITHUB_REPO_URL_CREDENTIAL_ID, variable: 'REPO_URL'),
-                string(credentialsId: env.GITHUB_BRANCH_CREDENTIAL_ID, variable: 'REPO_BRANCH')
-            ]) {
+                    string(credentialsId: env.GITHUB_REPO_URL_CREDENTIAL_ID, variable: 'REPO_URL'),
+                    string(credentialsId: env.GITHUB_BRANCH_CREDENTIAL_ID, variable: 'REPO_BRANCH')
+                ]) {
                     git branch: "${REPO_BRANCH}", url: "${REPO_URL}"
-            }
+                }
             }
         }
 
@@ -54,14 +54,13 @@ pipeline {
             steps {
                 sshagent(credentials: [env.GCP_SSH_CREDENTIAL_ID]) {
                     withCredentials([
-                    string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
-                    string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
-                // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
-                ]) {
+                        string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
+                        string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
+                        // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
+                    ]) {
                         sh '''
-                ssh-keygen -R ${GCP_VM_HOST}
+                        ssh-keygen -R ${GCP_VM_HOST}
 
-                # ssh 명령어부터 EOF까지의 모든 라인을 맨 앞으로 붙입니다.
 ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
 docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 docker stop seot-frontend || true
@@ -75,8 +74,8 @@ docker run -d \\
     ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 docker image prune -f
 EOF
-                '''
-                }
+                        '''
+                    }
                 }
             }
         }
@@ -90,28 +89,24 @@ EOF
                 script {
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
                     def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
-
                     def causes = currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')
 
                     sh """
-                curl -H "Content-Type: application/json" -X POST -d '{
-                    "username": "Jenkins CI/CD",
-                    "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
-                    "embeds": [
-                        {
-                            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-
-                            // 2. ${currentBuild.cause} 대신 가공된 ${causes} 변수를 사용합니다.
-                            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n트리거: ${causes}\\n자세히 보기: ${env.BUILD_URL}",
-
-                            "color": ${statusColor},
-                            "timestamp": "${new Date().toISOString()}"
-                        }
-                    ]
-                }' ${DISCORD_WEBHOOK_URL}
-                """
-                }
+                    curl -H "Content-Type: application/json" -X POST -d '{
+                        "username": "Jenkins CI/CD",
+                        "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
+                        "embeds": [
+                            {
+                                "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                                "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n트리거: ${causes}\\n자세히 보기: ${env.BUILD_URL}",
+                                "color": ${statusColor},
+                                "timestamp": "${new Date().toISOString()}"
+                            }
+                        ]
+                    }' ${DISCORD_WEBHOOK_URL}
+                    """
                 }
             }
         }
     }
+}
