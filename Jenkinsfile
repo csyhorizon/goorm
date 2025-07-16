@@ -46,7 +46,7 @@ pipeline {
                     string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
                     // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
                 ]) {
-                        sh """
+                        sh '''
                         ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << 'EOF'
                             docker stop ${DOCKER_IMAGE_NAME} || true
                             docker rm ${DOCKER_IMAGE_NAME} || true
@@ -61,7 +61,7 @@ pipeline {
 
                             docker image prune -f
                         EOF
-                    """
+                    '''
                 }
                 }
             }
