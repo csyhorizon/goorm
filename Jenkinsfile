@@ -60,7 +60,7 @@ pipeline {
                         sh '''
                         ssh-keygen -R ${GCP_VM_HOST}
 
-                        ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
+                        ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} <<- EOF
                             docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
                             docker stop seot-frontend || true
