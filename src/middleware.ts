@@ -27,12 +27,13 @@ export async function middleware(request: NextRequest) {
 
   if (accessToken) {
     try {
-      const { payload } = await jwtVerify(accessToken, JWT_SECRET_KEY, {
+      await jwtVerify(accessToken, JWT_SECRET_KEY, {
         algorithms: ['HS256'],
       });
       isAuthenticated = true;
-    } catch (error: any) {
-      console.error('JWT 유효성 검증 실패 또는 만료:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'JWT 검증 오류';
+      console.error('JWT 유효성 검증 실패 또는 만료:', errorMessage);
       isAuthenticated = false;
       const response = NextResponse.redirect(new URL('/auth/login', request.url));
       response.cookies.delete('accessToken');
