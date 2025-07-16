@@ -48,8 +48,8 @@ pipeline {
                 ]) {
                         sh '''
                         ssh-keygen -R ${GCP_VM_HOST}
-                        
-                        ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << 'EOF'
+
+                        ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
                             docker stop ${DOCKER_IMAGE_NAME} || true
                             docker rm ${DOCKER_IMAGE_NAME} || true
 
