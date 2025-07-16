@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
-public class DataBaseCleaner {
+public class DatabaseCleaner {
     private static final String TRUNCATE_FORMAT = "TRUNCATE TABLE %s";
     private static final String ID_RESET_FORMAT = "ALTER TABLE %s AUTO_INCREMENT = 1"; // MySQL의 ID 리셋 형식
     private static final String REFERENTIAL_FORMAT = "SET FOREIGN_KEY_CHECKS = %s"; // MySQL에서는 외래 키 체크 비활성화
