@@ -58,26 +58,24 @@ pipeline {
                 // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
                 ]) {
                         sh '''
-                        ssh-keygen -R ${GCP_VM_HOST}
+                ssh-keygen -R ${GCP_VM_HOST}
 
-                        ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} <<- EOF
-                            docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-
-                            docker stop seot-frontend || true
-                            docker rm seot-frontend || true
-
-                            docker run -d \\
-                                -p 3000:3000 \\
-                                --name seot-frontend \\
-                                --network seot \\
-                                -e "JWT_SECRET=${JWT_SECRET}" \\
-                                -e "NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL=${NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}" \\
-                                ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-
-                            docker image prune -f
-                        EOF
-                    '''
-                }
+                # ssh 명령어부터 EOF까지의 모든 라인을 맨 앞으로 붙입니다.
+ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
+docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+docker stop seot-frontend || true
+docker rm seot-frontend || true
+docker run -d \\
+    -p 3000:3000 \\
+    --name seot-frontend \\
+    --network seot \\
+    -e "JWT_SECRET=${JWT_SECRET}" \\
+    -e "NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL=${NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}" \\
+    ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+docker image prune -f
+EOF
+                '''
+                    }
                 }
             }
         }
