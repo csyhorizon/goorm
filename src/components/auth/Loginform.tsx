@@ -33,8 +33,9 @@ export default function LoginForm() {
       console.log('로그인 성공!');
       router.push('/dashboard');
 
-    } catch (err: any) {
-      setError(err.message || '알 수 없는 오류 발생');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류 발생';
+      setError(errorMessage);
       console.error('클라이언트 측 로그인 에러:', err);
     } finally {
       setLoading(false);
