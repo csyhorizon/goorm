@@ -1,4 +1,5 @@
 /* groovylint-disable LineLength */
+/* groovylint-disable-next-line CompileStatic */
 pipeline {
     agent any
 
@@ -36,17 +37,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo '--- 1. 현재 사용 중인 Dockerfile 내용 확인 ---'
-                    sh 'cat Dockerfile'
-
-                    echo "--- 2. Git DB의 실제 Dockerfile 내용 (git show 명령어) ---"
-                    sh 'git show HEAD:Dockerfile'
-
-                    echo '--- 3. 캐시 없이 Docker 이미지 새로 빌드 ---'
-                    sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-
-                    echo '--- 4. 빌드된 이미지 내부 확인 ---'
-                    sh "docker run --rm ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ls -l /app/node_modules/.bin"
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
         }
@@ -67,7 +58,9 @@ pipeline {
                         string(credentialsId: env.JWT_SECRET_CREDENTIAL_ID, variable: 'JWT_SECRET'),
                         string(credentialsId: env.SPRING_BOOT_API_URL_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL'),
                     // string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'NEXT_PUBLIC_KAKAO_MAP_APP_KEY')
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     ]) {
+                        /* groovylint-disable-next-line GStringExpressionWithinString */
                         sh '''
                         ssh-keygen -R ${GCP_VM_HOST}
 
@@ -91,32 +84,32 @@ EOF
         }
     }
 
-    // post {
-    //     always {
-    //         echo "Pipeline finished. Status: ${currentBuild.result}"
+    post {
+        always {
+            echo "Pipeline finished. Status: ${currentBuild.result}"
 
-    //         withCredentials([string(credentialsId: env.DISCORD_WEBHOOK_URL_CREDENTIAL_ID, variable: 'DISCORD_WEBHOOK_URL')]) {
-    //             script {
-    //                 def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
-    //                 def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
-    //                 def nowIso = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+            withCredentials([string(credentialsId: env.DISCORD_WEBHOOK_URL_CREDENTIAL_ID, variable: 'DISCORD_WEBHOOK_URL')]) {
+                script {
+                    def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
+                    def statusColor = (currentBuild.result == 'SUCCESS') ? 65280 : 16711680
+                    def nowIso = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
 
-    //                 sh """
-    //             curl -H "Content-Type: application/json" -X POST -d '{
-    //                 "username": "Jenkins CI/CD",
-    //                 "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
-    //                 "embeds": [
-    //                     {
-    //                         "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-    //                         "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n자세히 보기: ${env.BUILD_URL}",
-    //                         "color": ${statusColor},
-    //                         "timestamp": "${nowIso}"
-    //                     }
-    //                 ]
-    //             }' ${DISCORD_WEBHOOK_URL}
-    //             """
-    //             }
-    //             }
-    //         }
-    //     }
+                    sh """
+                curl -H "Content-Type: application/json" -X POST -d '{
+                    "username": "Jenkins CI/CD",
+                    "avatar_url": "https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins-icon.png",
+                    "embeds": [
+                        {
+                            "title": "${statusEmoji} 빌드 ${currentBuild.result}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                            "description": "프로젝트: **${env.JOB_NAME}**\\n빌드 번호: **${env.BUILD_NUMBER}**\\n상태: **${currentBuild.result}**\\n자세히 보기: ${env.BUILD_URL}",
+                            "color": ${statusColor},
+                            "timestamp": "${nowIso}"
+                        }
+                    ]
+                }' ${DISCORD_WEBHOOK_URL}
+                """
+                }
+                }
+            }
+        }
     }
