@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import BottomNav from "@/components/layout/BottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <main style={{ paddingBottom: '60px' }}>
+          {children}
+        </main>
+
+        <BottomNav />
+
         <Script
           src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_APP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
           strategy="beforeInteractive"

@@ -100,7 +100,7 @@ export default function KakaoMap() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100vw', height: 'calc(100vh - 60px)' }}>
       <div id="map" style={{ width: '100%', height: '100%' }} />
       {map && (
         <>
