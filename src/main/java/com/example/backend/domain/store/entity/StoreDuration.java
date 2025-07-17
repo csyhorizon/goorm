@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class StoreDuration {
-    private LocalTime startTime;  // 가게 운영 시작 시간
-    private LocalTime endTime;    // 가게 운영 종료 시간
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     public StoreDuration(LocalTime startTime, LocalTime endTime) {
         validate(startTime, endTime);

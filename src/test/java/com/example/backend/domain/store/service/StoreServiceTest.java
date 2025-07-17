@@ -1,10 +1,9 @@
-package com.example.backend.domain.store;
+package com.example.backend.domain.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
-import com.example.backend.domain.store.service.StoreService;
 import com.example.backend.domain.user.entity.Users;
 import com.example.backend.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
