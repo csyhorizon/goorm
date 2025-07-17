@@ -14,6 +14,7 @@ interface CustomPlace {
 
 interface PlaceDetailOverlayProps {
   place: CustomPlace;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any;
   onClose: () => void;
 }

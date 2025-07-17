@@ -13,6 +13,7 @@ interface CustomPlace {
 }
 
 interface CustomOverlaysProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any;
   places: CustomPlace[];
   selectedCategory: string;
@@ -23,6 +24,7 @@ export default function CustomOverlays({ map, places, selectedCategory, onSelect
   useEffect(() => {
     if (!map) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const overlays: any[] = [];
 
     const placesToShow =

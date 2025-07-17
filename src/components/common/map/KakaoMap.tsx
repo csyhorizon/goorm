@@ -8,6 +8,7 @@ import PlaceDetailOverlay from './PlaceDetailOverlay';
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     kakao: any;
   }
 }
@@ -23,6 +24,7 @@ interface CustomPlace {
 }
 
 export default function KakaoMap() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [map, setMap] = useState<any>(null);
   const [dbPlaces, setDbPlaces] = useState<CustomPlace[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -100,7 +102,7 @@ export default function KakaoMap() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100vw', height: 'calc(100vh - 60px)' }}>
       <div id="map" style={{ width: '100%', height: '100%' }} />
       {map && (
         <>
