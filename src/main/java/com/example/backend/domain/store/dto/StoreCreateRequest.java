@@ -1,6 +1,5 @@
 package com.example.backend.domain.store.dto;
 
-import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.entity.StoreCategory;
 import com.example.backend.domain.store.entity.StoreDuration;

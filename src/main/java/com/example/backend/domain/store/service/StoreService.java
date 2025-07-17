@@ -1,6 +1,5 @@
 package com.example.backend.domain.store.service;
 
-import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.entity.Store;

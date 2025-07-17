@@ -17,7 +17,7 @@ public class DatabaseCleaner {
 
     private static final String TRUNCATE_FORMAT = "TRUNCATE TABLE %s";
     private static final String ID_RESET_FORMAT = "ALTER TABLE %s ALTER COLUMN ID RESTART WITH 1";
-    private static final String REFERENTIAL_FORMAT = "SET FOREIGN_KEY_CHECKS = %s"; // MySQL에서는 외래 키 체크 비활성화
+    private static final String REFERENTIAL_FORMAT = "SET REFERENTIAL_INTEGRITY %s"; // H2에서 외래키 비활성화
 
     private final EntityManager entityManager;
     private final DataSource dataSource;

@@ -1,7 +1,6 @@
 package com.example.backend.domain.store.entity;
 
 import com.example.backend.domain.global.BaseEntity;
-import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.user.entity.Users;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
@@ -38,8 +37,8 @@ public class Store extends BaseEntity {
     @Embedded
     private StoreDuration storeDuration;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "users_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private Users user;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,

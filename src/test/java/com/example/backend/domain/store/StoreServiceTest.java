@@ -23,12 +23,24 @@ public class StoreServiceTest {
     UserRepository userRepository;
 
     @Test
-    void 가게를_저장할_수_있다(){
+    void 가게를_저장할_수_있다() {
         Users user = UsersFixture.김회원();
         userRepository.save(user);
-        Store store = StoreFixture.과일가게();
+        Store store = StoreFixture.과일가게(user);
         storeRepository.save(store);
 
         assertThat(storeRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void 가게를_삭제할_수_있다() {
+        Users user = UsersFixture.김회원();
+        userRepository.save(user);
+        Store store = StoreFixture.과일가게(user);
+        storeRepository.save(store);
+
+        storeRepository.delete(store);
+
+        assertThat(storeRepository.findAll()).hasSize(0);
     }
 }
