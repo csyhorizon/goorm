@@ -66,13 +66,86 @@ body {
 }
 
 .seot-logo {
-    font-size: 3rem;
-    font-weight: 800;
-    color: #facc15;
-    letter-spacing: -0.05em;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: -0.05em;
 }
 
 .font-medium {
   font-weight: 500;
   color: #836a08;
+}
+
+.custom-overlay {
+  background-color: #ffdd00;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%);
+}
+
+.custom-overlay::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #ffdd00;
+}
+
+/* 카테고리 필터의 스크롤바를 숨깁니다 */
+.category-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.category-scroll {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.detail-overlay {
+  position: relative;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 280px;
+}
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+.detail-header .title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #000000;
+}
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.detail-body {
+  padding: 15px;
+}
+.detail-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.description {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
 }
