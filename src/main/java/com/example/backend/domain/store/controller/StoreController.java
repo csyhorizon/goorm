@@ -7,6 +7,7 @@ import com.example.backend.domain.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,5 +30,11 @@ public class StoreController {
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreResponse> getStoreDetail(@PathVariable Long storeId) {
         return ResponseEntity.ok(storeService.findById(storeId));
+    }
+
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(@PathVariable Long storeId) {
+        storeService.delete(storeId);
+        return ResponseEntity.noContent().build();
     }
 }

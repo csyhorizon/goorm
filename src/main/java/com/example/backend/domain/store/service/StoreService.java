@@ -30,4 +30,9 @@ public class StoreService {
         Store store = storeRepository.findOrThrow(storeId);
         return StoreResponse.from(store);
     }
+
+    public void delete(Long storeId) {
+        Store store = storeRepository.findOrThrow(storeId);
+        storeRepository.delete(store);
+    }
 }
