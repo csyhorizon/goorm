@@ -7,6 +7,8 @@ import com.example.backend.domain.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +24,10 @@ public class StoreController {
     public ResponseEntity<StoreResponse> save(@AuthenticationPrincipal CustomUserDetails user, @RequestBody
     StoreCreateRequest storeCreateRequest) {
         return ResponseEntity.ok(storeService.save(user.getUserId(), storeCreateRequest));
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<StoreResponse> getStoreDetail(@PathVariable Long storeId) {
+        return ResponseEntity.ok(storeService.findById(storeId));
     }
 }

@@ -24,4 +24,10 @@ public class StoreService {
 
         return StoreResponse.from(store);
     }
+
+    @Transactional(readOnly = true)
+    public StoreResponse findById(Long storeId) {
+        Store store = storeRepository.findOrThrow(storeId);
+        return StoreResponse.from(store);
+    }
 }
