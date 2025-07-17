@@ -36,8 +36,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                withCredentials([string(credentialsId: env.KAKAO_MAP_APP_KEY_CREDENTIAL_ID, variable: 'KAKAOMAP_KEY')]) {
+                    script {
+                        sh "docker build --build-arg NEXT_PUBLIC_KAKAO_MAP_APP_KEY=${KAKAOMAP_KEY} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    }
                 }
             }
         }
