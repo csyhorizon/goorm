@@ -1,4 +1,4 @@
-package support;
+package com.example.backend.support;
 
 public enum SystemTableName {
     INFORMATION_SCHEMA,
