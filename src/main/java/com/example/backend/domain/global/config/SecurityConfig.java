@@ -73,6 +73,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/notifications/subscribe").permitAll()    // [임시] 테스트용
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
