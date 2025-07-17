@@ -2,12 +2,17 @@ package com.example.backend.domain.store.entity;
 
 import com.example.backend.domain.global.BaseEntity;
 import com.example.backend.domain.member.entity.Member;
+import com.example.backend.domain.user.entity.Users;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Store extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -32,16 +38,17 @@ public class Store extends BaseEntity {
     @Embedded
     private StoreDuration storeDuration;
 
-    @ManyToOne
-    private Member member;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "users_id")
+    private Users user;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, Member member) {
-        this(null, name, address, phone_number, description, category, storeDuration, member);
+                 StoreDuration storeDuration, Users user) {
+        this(null, name, address, phone_number, description, category, storeDuration, user);
     }
 
     public Store(Long id, String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, Member member) {
+                 StoreDuration storeDuration, Users user) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -49,14 +56,14 @@ public class Store extends BaseEntity {
         this.description = description;
         this.category = category;
         this.storeDuration = storeDuration;
-        this.member = member;
+        this.user = user;
     }
 
-    public LocalDate getStartDate() {
-        return storeDuration.getStartDate();
+    public LocalTime getStartTime() {
+        return storeDuration.getStartTime();
     }
 
-    public LocalDate getEndDate() {
-        return storeDuration.getEndDate();
+    public LocalTime getEndTime() {
+        return storeDuration.getEndTime();
     }
 }
