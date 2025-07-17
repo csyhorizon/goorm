@@ -9,7 +9,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Builder
 @ToString
 public class Users extends BaseEntity implements Serializable {
@@ -18,8 +17,11 @@ public class Users extends BaseEntity implements Serializable {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column
     private String username;
+
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
     private String password;
@@ -28,9 +30,15 @@ public class Users extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Role role;
 
-    public Users(String username, String password, Role role) {
+    public Users(Long id, String username, String email, String password, Role role) {
+        this.id = id;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public Users(String username, String email, String password, Role role) {
+        this(null, username, email, password, role);
     }
 }
