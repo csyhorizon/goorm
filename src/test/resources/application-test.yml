@@ -1,0 +1,27 @@
+spring:
+  config.activate.on-profile: "test"
+  data:
+    redis:
+      host: localhost
+      port: 63790
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:nolzo;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+
+jwt:
+  secret: CwJArxGyhBEEAXl2uVV8BTLcWLb30YHVPa/0cHaF/zd25IYyS8Isep2SxHDSJYSrxnsRbUmLqoqEorh+odLlFw==

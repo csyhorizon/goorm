@@ -43,3 +43,8 @@ out/
 
 ### APPLICATION PROPERTIES ###
 src/main/resources/application-local.yml
+
+### environment
+.env
+.env-local
+.env-prod
