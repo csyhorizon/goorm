@@ -1,3 +1,10 @@
 spring:
-  profiles:
-    active: local
+  data:
+    redis:
+      # 로컬 Redis 서버 설정
+      host: localhost
+      port: 6379
+
+# 자바 코드로 생성한 64바이트 base64 인코딩된 JWT 시크릿 키
+jwt:
+  secret: CwJArxGyhBEEAXl2uVV8BTLcWLb30YHVPa/0cHaF/zd25IYyS8Isep2SxHDSJYSrxnsRbUmLqoqEorh+odLlFw==
