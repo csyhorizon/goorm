@@ -48,4 +48,16 @@ pipeline {
         DOCKER_IMAGE_NAME = "${env.DOCKERHUB_USERNAME}/seot-backend"
         DOCKER_IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
+
+    tools {
+        jdk 'JDK17'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+    }
 }
