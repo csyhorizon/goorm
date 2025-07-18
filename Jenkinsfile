@@ -91,6 +91,11 @@ EOF
         always {
             echo "Pipeline finished. Status: ${currentBuild.result}"
 
+            script {
+                echo "Cleaning up local Docker images on Jenkins agent..."
+                sh "docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true"
+            }
+
             withCredentials([string(credentialsId: env.DISCORD_WEBHOOK_URL_CREDENTIAL_ID, variable: 'DISCORD_WEBHOOK_URL')]) {
                 script {
                     def statusEmoji = (currentBuild.result == 'SUCCESS') ? ':white_check_mark:' : ':x:'
