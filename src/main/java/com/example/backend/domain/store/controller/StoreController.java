@@ -7,6 +7,7 @@ import com.example.backend.domain.security.adapter.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.StoreService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,5 +48,18 @@ public class StoreController {
                                                         @PathVariable Long storeId,
                                                         @RequestBody ItemCreateRequest itemCreateRequest) {
         return ResponseEntity.ok(itemService.save(user.getUserId(), storeId, itemCreateRequest));
+    }
+
+    @GetMapping("/{storeId}/items")
+    public ResponseEntity<List<ItemResponse>> getStoreItems(@PathVariable Long storeId) {
+        return ResponseEntity.ok(itemService.findAllByStoreId(storeId));
+    }
+
+    @DeleteMapping("/{storeId}/{itemId}")
+    public ResponseEntity<Void> deleteItem(@AuthenticationPrincipal CustomUserDetails user,
+                                           @PathVariable Long storeId,
+                                           @PathVariable Long itemId) {
+        itemService.deleteItem(user.getUserId(), storeId, itemId);
+        return ResponseEntity.noContent().build();
     }
 }
