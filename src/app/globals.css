@@ -20,8 +20,8 @@ input[type="text"] {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    background: var(--background);
+    color: var(--foreground);
   }
 }
 
@@ -102,20 +102,25 @@ body {
 
 /* 카테고리 필터의 스크롤바를 숨깁니다 */
 .category-scroll::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera*/
+  display: none;
+  /* Chrome, Safari, Opera*/
 }
+
 .category-scroll {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .detail-overlay {
   position: relative;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   width: 280px;
 }
+
 .detail-header {
   display: flex;
   justify-content: space-between;
@@ -123,11 +128,13 @@ body {
   padding: 10px 15px;
   border-bottom: 1px solid #eee;
 }
+
 .detail-header .title {
   font-weight: bold;
   font-size: 1.1rem;
   color: #000000;
 }
+
 .close-btn {
   background: none;
   border: none;
@@ -135,15 +142,18 @@ body {
   cursor: pointer;
   padding: 0 5px;
 }
+
 .detail-body {
   padding: 15px;
 }
+
 .detail-img {
   width: 100%;
   height: 150px;
   object-fit: cover;
   border-radius: 5px;
 }
+
 .description {
   margin-top: 10px;
   font-size: 0.9rem;
@@ -155,14 +165,17 @@ body {
     opacity: 0;
     transform: translate(-50%, -20px);
   }
+
   10% {
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
   90% {
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -20px);
