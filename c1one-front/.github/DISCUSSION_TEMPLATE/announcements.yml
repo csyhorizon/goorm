@@ -1,0 +1,32 @@
+title: Announcements
+labels: [announcement]
+body:
+  - type: input
+    id: titles
+    attributes:
+      label: 🪧 제목
+      placeholder: 제목을 입력하세요
+    validations:
+      required: true
+
+  - type: input
+    id: date
+    attributes:
+      label: 📅 일정 또는 배경
+      placeholder: YYYY-MM-DD, Zoom 링크 등
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 📌 주요 내용
+      placeholder: 공지 내용을 입력하세요 
+    validations:
+      required: true
+
+  - type: textarea
+    id: todo
+    attributes:
+      label: ✅ 전달사항 / 행동 요청
+      placeholder: "[ ] TODO 항목 입력"
