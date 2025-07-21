@@ -46,11 +46,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  if (!isAuthenticated && !isPublicPath) {
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-  }
+  // if (!isAuthenticated && !isPublicPath) {
+  //   if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
+  //     return NextResponse.redirect(new URL('/auth/login', request.url));
+  //   }
+  // }
 
   const response = NextResponse.next();
 

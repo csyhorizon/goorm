@@ -1,7 +1,5 @@
 'use client';
 
-import { useToast } from '@/hooks/useToast';
-
 export default function CommunityPage() {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
