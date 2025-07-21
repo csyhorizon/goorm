@@ -80,7 +80,7 @@ export default function KakaoMap() {
         }
       });
       
-      const threshold = 0.01 * Math.pow(2, 7 - map.getLevel());
+      const threshold = 0.00005 * Math.pow(2, 7 - map.getLevel());
 
       if (closestPlace && minDistance < threshold) {
         setSelectedPlace(closestPlace);

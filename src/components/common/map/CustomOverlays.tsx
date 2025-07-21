@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface CustomPlace {
   id: number;
@@ -21,11 +21,18 @@ interface CustomOverlaysProps {
 }
 
 export default function CustomOverlays({ map, places, selectedCategory, onSelect }: CustomOverlaysProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [markers, setMarkers] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [overlays, setOverlays] = useState<any[]>([]);
+
   useEffect(() => {
     if (!map) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const overlays: any[] = [];
+    const newMarkers: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newOverlays: any[] = [];
 
     const placesToShow =
       selectedCategory === '전체'
@@ -33,30 +40,72 @@ export default function CustomOverlays({ map, places, selectedCategory, onSelect
         : places.filter((p) => p.category === selectedCategory);
 
     placesToShow.forEach((place) => {
+      const position = new window.kakao.maps.LatLng(place.lat, place.lng);
+
+      const marker = new window.kakao.maps.Marker({ position });
+      window.kakao.maps.event.addListener(marker, 'click', () => {
+        onSelect(place);
+      });
+      newMarkers.push(marker);
+
       const content = document.createElement('div');
       content.className = 'custom-overlay';
       content.innerText = place.name;
-      
-      content.onclick = () => {
-        onSelect(place);
-      };
-
-      const position = new window.kakao.maps.LatLng(place.lat, place.lng);
+      content.onclick = () => onSelect(place);
 
       const customOverlay = new window.kakao.maps.CustomOverlay({
-        position: position,
-        content: content,
+        position,
+        content,
         yAnchor: 1.2,
       });
-
-      customOverlay.setMap(map);
-      overlays.push(customOverlay);
+      newOverlays.push(customOverlay);
     });
 
-    return () => {
-      overlays.forEach((overlay) => overlay.setMap(null));
-    };
+    setMarkers(newMarkers);
+    setOverlays(newOverlays);
+
   }, [map, places, selectedCategory, onSelect]);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const clusterer = new window.kakao.maps.MarkerClusterer({
+      map: map,
+      averageCenter: true,
+      minLevel: 6,
+    });
+
+    const zoomLevel = map.getLevel();
+    const nameDisplayThreshold = 4;
+
+    if (zoomLevel <= nameDisplayThreshold) {
+      clusterer.clear();
+      overlays.forEach(overlay => overlay.setMap(map));
+      markers.forEach(marker => marker.setMap(null));
+    } else {
+      clusterer.addMarkers(markers);
+      overlays.forEach(overlay => overlay.setMap(null));
+    }
+
+    const handleZoomChanged = () => {
+      const currentLevel = map.getLevel();
+      if (currentLevel <= nameDisplayThreshold) {
+        clusterer.clear();
+        overlays.forEach(overlay => overlay.setMap(map));
+      } else {
+        overlays.forEach(overlay => overlay.setMap(null));
+        clusterer.addMarkers(markers);
+      }
+    };
+
+    window.kakao.maps.event.addListener(map, 'zoom_changed', handleZoomChanged);
+
+    return () => {
+      window.kakao.maps.event.removeListener(map, 'zoom_changed', handleZoomChanged);
+      clusterer.clear();
+      overlays.forEach(overlay => overlay.setMap(null));
+    };
+  }, [map, markers, overlays]);
 
   return null;
 }
