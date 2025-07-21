@@ -17,7 +17,7 @@ import com.example.backend.domain.auth.dto.JwtToken;
 import com.example.backend.domain.security.adapter.CustomUserDetails;
 import com.example.backend.domain.security.jwt.entity.RefreshToken;
 import com.example.backend.domain.security.jwt.repository.RefreshTokenRepository;
-import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 
 import java.security.Key;
@@ -64,7 +64,7 @@ public class JwtTokenProvider {
 
         // 인증 정보 가져오기
         String username = authentication.getName();
-        member user = userRepository.findByUsername(username)
+        Member user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
 
@@ -102,7 +102,7 @@ public class JwtTokenProvider {
 
         String username = claims.getSubject();
 
-        member user = userRepository.findByUsername(username)
+        Member user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
 
 
@@ -148,7 +148,7 @@ public class JwtTokenProvider {
     }
 
     @Transactional
-    public void saveRefreshToken(member user, String token, LocalDateTime expiryDate) {
+    public void saveRefreshToken(Member user, String token, LocalDateTime expiryDate) {
         // 토큰 여부 확인
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
 
@@ -189,7 +189,7 @@ public class JwtTokenProvider {
         }
 
         // Get user from token
-        member user = token.getUser();
+        Member user = token.getUser();
 
 
         // Create authentication object
@@ -202,7 +202,7 @@ public class JwtTokenProvider {
     }
 
     @Transactional
-    public void deleteRefreshTokenByUser(member user) {
+    public void deleteRefreshTokenByUser(Member user) {
         refreshTokenRepository.deleteByUser(user);
     }
 

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @ToString
-public class member extends BaseEntity implements Serializable {
+public class Member extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -30,7 +30,7 @@ public class member extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Role role;
 
-    public member(Long id, String username, String email, String password, Role role) {
+    public Member(Long id, String username, String email, String password, Role role) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -38,7 +38,7 @@ public class member extends BaseEntity implements Serializable {
         this.role = role;
     }
 
-    public member(String username, String email, String password, Role role) {
+    public Member(String username, String email, String password, Role role) {
         this(null, username, email, password, role);
     }
 }

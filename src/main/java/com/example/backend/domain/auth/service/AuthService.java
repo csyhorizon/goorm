@@ -14,7 +14,7 @@ import com.example.backend.domain.auth.exception.AuthErrorCode;
 import com.example.backend.domain.auth.exception.AuthException;
 import com.example.backend.domain.security.jwt.JwtTokenProvider;
 import com.example.backend.domain.member.entity.Role;
-import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 
 @Service
@@ -37,7 +37,7 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        member user = member.builder()
+        Member user = Member.builder()
                 .username(request.getUsername())
                 .password(encodedPassword)
                 .role(Role.USER)

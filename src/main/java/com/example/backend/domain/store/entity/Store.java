@@ -1,7 +1,7 @@
 package com.example.backend.domain.store.entity;
 
 import com.example.backend.domain.global.BaseEntity;
-import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.entity.Member;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -38,15 +38,15 @@ public class Store extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private member user;
+    private Member user;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, member user) {
+                 StoreDuration storeDuration, Member user) {
         this(null, name, address, phone_number, description, category, storeDuration, user);
     }
 
     public Store(Long id, String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, member user) {
+                 StoreDuration storeDuration, Member user) {
         this.id = id;
         this.name = name;
         this.address = address;

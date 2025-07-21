@@ -4,7 +4,7 @@ import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
-import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
 
     public StoreResponse save(Long userId, StoreCreateRequest storeCreateRequest) {
-        member user = memberRepository.findOrThrow(userId);
+        Member user = memberRepository.findOrThrow(userId);
         Store store = storeRepository.save(storeCreateRequest.toEntity(user));
 
         return StoreResponse.from(store);

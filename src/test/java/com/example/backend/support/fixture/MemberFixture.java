@@ -1,7 +1,7 @@
 package com.example.backend.support.fixture;
 
 import com.example.backend.domain.member.entity.Role;
-import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.entity.Member;
 import lombok.Getter;
 
 @Getter
@@ -19,7 +19,7 @@ public enum MemberFixture {
         this.role = role;
     }
 
-    public static member 김회원() {
-        return new member(회원.name, 회원.email, 회원.password, 회원.role);
+    public static Member 김회원() {
+        return new Member(회원.name, 회원.email, 회원.password, 회원.role);
     }
 }
