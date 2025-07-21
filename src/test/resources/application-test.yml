@@ -17,11 +17,24 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-
+  config:
+    import:
+      - optional:file:./env/db.env.properties
+      - optional:file:./.env.properties
 logging:
   level:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+#AWS S3 관련 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucketName: ${BUCKET_NAME}
 
 jwt:
   secret: CwJArxGyhBEEAXl2uVV8BTLcWLb30YHVPa/0cHaF/zd25IYyS8Isep2SxHDSJYSrxnsRbUmLqoqEorh+odLlFw==
