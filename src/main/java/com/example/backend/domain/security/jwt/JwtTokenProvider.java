@@ -18,7 +18,7 @@ import com.example.backend.domain.security.adapter.CustomUserDetails;
 import com.example.backend.domain.security.jwt.entity.RefreshToken;
 import com.example.backend.domain.security.jwt.repository.RefreshTokenRepository;
 import com.example.backend.domain.member.entity.member;
-import com.example.backend.domain.member.repository.UserRepository;
+import com.example.backend.domain.member.repository.MemberRepository;
 
 import java.security.Key;
 import java.time.Duration;
@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     private final Key key;
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(1).toMillis();      // 1시간
     private static final long REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(14).toMillis();    // 14일
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, RedisTemplate<String, String> redisTemplate) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository userRepository, RefreshTokenRepository refreshTokenRepository, RedisTemplate<String, String> redisTemplate) {
         byte[] decode = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(decode);
         this.userRepository = userRepository;

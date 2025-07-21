@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
 import com.example.backend.domain.member.entity.member;
-import com.example.backend.domain.member.repository.UserRepository;
+import com.example.backend.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.backend.support.annotation.ServiceTest;
@@ -19,12 +19,12 @@ public class StoreServiceTest {
     @Autowired
     StoreRepository storeRepository;
     @Autowired
-    UserRepository userRepository;
+    MemberRepository memberRepository;
 
     @Test
     void 가게를_저장할_수_있다() {
         member user = MemberFixture.김회원();
-        userRepository.save(user);
+        memberRepository.save(user);
         Store store = StoreFixture.과일가게(user);
         storeRepository.save(store);
 
@@ -34,7 +34,7 @@ public class StoreServiceTest {
     @Test
     void 가게를_삭제할_수_있다() {
         member user = MemberFixture.김회원();
-        userRepository.save(user);
+        memberRepository.save(user);
         Store store = StoreFixture.과일가게(user);
         storeRepository.save(store);
 

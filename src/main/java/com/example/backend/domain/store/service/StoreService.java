@@ -5,7 +5,7 @@ import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
 import com.example.backend.domain.member.entity.member;
-import com.example.backend.domain.member.repository.UserRepository;
+import com.example.backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class StoreService {
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
 
     public StoreResponse save(Long userId, StoreCreateRequest storeCreateRequest) {
-        member user = userRepository.findOrThrow(userId);
+        member user = memberRepository.findOrThrow(userId);
         Store store = storeRepository.save(storeCreateRequest.toEntity(user));
 
         return StoreResponse.from(store);

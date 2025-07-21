@@ -5,7 +5,7 @@ import com.example.backend.domain.member.entity.member;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<member, Long> {
+public interface MemberRepository extends JpaRepository<member, Long> {
     default member findOrThrow(Long id) {
         return findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found")); // 에러코드 추후 통일화 필요

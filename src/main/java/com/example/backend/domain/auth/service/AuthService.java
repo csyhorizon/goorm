@@ -15,13 +15,13 @@ import com.example.backend.domain.auth.exception.AuthException;
 import com.example.backend.domain.security.jwt.JwtTokenProvider;
 import com.example.backend.domain.member.entity.Role;
 import com.example.backend.domain.member.entity.member;
-import com.example.backend.domain.member.repository.UserRepository;
+import com.example.backend.domain.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
