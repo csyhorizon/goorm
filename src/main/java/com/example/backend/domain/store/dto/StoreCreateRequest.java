@@ -3,7 +3,7 @@ package com.example.backend.domain.store.dto;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.entity.StoreCategory;
 import com.example.backend.domain.store.entity.StoreDuration;
-import com.example.backend.domain.user.entity.Users;
+import com.example.backend.domain.member.entity.Member;
 import java.time.LocalTime;
 
 public record StoreCreateRequest(
@@ -15,7 +15,7 @@ public record StoreCreateRequest(
         LocalTime startDate,
         LocalTime endDate
 ) {
-    public Store toEntity(Users user) {
+    public Store toEntity(Member user) {
         return new Store(name, address, phone_number, description, category,
                 new StoreDuration(startDate, endDate), user);
     }

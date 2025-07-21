@@ -6,7 +6,7 @@ spring:
       port: 63790
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:nolzo;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:seop;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
   jpa:

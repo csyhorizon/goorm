@@ -1,40 +1,42 @@
 package com.example.backend.domain.member.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
 import com.example.backend.domain.global.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class Member extends BaseEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class Member extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private String username;
+
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    @Enumerated
-    private MemberRole memberRole;
-
-    public Member(Long id, String email, String password, String name, MemberRole memberRole) {
+    public Member(Long id, String username, String email, String password, Role role) {
         this.id = id;
+        this.username = username;
         this.email = email;
         this.password = password;
-        this.name = name;
-        this.memberRole = memberRole;
+        this.role = role;
     }
 
-    public Member(String email, String password, String name, MemberRole memberRole) {
-       this(null, email, password, name, memberRole);
+    public Member(String username, String email, String password, Role role) {
+        this(null, username, email, password, role);
     }
 }

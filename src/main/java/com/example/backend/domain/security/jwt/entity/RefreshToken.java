@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.example.backend.domain.user.entity.Users;
+import com.example.backend.domain.member.entity.Member;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class RefreshToken {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users user;
+    private Member user;
 
     @Column(nullable = false, unique = true)
     private String token;

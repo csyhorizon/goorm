@@ -13,15 +13,15 @@ import com.example.backend.domain.auth.dto.SignupRequest;
 import com.example.backend.domain.auth.exception.AuthErrorCode;
 import com.example.backend.domain.auth.exception.AuthException;
 import com.example.backend.domain.security.jwt.JwtTokenProvider;
-import com.example.backend.domain.user.entity.Role;
-import com.example.backend.domain.user.entity.Users;
-import com.example.backend.domain.user.repository.UserRepository;
+import com.example.backend.domain.member.entity.Role;
+import com.example.backend.domain.member.entity.Member;
+import com.example.backend.domain.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -37,7 +37,7 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        Users user = Users.builder()
+        Member user = Member.builder()
                 .username(request.getUsername())
                 .password(encodedPassword)
                 .role(Role.USER)
