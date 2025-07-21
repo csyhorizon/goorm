@@ -1,5 +1,8 @@
 package com.example.backend.domain.store.controller;
 
+import com.example.backend.domain.item.dto.ItemCreateRequest;
+import com.example.backend.domain.item.dto.ItemResponse;
+import com.example.backend.domain.item.service.ItemService;
 import com.example.backend.domain.security.adapter.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class StoreController {
     private final StoreService storeService;
+    private final ItemService itemService;
 
     @PostMapping
     public ResponseEntity<StoreResponse> save(@AuthenticationPrincipal CustomUserDetails user, @RequestBody
@@ -36,5 +40,12 @@ public class StoreController {
     public ResponseEntity<Void> deleteStore(@PathVariable Long storeId) {
         storeService.delete(storeId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{storeId}/items")
+    public ResponseEntity<ItemResponse> createStoreItem(@AuthenticationPrincipal CustomUserDetails user,
+                                                        @PathVariable Long storeId,
+                                                        @RequestBody ItemCreateRequest itemCreateRequest) {
+        return ResponseEntity.ok(itemService.save(user.getUserId(), storeId, itemCreateRequest));
     }
 }

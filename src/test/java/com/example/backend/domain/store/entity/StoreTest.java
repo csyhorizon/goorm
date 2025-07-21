@@ -1,11 +1,8 @@
-package com.example.backend.domain.store;
+package com.example.backend.domain.store.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.backend.domain.store.entity.Store;
-import com.example.backend.domain.store.entity.StoreCategory;
-import com.example.backend.domain.store.entity.StoreDuration;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.support.fixture.MemberFixture;
 import java.time.LocalTime;

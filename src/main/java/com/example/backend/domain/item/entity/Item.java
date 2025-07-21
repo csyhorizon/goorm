@@ -1,6 +1,7 @@
 package com.example.backend.domain.item.entity;
 
 import com.example.backend.domain.store.entity.Store;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +29,6 @@ public class Item {
     private int discountRate;
 
     @ManyToOne
-    @JoinColumn(name = "store_id")
     private Store store;
 
     public Item(Long id, String name, int price, int discountRate, Store store) {
@@ -41,7 +41,11 @@ public class Item {
     }
 
     public Item(String name, int price, Store store) {
-       this(null, name, price, DEFAULT_DISCOUNT_RATE, store);
+        this(null, name, price, DEFAULT_DISCOUNT_RATE, store);
+    }
+
+    public Item(String name, int price, int discountRate, Store store) {
+        this(null, name, price, discountRate, store);
     }
 
     private void validateAll(String name, int price, int discountRate) {
