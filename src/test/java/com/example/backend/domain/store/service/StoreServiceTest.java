@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
-import com.example.backend.domain.user.entity.Users;
-import com.example.backend.domain.user.repository.UserRepository;
+import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.backend.support.annotation.ServiceTest;
-import com.example.backend.support.fixture.UsersFixture;
+import com.example.backend.support.fixture.MemberFixture;
 import com.example.backend.support.fixture.StoreFixture;
 
 @ServiceTest
@@ -23,7 +23,7 @@ public class StoreServiceTest {
 
     @Test
     void 가게를_저장할_수_있다() {
-        Users user = UsersFixture.김회원();
+        member user = MemberFixture.김회원();
         userRepository.save(user);
         Store store = StoreFixture.과일가게(user);
         storeRepository.save(store);
@@ -33,7 +33,7 @@ public class StoreServiceTest {
 
     @Test
     void 가게를_삭제할_수_있다() {
-        Users user = UsersFixture.김회원();
+        member user = MemberFixture.김회원();
         userRepository.save(user);
         Store store = StoreFixture.과일가게(user);
         storeRepository.save(store);

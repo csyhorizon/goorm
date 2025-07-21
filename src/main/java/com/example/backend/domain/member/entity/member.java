@@ -1,4 +1,4 @@
-package com.example.backend.domain.user.entity;
+package com.example.backend.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,10 +11,10 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @ToString
-public class Users extends BaseEntity implements Serializable {
+public class member extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column
@@ -30,7 +30,7 @@ public class Users extends BaseEntity implements Serializable {
     @Column(nullable = false)
     private Role role;
 
-    public Users(Long id, String username, String email, String password, Role role) {
+    public member(Long id, String username, String email, String password, Role role) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -38,7 +38,7 @@ public class Users extends BaseEntity implements Serializable {
         this.role = role;
     }
 
-    public Users(String username, String email, String password, Role role) {
+    public member(String username, String email, String password, Role role) {
         this(null, username, email, password, role);
     }
 }

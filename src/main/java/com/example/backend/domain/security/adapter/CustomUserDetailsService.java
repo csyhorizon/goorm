@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.example.backend.domain.user.entity.Users;
-import com.example.backend.domain.user.repository.UserRepository;
+import com.example.backend.domain.member.entity.member;
+import com.example.backend.domain.member.repository.UserRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -16,7 +16,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userRepository.findByUsername(username)
+        member user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음 : " + username));
         return new CustomUserDetails(user);
     }
