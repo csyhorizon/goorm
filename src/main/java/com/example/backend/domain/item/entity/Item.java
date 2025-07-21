@@ -24,6 +24,8 @@ public class Item {
 
     private String name;
 
+    private String description;
+
     private int price;
 
     private int discountRate;
@@ -31,21 +33,22 @@ public class Item {
     @ManyToOne
     private Store store;
 
-    public Item(Long id, String name, int price, int discountRate, Store store) {
+    public Item(Long id, String name, String description, int price, int discountRate, Store store) {
         validateAll(name, price, discountRate);
         this.id = id;
         this.name = name;
+        this.description = description;
         this.price = price;
         this.discountRate = discountRate;
         this.store = store;
     }
 
-    public Item(String name, int price, Store store) {
-        this(null, name, price, DEFAULT_DISCOUNT_RATE, store);
+    public Item(String name, String description, int price, int discountRate, Store store) {
+        this(null, name, description, price, discountRate, store);
     }
 
-    public Item(String name, int price, int discountRate, Store store) {
-        this(null, name, price, discountRate, store);
+    public Item(String name, String description, int price, Store store) {
+        this(null, name, description, price, DEFAULT_DISCOUNT_RATE, store);
     }
 
     private void validateAll(String name, int price, int discountRate) {

@@ -14,7 +14,7 @@ class ItemTest {
     void 상품의_가격은_0원보다_낮을_수_없다() {
         Member member = MemberFixture.김회원();
         Store store = StoreFixture.과일가게(member);
-        assertThatThrownBy(() -> new Item("사과", -1, store))
+        assertThatThrownBy(() -> new Item("사과", "사입니다과", -1, store))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -22,7 +22,7 @@ class ItemTest {
     void 상품의_이름은_공백일_수_없다() {
         Member member = MemberFixture.김회원();
         Store store = StoreFixture.과일가게(member);
-        assertThatThrownBy(() -> new Item("", -1, store))
+        assertThatThrownBy(() -> new Item("", "설명", -1, store))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -30,7 +30,7 @@ class ItemTest {
     void 상품의_할인율은_0보다_낮을_수_없다() {
         Member member = MemberFixture.김회원();
         Store store = StoreFixture.과일가게(member);
-        assertThatThrownBy(() -> new Item("사과", 1000, -100, store))
+        assertThatThrownBy(() -> new Item("사과", "설명", 1000, -100, store))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

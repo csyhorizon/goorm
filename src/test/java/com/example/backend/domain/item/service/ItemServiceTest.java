@@ -49,7 +49,7 @@ class ItemServiceTest {
 
         Store store = StoreFixture.과일가게(owner);
         storeRepository.save(store);
-        ItemCreateRequest request = new ItemCreateRequest("사과", 1500);
+        ItemCreateRequest request = new ItemCreateRequest("사과", "설명", 1500);
         assertThatThrownBy(() -> itemService.save(anotherMember.getId(), store.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
