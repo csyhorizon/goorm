@@ -56,6 +56,12 @@ public class ItemService {
         itemRepository.delete(findOrThrow(itemId));
     }
 
+    @Transactional(readOnly = true)
+    public ItemResponse findById(Long itemId) {
+        Item item = findOrThrow(itemId);
+        return ItemResponse.from(item);
+    }
+
     private Item findOrThrow(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("not found"));
