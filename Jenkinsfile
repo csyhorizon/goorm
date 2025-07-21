@@ -59,5 +59,17 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Build & Test') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: '', variable: ''),
+                    ]) {
+                        // sh 테스트 명령
+                    }
+                }
+            }
+        }
     }
 }
