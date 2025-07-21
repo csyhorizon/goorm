@@ -1,5 +1,6 @@
 package com.example.backend.domain.item.entity;
 
+import com.example.backend.domain.global.BaseEntity;
 import com.example.backend.domain.store.entity.Store;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Item {
+public class Item extends BaseEntity {
     private static final int DEFAULT_DISCOUNT_RATE = 0;
     private static final int MIN_PRICE = 0;
 
