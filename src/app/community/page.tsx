@@ -1,9 +1,14 @@
-'use client';
+import PostList from "@/components/features/community/PostList";
+import FloatingWriteButton from "@/components/features/community/FloatingWriteButton";
 
 export default function CommunityPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold">커뮤니티 페이지</h1>
+    <div style={{
+      maxWidth: '1000px',
+      margin: '0 auto'
+    }}>
+      <PostList />
+      <FloatingWriteButton />
     </div>
   );
 }
