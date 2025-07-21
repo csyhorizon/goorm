@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface User {
   name: string;
@@ -9,7 +10,13 @@ interface User {
 }
 
 const UserAvatar = ({ url }: { url: string }) => (
-  <img src={url} alt="Profile Avatar" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
+  <Image 
+    src={url} 
+    alt="Profile Avatar" 
+    width={80} 
+    height={80} 
+    style={{ borderRadius: '50%', objectFit: 'cover' }} 
+  />
 );
 
 interface ProfileSectionProps {
