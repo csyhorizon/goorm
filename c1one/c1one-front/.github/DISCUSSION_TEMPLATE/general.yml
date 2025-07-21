@@ -1,0 +1,22 @@
+title: General
+labels: [general]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: 💬 주제
+      placeholder: ex)개발자 컨퍼런스 참가 후기
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 📝 내용
+      placeholder: 자유롭게 내용을 작성하세요.
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: 📸 참고 자료 (선택)
+      placeholder: 링크, 이미지 등
