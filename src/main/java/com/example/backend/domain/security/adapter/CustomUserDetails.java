@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.example.backend.domain.user.entity.Users;
+import com.example.backend.domain.member.entity.Member;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails, Serializable {
 
-    private final Users user;
+    private final Member user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
