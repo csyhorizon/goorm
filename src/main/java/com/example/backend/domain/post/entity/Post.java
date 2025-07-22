@@ -1,8 +1,8 @@
 package com.example.backend.domain.post.entity;
 
 import com.example.backend.domain.global.BaseEntity;
+import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.store.entity.Store;
-import com.example.backend.domain.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +24,8 @@ public class Post extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "store_id")
@@ -43,18 +43,16 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostMedia> mediaList = new ArrayList<>();
 
-    private Post(Users user, Store store, String location, String title, String content) {
-        this.user = user;
+    private Post(Member member, Store store, String location, String title, String content) {
+        this.member = member;
         this.store = store;
         this.location = location;
         this.title = title;
         this.content = content;
     }
 
-
-
-    public static Post of(Users user,Store store, String location, String title, String content) {
-        return new Post(user, store, location, title, content);
+    public static Post of(Member member,Store store, String location, String title, String content) {
+        return new Post(member, store, location, title, content);
     }
 
     public void update(String title, String content, String location) {
@@ -63,4 +61,7 @@ public class Post extends BaseEntity {
         this.location = location;
     }
 
+    public Long getOwnerId() {
+        return member.getId();
+    }
 }

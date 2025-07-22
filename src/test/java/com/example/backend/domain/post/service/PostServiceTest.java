@@ -1,6 +1,8 @@
 package com.example.backend.domain.post.service;
 
 import com.example.backend.domain.global.s3.S3Service;
+import com.example.backend.domain.member.entity.Member;
+import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.post.dto.PostCreateRequest;
 import com.example.backend.domain.post.dto.PostResponse;
 import com.example.backend.domain.post.dto.PostUpdateRequest;
@@ -10,12 +12,10 @@ import com.example.backend.domain.post.repository.PostMediaRepository;
 import com.example.backend.domain.post.repository.PostRepository;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
-import com.example.backend.domain.user.entity.Users;
-import com.example.backend.domain.user.repository.UserRepository;
 import com.example.backend.support.annotation.ServiceTest;
+import com.example.backend.support.fixture.MemberFixture;
 import com.example.backend.support.fixture.PostFixture;
 import com.example.backend.support.fixture.StoreFixture;
-import com.example.backend.support.fixture.UsersFixture;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class PostServiceTest {
     @Autowired
     PostRepository postRepository;
     @Autowired
-    UserRepository userRepository;
+    MemberRepository memberRepository;
     @Autowired
     StoreRepository storeRepository;
     @Autowired
@@ -49,8 +49,12 @@ public class PostServiceTest {
 
     @Test
     void createPost() {
-        Users user = UsersFixture.김회원();
-        userRepository.save(user);
+
+        Member member = MemberFixture.김회원();
+        memberRepository.save(member);
+
+        Store store = StoreFixture.과일가게(member);
+        storeRepository.save(store);
 
         PostFixture postFixture = PostFixture.이미지_포함_게시글;
         PostCreateRequest postCreateRequest = postFixture.toCreateRequest();
@@ -63,19 +67,19 @@ public class PostServiceTest {
             throw new RuntimeException(e);
         }
 
-        PostResponse postResponse = postService.createPost(user.getId(), postCreateRequest, files);
+        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
 
         assertEquals(postFixture.getTitle(), postResponse.getTitle());
         assertEquals(postFixture.getContent(), postResponse.getContent());
         assertEquals(postFixture.getLocation(), postResponse.getLocation());
-        assertEquals(user.getId(), postResponse.getUserId());
+        assertEquals(member.getId(), postResponse.getMemberId());
     }
 
     @Test
     void updatePost() {
-        Users user = UsersFixture.김회원();
-        Store store = StoreFixture.과일가게(user);
-        userRepository.save(user);
+        Member member = MemberFixture.김회원();
+        memberRepository.save(member);
+        Store store = StoreFixture.과일가게(member);
         storeRepository.save(store);
 
         PostFixture postFixture = PostFixture.이미지_포함_게시글;
@@ -89,10 +93,11 @@ public class PostServiceTest {
             throw new RuntimeException(e);
         }
 
-        PostResponse postResponse = postService.createPost(user.getId(), postCreateRequest, files);
+        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
 
         Long postId = postResponse.getId();
         Long storeId = store.getId();
+        Long memberId = member.getId();
 
         List<String> keepMediaUrls = List.of("http://mock-s3-url/img1.png");
 
@@ -116,7 +121,7 @@ public class PostServiceTest {
                 .storeId(storeId)
                 .build();
 
-        PostResponse updated = postService.updatePost(postId, updateRequest, newFiles);
+        PostResponse updated = postService.updatePost(postId, memberId, updateRequest, newFiles);
 
         assertEquals("수정된 제목", updated.getTitle());
         assertEquals("수정된 내용", updated.getContent());
@@ -129,9 +134,9 @@ public class PostServiceTest {
 
     @Test
     void deletePost() {
-        Users user = UsersFixture.김회원();
-        userRepository.save(user);
-        Store store = StoreFixture.과일가게(user);
+        Member member = MemberFixture.김회원();
+        memberRepository.save(member);
+        Store store = StoreFixture.과일가게(member);
         storeRepository.save(store);
 
         PostFixture postFixture = PostFixture.이미지_포함_게시글;
@@ -144,14 +149,15 @@ public class PostServiceTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        PostResponse postResponse = postService.createPost(user.getId(), postCreateRequest, files);
+        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
         Long postId = postResponse.getId();
+        Long memberId = member.getId();
 
         // S3Service Mock: 삭제 호출 기대
         Mockito.doNothing().when(s3Service).deleteFile(anyString());
 
         // 2. 게시글 삭제
-        postService.deletePost(postId);
+        postService.deletePost(postId, memberId);
 
         // 3. 실제로 DB에서 삭제되었는지 검증
         assertFalse(postRepository.findById(postId).isPresent());
