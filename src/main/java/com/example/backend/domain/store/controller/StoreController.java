@@ -73,4 +73,9 @@ public class StoreController {
                                                       @RequestBody EventCreateRequest eventCreateRequest) {
         return ResponseEntity.ok(eventService.save(user.getUserId(), storeId, eventCreateRequest));
     }
+
+    @GetMapping("/{storeId}/events")
+    public ResponseEntity<List<EventResponse>> getEvents(@PathVariable Long storeId) {
+        return ResponseEntity.ok(eventService.getAllEvents(storeId));
+    }
 }

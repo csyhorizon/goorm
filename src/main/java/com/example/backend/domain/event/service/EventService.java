@@ -8,6 +8,7 @@ import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,5 +35,14 @@ public class EventService {
         if (!Objects.equals(store.getOwnerId(), member.getId())) {
             throw new IllegalArgumentException("this user is not owner");
         }
+    }
+
+    public List<EventResponse> getAllEvents(Long storeId) {
+        Store store = storeRepository.findOrThrow(storeId);
+        List<Event> events = eventRepository.findAllByStoreId(store.getId());
+
+        return events.stream()
+                .map(EventResponse::from)
+                .toList();
     }
 }
