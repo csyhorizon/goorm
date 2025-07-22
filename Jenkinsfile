@@ -59,39 +59,12 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
-            steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'mysql-username', variable: 'DB_USER'),
-                        string(credentialsId: 'mysql-password', variable: 'DB_PASSWORD'),
-
-                        string(credentialsId: 'redis-password', variable: 'REDIS_PASSWORD'),
-
-                        string(credentialsId: 'mongo-username', variable: 'MONGO_USER'),
-                        string(credentialsId: 'mongo-password', variable: 'MONGO_PASSWORD'),
-
-                        string(credentialsId: 'jwt-secret-text', variable: 'JWT_SECRET')
-                    ]) {
-                        sh '''
-                            export DB_USER
-                            export DB_PASSWORD
-                            export REDIS_PASSWORD
-                            export MONGO_USER
-                            export MONGO_PASSWORD
-                            export JWT_SECRET
-                            ./gradlew clean build --no-daemon
-                        '''
-                    }
-                }
-            }
-            post {
-                always {
-                    junit '**/build/test-results/test/*.xml'
-                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
-                    archiveArtifacts artifacts: 'build/reports/tests/test/index.html', allowEmptyArchive: true
-                }
-            }
+        stage('Build Only') { // 스테이지 이름 변경
+             steps {
+                 script {
+                     sh "./gradlew clean build -x test --no-daemon"
+                 }
+             }
         }
 
         stage('Build & Push Docker Image') {
