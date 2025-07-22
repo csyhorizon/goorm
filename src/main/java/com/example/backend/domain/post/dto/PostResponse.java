@@ -15,20 +15,20 @@ public class PostResponse {
     private String title;
     private String content;
     private String location;
-    private Long userId;
-    private String username;
+    private Long memberId;
+    private String memberName;
     private List<String> mediaUrls;
     private Long storeId;
     private String storeName;
 
-    public static PostResponse from(Post post, List<String> mediaUrl, Store store) {
+    public static PostResponse of(Post post, List<String> mediaUrl, Store store) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .location(post.getLocation())
-                .userId(post.getUser().getId())
-                .username(post.getUser().getUsername())
+                .memberId(post.getMember().getId())
+                .memberName(post.getMember().getUsername())
                 .mediaUrls(mediaUrl)
                 .storeId(store.getId())
                 .storeName(store.getName())

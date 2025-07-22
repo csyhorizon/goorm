@@ -4,10 +4,15 @@ import lombok.*;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostMediaResponse {
     private Long id;
     private String mediaUrl;
     private Integer sequence;
+
+    public PostMediaResponse(Long id, String mediaUrl, Integer sequence) {
+        this.id = id;
+        this.mediaUrl = mediaUrl;
+        this.sequence = sequence;
+    }
 }

@@ -10,9 +10,13 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-
-//    Page<Post> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
-
     Page<Post> findAllByStoreIdOrderByCreatedAtDesc(Long storeId, Pageable pageable);
+
+    default Post findOrThrow(Long id) {
+        return findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+    }
+
+
 
 }

@@ -55,16 +55,20 @@ public class PostController {
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable Long postId,
             @PathVariable Long storeId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("postUpdateRequest") PostUpdateRequest postUpdateRequest,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        PostResponse updated = postService.updatePost(postId, postUpdateRequest, images);
+        PostResponse updated = postService.updatePost(postId, userDetails.getUserId(), postUpdateRequest, images);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{storeId}/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @PathVariable Long storeId) {
-        postService.deletePost(postId);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @PathVariable Long storeId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.deletePost(postId, userDetails.getUserId());
         return ResponseEntity.noContent().build();
     }
 }
