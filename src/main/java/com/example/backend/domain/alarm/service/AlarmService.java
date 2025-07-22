@@ -2,6 +2,8 @@ package com.example.backend.domain.alarm.service;
 
 import com.example.backend.domain.alarm.entity.Alarm;
 import com.example.backend.domain.alarm.repository.AlarmRepository;
+import com.example.backend.domain.member.entity.Member;
+import com.example.backend.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AlarmService {
 
+    private static final long SSE_TIMEOUT = 60 * 60 * 1000L; // 1시간
     private final AlarmRepository alarmRepository;
+    private final MemberRepository memberRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     // SSE 구독(단일 디바이스)
     public SseEmitter subscribe(Long memberId) {
-        SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); // 1시간
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
         emitters.put(memberId, emitter);
 
         emitter.onCompletion(() -> emitters.remove(memberId));
@@ -40,6 +44,8 @@ public class AlarmService {
 
     // 개별 사용자에게 알림 보내기
     public void sendToUser(Long memberId, String message) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
         SseEmitter emitter = emitters.get(memberId);
         if (emitter != null) {
             try {
@@ -50,7 +56,7 @@ public class AlarmService {
         }
         // 알림 이력 저장(DB)
         Alarm alarm = Alarm.builder()
-                .memberId(memberId)
+                .member(member)
                 .content(message)
                 .build();
         alarmRepository.save(alarm);
@@ -58,13 +64,17 @@ public class AlarmService {
 
     // 안 읽은 알림 개수 반환
     public long getUnreadCount(Long memberId) {
-        return alarmRepository.countUnreadByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        return alarmRepository.countUnreadByMember(member);
     }
 
     // 전체 알림 읽음 처리
     @Transactional
     public void readAll(Long memberId) {
-        alarmRepository.markAllReadByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        alarmRepository.markAllReadByMember(member);
     }
 
     // 알림 개별 삭제
@@ -75,6 +85,8 @@ public class AlarmService {
 
     // 내 알림 리스트 조회
     public List<Alarm> getMyAlarms(Long memberId) {
-        return alarmRepository.findByMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        return alarmRepository.findByMemberAndIsDeletedFalseOrderByCreatedAtDesc(member);
     }
 }
