@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Item extends BaseEntity {
-    private static final int DEFAULT_DISCOUNT_RATE = 0;
     private static final int MIN_PRICE = 0;
 
     @Id
@@ -29,33 +28,26 @@ public class Item extends BaseEntity {
 
     private int price;
 
-    private int discountRate;
 
     @ManyToOne
     private Store store;
 
-    public Item(Long id, String name, String description, int price, int discountRate, Store store) {
-        validateAll(name, price, discountRate);
+    public Item(Long id, String name, String description, int price, Store store) {
+        validateAll(name, price);
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.discountRate = discountRate;
         this.store = store;
     }
 
-    public Item(String name, String description, int price, int discountRate, Store store) {
-        this(null, name, description, price, discountRate, store);
-    }
-
     public Item(String name, String description, int price, Store store) {
-        this(null, name, description, price, DEFAULT_DISCOUNT_RATE, store);
+        this(null, name, description, price, store);
     }
 
-    private void validateAll(String name, int price, int discountRate) {
+    private void validateAll(String name, int price) {
         validateName(name);
         validatePrice(price);
-        validateDiscountRate(discountRate);
     }
 
     private void validateName(String name) {
@@ -67,12 +59,6 @@ public class Item extends BaseEntity {
     private void validatePrice(int price) {
         if (price < MIN_PRICE) {
             throw new IllegalArgumentException("Price cannot be negative");
-        }
-    }
-
-    private void validateDiscountRate(int discountRate) {
-        if (discountRate < MIN_PRICE) {
-            throw new IllegalArgumentException("Discount rate cannot be negative");
         }
     }
 }
