@@ -28,7 +28,6 @@ public class Item extends BaseEntity {
 
     private int price;
 
-
     @ManyToOne
     private Store store;
 
