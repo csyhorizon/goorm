@@ -18,8 +18,15 @@ public class EventInfo {
     private EventCategory eventCategory;
 
     public EventInfo(String title, String description, EventCategory eventCategory) {
+        validateTitle(title);
         this.title = title;
         this.description = description;
         this.eventCategory = eventCategory;
+    }
+
+    private void validateTitle(String title) {
+        if (title.isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty");
+        }
     }
 }
