@@ -49,17 +49,12 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public EventResponse getEventDetail(Long eventId) {
-        Event event = findOrThrow(eventId);
+        Event event = eventRepository.findOrThrow(eventId);
         return EventResponse.from(event);
     }
 
     public void delete(Long eventId) {
-        Event event = findOrThrow(eventId);
+        Event event = eventRepository.findOrThrow(eventId);
         eventRepository.delete(event);
-    }
-
-    private Event findOrThrow(Long eventId) {
-        return eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("not found"));
     }
 }

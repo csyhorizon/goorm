@@ -7,5 +7,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
+
+    default Event findOrThrow(Long eventId) {
+        return findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("not found"));
+    }
+
     List<Event> findAllByStoreId(Long storeId);
 }

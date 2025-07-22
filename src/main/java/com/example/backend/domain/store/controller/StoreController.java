@@ -78,4 +78,10 @@ public class StoreController {
     public ResponseEntity<List<EventResponse>> getEvents(@PathVariable Long storeId) {
         return ResponseEntity.ok(eventService.getAllEvents(storeId));
     }
+
+    @GetMapping("/{storeId}/{eventId}/items")
+    public ResponseEntity<List<ItemResponse>> getItemListWithEvent(@PathVariable Long storeId,
+                                                                   @PathVariable Long eventId) {
+        return ResponseEntity.ok(itemService.getItemsWithEvent(storeId, eventId));
+    }
 }

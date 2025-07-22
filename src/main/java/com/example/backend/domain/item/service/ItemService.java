@@ -1,5 +1,8 @@
 package com.example.backend.domain.item.service;
 
+import com.example.backend.domain.event.entity.Event;
+import com.example.backend.domain.event.entity.EventCategory;
+import com.example.backend.domain.event.repository.EventRepository;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.entity.Item;
@@ -21,6 +24,7 @@ public class ItemService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final ItemRepository itemRepository;
+    private final EventRepository eventRepository;
 
     public ItemResponse save(Long memberId, Long storeId, ItemCreateRequest itemCreateRequest) {
         Member member = memberRepository.findOrThrow(memberId);
@@ -65,5 +69,28 @@ public class ItemService {
     private Item findOrThrow(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemResponse> getItemsWithEvent(Long storeId, Long eventId) {
+        Store store = storeRepository.findOrThrow(storeId);
+        List<Item> itemList = itemRepository.findAllByStoreId(store.getId());
+        Event event = eventRepository.findOrThrow(eventId);
+
+        return itemList.stream()
+                .map(item -> ItemResponse.of(item, calculatePrice(item, event)))
+                .toList();
+    }
+
+    private int calculatePrice(Item item, Event event) {
+        if (event.getCategory().equals(EventCategory.DISCOUNT_AMOUNT)) {
+            return item.getPrice() - event.getDiscountAmount();
+        }
+
+        if (event.getCategory().equals(EventCategory.DISCOUNT_PERCENTAGE)) {
+            return (int) (item.getPrice() - (item.getPrice() * event.getDiscountRate()));
+        }
+
+        return item.getPrice();
     }
 }

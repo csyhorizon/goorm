@@ -2,6 +2,9 @@ package com.example.backend.domain.event.controller;
 
 import com.example.backend.domain.event.dto.EventResponse;
 import com.example.backend.domain.event.service.EventService;
+import com.example.backend.domain.item.dto.ItemResponse;
+import com.example.backend.domain.item.service.ItemService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
