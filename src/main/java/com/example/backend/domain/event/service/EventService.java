@@ -37,6 +37,7 @@ public class EventService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<EventResponse> getAllEvents(Long storeId) {
         Store store = storeRepository.findOrThrow(storeId);
         List<Event> events = eventRepository.findAllByStoreId(store.getId());
@@ -46,9 +47,15 @@ public class EventService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public EventResponse getEventDetail(Long eventId) {
         Event event = findOrThrow(eventId);
         return EventResponse.from(event);
+    }
+
+    public void delete(Long eventId) {
+        Event event = findOrThrow(eventId);
+        eventRepository.delete(event);
     }
 
     private Event findOrThrow(Long eventId) {
