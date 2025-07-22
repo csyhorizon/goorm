@@ -1,8 +1,8 @@
 package com.example.backend.domain.store.entity;
 
 import com.example.backend.domain.global.BaseEntity;
-import com.example.backend.domain.user.entity.Users;
-import jakarta.persistence.CascadeType;
+import com.example.backend.domain.member.entity.Member;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -38,16 +38,15 @@ public class Store extends BaseEntity {
     private StoreDuration storeDuration;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
+    private Member member;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, Users user) {
-        this(null, name, address, phone_number, description, category, storeDuration, user);
+                 StoreDuration storeDuration, Member member) {
+        this(null, name, address, phone_number, description, category, storeDuration, member);
     }
 
     public Store(Long id, String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, Users user) {
+                 StoreDuration storeDuration, Member member) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -55,7 +54,7 @@ public class Store extends BaseEntity {
         this.description = description;
         this.category = category;
         this.storeDuration = storeDuration;
-        this.user = user;
+        this.member = member;
     }
 
     public LocalTime getStartTime() {
@@ -64,5 +63,9 @@ public class Store extends BaseEntity {
 
     public LocalTime getEndTime() {
         return storeDuration.getEndTime();
+    }
+
+    public Long getOwnerId() {
+        return member.getId();
     }
 }

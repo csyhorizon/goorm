@@ -3,7 +3,7 @@ package com.example.backend.support.fixture;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.entity.StoreCategory;
 import com.example.backend.domain.store.entity.StoreDuration;
-import com.example.backend.domain.user.entity.Users;
+import com.example.backend.domain.member.entity.Member;
 import java.time.LocalTime;
 import lombok.Getter;
 
@@ -28,7 +28,7 @@ public enum StoreFixture {
         this.storeDuration = storeDuration;
     }
 
-    public static Store 과일가게(Users user) {
+    public static Store 과일가게(Member user) {
         return new Store(과일가게.name, 과일가게.address, 과일가게.phone_number, 과일가게.description, 과일가게.category,
                 과일가게.storeDuration, user);
     }
