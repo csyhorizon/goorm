@@ -1,5 +1,6 @@
 package com.example.backend.domain.alarm.entity;
 
+import com.example.backend.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Alarm {
+public class Alarm extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,15 +26,12 @@ public class Alarm {
 
     private Boolean isDeleted = false; // 삭제 여부
 
-    private LocalDateTime createdAt; // 생성 시각
-
     @Builder
     public Alarm(Long memberId, String content) {
         this.memberId = memberId;
         this.content = content;
         this.isRead = false;
         this.isDeleted = false;
-        this.createdAt = LocalDateTime.now();
     }
 
     public void markAsRead() {
