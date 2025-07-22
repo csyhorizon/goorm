@@ -45,4 +45,14 @@ public class EventService {
                 .map(EventResponse::from)
                 .toList();
     }
+
+    public EventResponse getEventDetail(Long eventId) {
+        Event event = findOrThrow(eventId);
+        return EventResponse.from(event);
+    }
+
+    private Event findOrThrow(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("not found"));
+    }
 }
