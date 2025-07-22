@@ -18,6 +18,7 @@ public class Alarm {
 
     private Long memberId;           // 알림 받는 회원
 
+    @Column(length = 1000)
     private String content;          // 알림 내용
 
     private Boolean isRead = false;  // 읽음 여부

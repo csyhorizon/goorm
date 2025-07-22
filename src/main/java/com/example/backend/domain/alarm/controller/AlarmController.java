@@ -19,8 +19,8 @@ public class AlarmController {
 
     // TODO: [유저별 알림] userId, 상점 정보 등 연동 시, subscribe 파라미터 확장 예정
     @GetMapping("/subscribe")
-    public SseEmitter subscribe(@RequestParam Long userId) {
-        return alarmService.subscribe(userId);
+    public SseEmitter subscribe(@RequestParam Long memberId) {
+        return alarmService.subscribe(memberId);
     }
 
     // 안 읽은 알림 개수 조회

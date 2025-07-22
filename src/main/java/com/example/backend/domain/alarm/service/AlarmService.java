@@ -22,13 +22,13 @@ public class AlarmService {
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     // SSE 구독(단일 디바이스)
-    public SseEmitter subscribe(Long userId) {
+    public SseEmitter subscribe(Long memberId) {
         SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); // 1시간
-        emitters.put(userId, emitter);
+        emitters.put(memberId, emitter);
 
-        emitter.onCompletion(() -> emitters.remove(userId));
-        emitter.onTimeout(() -> emitters.remove(userId));
-        emitter.onError((e) -> emitters.remove(userId));
+        emitter.onCompletion(() -> emitters.remove(memberId));
+        emitter.onTimeout(() -> emitters.remove(memberId));
+        emitter.onError((e) -> emitters.remove(memberId));
 
         try {
             emitter.send(SseEmitter.event().name("connect").data("connected"));
@@ -39,18 +39,18 @@ public class AlarmService {
     }
 
     // 개별 사용자에게 알림 보내기
-    public void sendToUser(Long userId, String message) {
-        SseEmitter emitter = emitters.get(userId);
+    public void sendToUser(Long memberId, String message) {
+        SseEmitter emitter = emitters.get(memberId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name("alarm").data(message));
             } catch (IOException e) {
-                emitters.remove(userId);
+                emitters.remove(memberId);
             }
         }
         // 알림 이력 저장(DB)
         Alarm alarm = Alarm.builder()
-                .memberId(userId)
+                .memberId(memberId)
                 .content(message)
                 .build();
         alarmRepository.save(alarm);

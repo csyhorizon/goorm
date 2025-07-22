@@ -12,7 +12,6 @@ import java.util.List;
 
 @ServiceTest
 class AlarmServiceTest {
-
     @Autowired
     AlarmService alarmService;
     @Autowired
