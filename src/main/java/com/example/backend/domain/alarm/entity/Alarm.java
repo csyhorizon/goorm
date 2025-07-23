@@ -1,22 +1,24 @@
 package com.example.backend.domain.alarm.entity;
-
+import com.example.backend.domain.member.entity.Member;
+import com.example.backend.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class Alarm {
+public class Alarm extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;           // 알림 받는 회원
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;           // 알림 받는 회원
 
     @Column(length = 1000)
     private String content;          // 알림 내용
@@ -25,15 +27,12 @@ public class Alarm {
 
     private Boolean isDeleted = false; // 삭제 여부
 
-    private LocalDateTime createdAt; // 생성 시각
-
     @Builder
-    public Alarm(Long memberId, String content) {
-        this.memberId = memberId;
+    public Alarm(Member member, String content) {
+        this.member = member;
         this.content = content;
         this.isRead = false;
         this.isDeleted = false;
-        this.createdAt = LocalDateTime.now();
     }
 
     public void markAsRead() {
