@@ -33,6 +33,7 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 	//AWS S3
 	implementation platform('software.amazon.awssdk:bom:2.20.56')
