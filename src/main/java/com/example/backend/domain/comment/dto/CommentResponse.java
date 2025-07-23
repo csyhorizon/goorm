@@ -14,13 +14,17 @@ public record CommentResponse(
         LocalDateTime createdAt
 ) {
     public static CommentResponse from(Comment comment) {
+        Long parentCommentId = null;
+        if (comment.getParentComment() != null) {
+            parentCommentId = comment.getParentComment().getId();
+        }
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),
                 comment.getMember().getId(),
                 comment.getMember().getUsername(),
                 comment.getPost().getId(),
-                comment.getParentComment() != null ? comment.getParentComment().getId() : null,
+                parentCommentId,
                 comment.getCreatedAt()
         );
     }

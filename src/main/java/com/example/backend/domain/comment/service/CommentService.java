@@ -28,11 +28,7 @@ public class CommentService {
     public CommentResponse createComment(Long memberId, Long postId, CommentCreateRequest createRequest) {
         Member member = memberRepository.findOrThrow(memberId);
         Post post = postRepository.findOrThrow(postId);
-
-        Comment parentComment = null;
-        if(createRequest.getParentCommentId() != null) {
-            parentComment = commentRepository.findOrThrow(createRequest.getParentCommentId());
-        }
+        Comment parentComment = findParentCommentOrNull(createRequest.getParentCommentId());
 
         Comment comment = Comment.of(member, post, parentComment, createRequest.getContent());
         commentRepository.save(comment);
@@ -67,4 +63,8 @@ public class CommentService {
         }
     }
 
+    private Comment findParentCommentOrNull(Long parentCommentId) {
+        if(parentCommentId == null) return null;
+        return commentRepository.findOrThrow(parentCommentId);
+    }
 }

@@ -43,7 +43,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostMedia> mediaList = new ArrayList<>();
 
-    public Post(Member member, Store store, String location, String title, String content) {
+    private Post(Member member, Store store, String location, String title, String content) {
         this.member = member;
         this.store = store;
         this.location = location;
