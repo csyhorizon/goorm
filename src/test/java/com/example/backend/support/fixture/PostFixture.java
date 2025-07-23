@@ -1,7 +1,9 @@
 package com.example.backend.support.fixture;
 
+import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.post.dto.PostCreateRequest;
 import com.example.backend.domain.post.entity.Post;
+import com.example.backend.domain.store.entity.Store;
 import lombok.Getter;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +41,10 @@ public enum PostFixture {
     public PostCreateRequest toCreateRequest() {
         return new PostCreateRequest(
                 title, content, location, storeId);
+    }
+
+    public static Post 게시글(Member member, Store store) {
+        return new Post(member, store, 이미지_포함_게시글.location, 이미지_포함_게시글.title, 이미지_포함_게시글.content);
     }
 
 }
