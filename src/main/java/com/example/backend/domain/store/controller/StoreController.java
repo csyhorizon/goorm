@@ -1,5 +1,8 @@
 package com.example.backend.domain.store.controller;
 
+import com.example.backend.domain.event.dto.EventCreateRequest;
+import com.example.backend.domain.event.dto.EventResponse;
+import com.example.backend.domain.event.service.EventService;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.service.ItemService;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreController {
     private final StoreService storeService;
     private final ItemService itemService;
+    private final EventService eventService;
 
     @PostMapping
     public ResponseEntity<StoreResponse> save(@AuthenticationPrincipal CustomUserDetails user, @RequestBody
@@ -61,5 +65,23 @@ public class StoreController {
                                            @PathVariable Long itemId) {
         itemService.deleteItem(user.getUserId(), storeId, itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{storeId}/events")
+    public ResponseEntity<EventResponse> createEvents(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @PathVariable Long storeId,
+                                                      @RequestBody EventCreateRequest eventCreateRequest) {
+        return ResponseEntity.ok(eventService.save(user.getUserId(), storeId, eventCreateRequest));
+    }
+
+    @GetMapping("/{storeId}/events")
+    public ResponseEntity<List<EventResponse>> getEvents(@PathVariable Long storeId) {
+        return ResponseEntity.ok(eventService.getAllEvents(storeId));
+    }
+
+    @GetMapping("/{storeId}/{eventId}/items")
+    public ResponseEntity<List<ItemResponse>> getItemListWithEvent(@PathVariable Long storeId,
+                                                                   @PathVariable Long eventId) {
+        return ResponseEntity.ok(itemService.getItemsWithEvent(storeId, eventId));
     }
 }

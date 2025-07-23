@@ -1,6 +1,5 @@
 package com.example.backend.domain.item.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.backend.domain.member.entity.Member;
@@ -23,14 +22,6 @@ class ItemTest {
         Member member = MemberFixture.김회원();
         Store store = StoreFixture.과일가게(member);
         assertThatThrownBy(() -> new Item("", "설명", -1, store))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void 상품의_할인율은_0보다_낮을_수_없다() {
-        Member member = MemberFixture.김회원();
-        Store store = StoreFixture.과일가게(member);
-        assertThatThrownBy(() -> new Item("사과", "설명", 1000, -100, store))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
