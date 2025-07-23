@@ -27,12 +27,13 @@ public class StoreLikeService {
         Optional<StoreLike> storeLike = storeLikeRepository.findByMemberAndStore(member,store);
         if(storeLike.isPresent()){
             storeLikeRepository.delete(storeLike.get());
-            return new StoreLikeResponse(false);
+            return StoreLikeResponse.cancleStoreLike();
         }
-        else{
+        if(storeLike.isEmpty()){
             storeLikeRepository.save(new StoreLike(member, store));
-            return new StoreLikeResponse(true);
+            return StoreLikeResponse.pressStoreLike();
         }
+        throw new IllegalStateException("좋아요 처리 실패");
     }
 
 }
