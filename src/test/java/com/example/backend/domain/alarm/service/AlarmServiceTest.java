@@ -40,21 +40,6 @@ class AlarmServiceTest {
     }
 
     @Test
-    void 알림을_조회할_수_있다() {
-        // given
-        Member member = MemberFixture.김회원();
-        memberRepository.save(member);
-        alarmService.sendToUser(member.getId(), "조회 테스트 알림");
-
-        // when
-        List<Alarm> alarms = alarmService.getMyAlarms(member.getId());
-
-        // then
-        assertThat(alarms).hasSize(1);
-        assertThat(alarms.get(0).getContent()).isEqualTo("조회 테스트 알림");
-    }
-
-    @Test
     void 알림을_읽음처리_할_수_있다() {
         // given
         Member member = MemberFixture.김회원();

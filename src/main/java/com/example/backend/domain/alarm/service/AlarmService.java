@@ -25,6 +25,11 @@ public class AlarmService {
     private final MemberRepository memberRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
+    private Member findOrThrow(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+    }
+
     // SSE 구독(단일 디바이스)
     public SseEmitter subscribe(Long memberId) {
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
@@ -44,8 +49,7 @@ public class AlarmService {
 
     // 개별 사용자에게 알림 보내기
     public void sendToUser(Long memberId, String message) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        Member member = findOrThrow(memberId);
         SseEmitter emitter = emitters.get(memberId);
         if (emitter != null) {
             try {
@@ -64,16 +68,14 @@ public class AlarmService {
 
     // 안 읽은 알림 개수 반환
     public long getUnreadCount(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        Member member = findOrThrow(memberId);
         return alarmRepository.countUnreadByMember(member);
     }
 
     // 전체 알림 읽음 처리
     @Transactional
     public void readAll(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        Member member = findOrThrow(memberId);
         alarmRepository.markAllReadByMember(member);
     }
 
@@ -85,8 +87,7 @@ public class AlarmService {
 
     // 내 알림 리스트 조회
     public List<Alarm> getMyAlarms(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
+        Member member = findOrThrow(memberId);
         return alarmRepository.findByMemberAndIsDeletedFalseOrderByCreatedAtDesc(member);
     }
 }
