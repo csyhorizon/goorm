@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 public class MemberServiceTest {
-    @Autowired MemberService memberService;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     void 회원_찾기(){

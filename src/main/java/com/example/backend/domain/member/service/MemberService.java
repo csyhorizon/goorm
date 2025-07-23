@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    public MemberResponse getMember(Long memberId){
+    public MemberResponse getMember(Long memberId) {
         Member member = memberRepository.findOrThrow(memberId);
         return MemberResponse.from(member);
     }
