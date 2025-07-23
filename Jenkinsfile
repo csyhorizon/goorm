@@ -18,6 +18,7 @@ pipeline {
 
         // --- 수정 끝 ---
         S3_BUCKET_NAME = 'seotbucket'
+        CLOUD_AWS_REGION_STATIC = 'ap-northeast-2'
 
         // JWT (ID만 환경변수로 설정)
         JWT_SECRET_CREDENTIAL_ID = 'jwt-secret-text'
