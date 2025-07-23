@@ -43,8 +43,13 @@ public enum PostFixture {
                 title, content, location, storeId);
     }
 
+//    public static Post 게시글(Member member, Store store) {
+//        return new Post(member, store, 이미지_포함_게시글.location, 이미지_포함_게시글.title, 이미지_포함_게시글.content);
+//    }
+
     public static Post 게시글(Member member, Store store) {
-        return new Post(member, store, 이미지_포함_게시글.location, 이미지_포함_게시글.title, 이미지_포함_게시글.content);
+        return Post.of(member, store, 이미지_포함_게시글.location, 이미지_포함_게시글.title, 이미지_포함_게시글.content);
     }
+
 
 }

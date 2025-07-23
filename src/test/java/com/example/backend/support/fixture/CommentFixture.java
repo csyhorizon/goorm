@@ -17,11 +17,11 @@ public enum CommentFixture {
     }
 
     public static Comment 댓글(Member member, Post post){
-        return new Comment(member, post, null, 댓글.content);
+        return Comment.of(member, post, null, 댓글.content);
     }
 
     public static Comment 대댓글(Member member, Post post, Comment parentComment) {
-        return new Comment(member, post, parentComment, 대댓글.content);
+        return Comment.of(member, post, parentComment, 대댓글.content);
     }
 
 }
