@@ -112,10 +112,13 @@ docker run -d \\
     -e SPRING_DATA_MONGODB_PORT=${MONGO_PORT} \\
     -e SPRING_DATA_MONGODB_DATABASE=${MONGO_DB} \\
     -e JWT_SECRET=${JWT_SECRET} \\
-    -e CLOUD_AWS_CREDENTIALS_ACCESS-KEY=${AWS_ACCESS_KEY} \\
-    -e CLOUD_AWS_CREDENTIALS_SECRET-KEY=${AWS_SECRET_KEY} \\
-    -e CLOUD_AWS_S3_BUCKET=${S3_BUCKET_NAME} \\
-    -e CLOUD_AWS_REGION_STATIC=ap-northeast-2 \\
+    -e CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${AWS_ACCESS_KEY} \\
+    -e CLOUD_AWS_CREDENTIALS_SECRET_KEY=${AWS_SECRET_KEY} \\
+    -e CLOUD_AWS_REGION_STATIC=${CLOUD_AWS_REGION_STATIC} \\
+    -e cloud.aws.credentials.access-key=${AWS_ACCESS_KEY} \\
+    -e cloud.aws.credentials.secret-key=${AWS_SECRET_KEY} \\
+    -e cloud.aws.region.static=${CLOUD_AWS_REGION_STATIC} \\
+    -e cloud.aws.s3.bucketName=${S3_BUCKET_NAME} \\
     ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 docker image prune -f
 EOF
