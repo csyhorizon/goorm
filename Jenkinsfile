@@ -2,46 +2,38 @@ pipeline {
     agent any
 
     environment {
-        // MySQL [O]
+        // MySQL
         DB_HOST = 'mysql-db'
         DB_PORT = '3306'
         DB_NAME = 'seot'
-        DB_USER = credentials('mysql-username')
-        DB_PASSWORD = credentials('mysql-password')
 
-        // Redis [O]
+        // Redis
         REDIS_HOST = 'redis-cache'
         REDIS_PORT = '6379'
-        REDIS_PASSWORD = credentials('redis-password')
 
-        // MongoDB [O]
-        MONGO_USER = credentials('mongo-username')
-        MONGO_PASSWORD = credentials('mongo-password')
+        // --- 수정 끝 ---
         MONGO_HOST = 'mongodb'
         MONGO_PORT = '27017'
         MONGO_DB = 'seot'
 
-        // AWS S3 [O]
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        // --- 수정 끝 ---
         S3_BUCKET_NAME = 'seotbucket'
+        CLOUD_AWS_REGION_STATIC = 'ap-northeast-2'
 
-        // JWT [O]
+        // JWT (ID만 환경변수로 설정)
         JWT_SECRET_CREDENTIAL_ID = 'jwt-secret-text'
 
-        // Discord [O]
+        // Discord (ID만 환경변수로 설정)
         DISCORD_WEBHOOK_URL_CREDENTIAL_ID = 'DISCORD_WEBHOOK_URL'
 
-        // Github [O]
+        // Github (ID만 환경변수로 설정)
         GITHUB_REPO_URL_CREDENTIAL_ID = 'github-repo-url'
         GITHUB_BRANCH_CREDENTIAL_ID = 'github-branch'
 
-        // GCP [O]
+        // GCP (ID만 환경변수로 설정)
         GCP_SSH_CREDENTIAL_ID = 'gcp-ssh-key-credential'
-        GCP_VM_USER = credentials('host-vm-user')
-        GCP_VM_HOST = credentials('host-vm-ip-address-or-hostname')
 
-        // Docker [O]
+        // Docker (ID와 사용자 이름은 환경변수로 설정)
         DOCKERHUB_CREDENTIAL_ID = 'dockerhub-credential'
         DOCKERHUB_USERNAME = 'chinoel'
         DOCKER_IMAGE_NAME = "${env.DOCKERHUB_USERNAME}/seot-backend"
@@ -59,12 +51,12 @@ pipeline {
             }
         }
 
-        stage('Build Only') { // 스테이지 이름 변경
-             steps {
-                 script {
-                     sh "./gradlew clean build -x test --no-daemon"
-                 }
-             }
+        stage('Build Only') {
+            steps {
+                script {
+                    sh "./gradlew clean build -x test --no-daemon"
+                }
+            }
         }
 
         stage('Build & Push Docker Image') {
@@ -84,8 +76,8 @@ pipeline {
             steps {
                 sshagent(credentials: [env.GCP_SSH_CREDENTIAL_ID]) {
                     withCredentials([
-                        credentials(credentialsId: 'host-vm-user', variable: 'GCP_VM_USER'),
-                        credentials(credentialsId: 'host-vm-ip-address-or-hostname', variable: 'GCP_VM_HOST'),
+                        string(credentialsId: 'host-vm-user', variable: 'GCP_VM_USER'),
+                        string(credentialsId: 'host-vm-ip-address-or-hostname', variable: 'GCP_VM_HOST'),
                         string(credentialsId: 'mysql-username', variable: 'MYSQL_USER'),
                         string(credentialsId: 'mysql-password', variable: 'MYSQL_PASSWORD'),
                         string(credentialsId: 'redis-password', variable: 'REDIS_PASSWORD'),
@@ -96,7 +88,7 @@ pipeline {
                         string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_KEY')
                     ]) {
                         sh '''
-                        ssh-keygen -R ${GCP_VM_HOST}
+                        ssh-keygen -R ${GCP_VM_HOST} || true # 호스트 키 제거 실패 시에도 파이프라인 중단 방지
 
 ssh -o StrictHostKeyChecking=no ${GCP_VM_USER}@${GCP_VM_HOST} << EOF
 docker pull ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
@@ -112,16 +104,22 @@ docker run -d \\
     -e SPRING_REDIS_HOST=${REDIS_HOST} \\
     -e SPRING_REDIS_PORT=${REDIS_PORT} \\
     -e SPRING_REDIS_PASSWORD=${REDIS_PASSWORD} \\
+    -e SPRING_DATA_REDIS_HOST=${REDIS_HOST} \\
+    -e SPRING_DATA_REDIS_PORT=${REDIS_PORT} \\
+    -e SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD} \\
     -e SPRING_DATA_MONGODB_USERNAME=${MONGO_USER} \\
     -e SPRING_DATA_MONGODB_PASSWORD=${MONGO_PASSWORD} \\
     -e SPRING_DATA_MONGODB_HOST=${MONGO_HOST} \\
     -e SPRING_DATA_MONGODB_PORT=${MONGO_PORT} \\
     -e SPRING_DATA_MONGODB_DATABASE=${MONGO_DB} \\
     -e JWT_SECRET=${JWT_SECRET} \\
-    -e CLOUD_AWS_CREDENTIALS_ACCESS-KEY=${AWS_ACCESS_KEY} \\
-    -e CLOUD_AWS_CREDENTIALS_SECRET-KEY=${AWS_SECRET_KEY} \\
-    -e CLOUD_AWS_S3_BUCKET=${S3_BUCKET_NAME} \\
-    -e CLOUD_AWS_REGION_STATIC=ap-northeast-2 \\
+    -e CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${AWS_ACCESS_KEY} \\
+    -e CLOUD_AWS_CREDENTIALS_SECRET_KEY=${AWS_SECRET_KEY} \\
+    -e CLOUD_AWS_REGION_STATIC=${CLOUD_AWS_REGION_STATIC} \\
+    -e cloud.aws.credentials.access-key=${AWS_ACCESS_KEY} \\
+    -e cloud.aws.credentials.secret-key=${AWS_SECRET_KEY} \\
+    -e cloud.aws.region.static=${CLOUD_AWS_REGION_STATIC} \\
+    -e cloud.aws.s3.bucketName=${S3_BUCKET_NAME} \\
     ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 docker image prune -f
 EOF
