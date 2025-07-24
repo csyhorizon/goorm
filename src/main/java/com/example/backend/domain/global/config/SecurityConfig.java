@@ -98,7 +98,7 @@ public class SecurityConfig {
     @Primary
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:8081", "https://uniqram.kro.kr"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://seot.kro.kr"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
