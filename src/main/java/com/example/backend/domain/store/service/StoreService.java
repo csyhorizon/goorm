@@ -17,11 +17,17 @@ public class StoreService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
 
-    public StoreResponse save(Long userId, StoreCreateRequest storeCreateRequest) {
-        Member user = memberRepository.findOrThrow(userId);
-        Store store = storeRepository.save(storeCreateRequest.toEntity(user));
-
+    public StoreResponse save(Long memberId, StoreCreateRequest storeCreateRequest) {
+        Member member = memberRepository.findOrThrow(memberId);
+        validateOwnerRole(member);
+        Store store = storeRepository.save(storeCreateRequest.toEntity(member));
         return StoreResponse.from(store);
+    }
+
+    private static void validateOwnerRole(Member member) {
+        if (!member.isOwner()){
+            throw new IllegalArgumentException("this member is not owner");
+        }
     }
 
     @Transactional(readOnly = true)

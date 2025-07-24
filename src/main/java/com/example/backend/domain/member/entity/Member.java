@@ -13,6 +13,7 @@ import java.io.Serializable;
 public class Member extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     @Column
@@ -38,5 +39,9 @@ public class Member extends BaseEntity implements Serializable {
 
     public Member(String username, String email, String password, Role role) {
         this(null, username, email, password, role);
+    }
+
+    public boolean isOwner() {
+        return role == Role.OWNER;
     }
 }
