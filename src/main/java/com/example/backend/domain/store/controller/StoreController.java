@@ -32,27 +32,11 @@ public class StoreController {
     private final ItemService itemService;
     private final EventService eventService;
 
-    @Operation(summary = "가게 등록", description = "사장님이 가게를 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "가게 등록 성공")
-    @PostMapping
-    public ResponseEntity<StoreResponse> save(@AuthenticationPrincipal CustomUserDetails user, @RequestBody
-    StoreCreateRequest storeCreateRequest) {
-        return ResponseEntity.ok(storeService.save(user.getUserId(), storeCreateRequest));
-    }
-
     @Operation(summary = "가게 상세조회", description = "가게를 상세 조회합니다.")
     @ApiResponse(responseCode = "200", description = "가게 상세조회 성공")
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreResponse> getStoreDetail(@PathVariable Long storeId) {
         return ResponseEntity.ok(storeService.findById(storeId));
-    }
-
-    @Operation(summary = "가게 삭제", description = "사장님이 가게를 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "가게 삭제 성공")
-    @DeleteMapping("/{storeId}")
-    public ResponseEntity<Void> deleteStore(@PathVariable Long storeId) {
-        storeService.delete(storeId);
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "가게의 상품 등록", description = "사장님이 가게에 판매상품을 등록합니다.")

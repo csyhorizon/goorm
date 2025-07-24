@@ -12,32 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class StoreService {
-    private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
 
-    public StoreResponse save(Long memberId, StoreCreateRequest storeCreateRequest) {
-        Member member = memberRepository.findOrThrow(memberId);
-        validateOwnerRole(member);
-        Store store = storeRepository.save(storeCreateRequest.toEntity(member));
-        return StoreResponse.from(store);
-    }
-
-    private static void validateOwnerRole(Member member) {
-        if (!member.isOwner()){
-            throw new IllegalArgumentException("this member is not owner");
-        }
-    }
-
-    @Transactional(readOnly = true)
     public StoreResponse findById(Long storeId) {
         Store store = storeRepository.findOrThrow(storeId);
         return StoreResponse.from(store);
-    }
-
-    public void delete(Long storeId) {
-        Store store = storeRepository.findOrThrow(storeId);
-        storeRepository.delete(store);
     }
 }
