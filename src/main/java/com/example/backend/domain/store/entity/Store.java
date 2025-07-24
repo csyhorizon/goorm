@@ -38,6 +38,7 @@ public class Store extends BaseEntity {
     private StoreDuration storeDuration;
 
     @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,

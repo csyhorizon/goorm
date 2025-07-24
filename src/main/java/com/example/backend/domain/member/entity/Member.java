@@ -39,4 +39,8 @@ public class Member extends BaseEntity implements Serializable {
     public Member(String username, String email, String password, Role role) {
         this(null, username, email, password, role);
     }
+
+    public boolean isOwner() {
+        return role == Role.OWNER;
+    }
 }

@@ -148,9 +148,9 @@ public class JwtTokenProvider {
     }
 
     @Transactional
-    public void saveRefreshToken(Member user, String token, LocalDateTime expiryDate) {
+    public void saveRefreshToken(Member member, String token, LocalDateTime expiryDate) {
         // 토큰 여부 확인
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByMember(member);
 
         if (existingToken.isPresent()) {
             // Update existing token
@@ -158,14 +158,14 @@ public class JwtTokenProvider {
         } else {
             // Create new token
             RefreshToken refreshToken = RefreshToken.builder()
-                    .user(user)
+                    .member(member)
                     .token(token)
                     .expiryDate(expiryDate)
                     .build();
             refreshTokenRepository.save(refreshToken);
         }
         redisTemplate.opsForValue().set(
-                "refresh_token:" + user.getUsername(),
+                "refresh_token:" + member.getUsername(),
                 token,
                 Duration.between(LocalDateTime.now(), expiryDate)
         );
@@ -189,7 +189,7 @@ public class JwtTokenProvider {
         }
 
         // Get user from token
-        Member user = token.getUser();
+        Member user = token.getMember();
 
 
         // Create authentication object
@@ -202,8 +202,8 @@ public class JwtTokenProvider {
     }
 
     @Transactional
-    public void deleteRefreshTokenByUser(Member user) {
-        refreshTokenRepository.deleteByUser(user);
+    public void deleteRefreshTokenByUser(Member member) {
+        refreshTokenRepository.deleteByMember(member);
     }
 
     @Transactional

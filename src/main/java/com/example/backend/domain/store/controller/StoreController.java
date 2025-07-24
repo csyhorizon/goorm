@@ -10,6 +10,8 @@ import com.example.backend.domain.security.adapter.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.StoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,23 +32,31 @@ public class StoreController {
     private final ItemService itemService;
     private final EventService eventService;
 
+    @Operation(summary = "가게 등록", description = "사장님이 가게를 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "가게 등록 성공")
     @PostMapping
     public ResponseEntity<StoreResponse> save(@AuthenticationPrincipal CustomUserDetails user, @RequestBody
     StoreCreateRequest storeCreateRequest) {
         return ResponseEntity.ok(storeService.save(user.getUserId(), storeCreateRequest));
     }
 
+    @Operation(summary = "가게 상세조회", description = "가게를 상세 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "가게 상세조회 성공")
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreResponse> getStoreDetail(@PathVariable Long storeId) {
         return ResponseEntity.ok(storeService.findById(storeId));
     }
 
+    @Operation(summary = "가게 삭제", description = "사장님이 가게를 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "가게 삭제 성공")
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(@PathVariable Long storeId) {
         storeService.delete(storeId);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "가게의 상품 등록", description = "사장님이 가게에 판매상품을 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "상품 등록 성공")
     @PostMapping("/{storeId}/items")
     public ResponseEntity<ItemResponse> createStoreItem(@AuthenticationPrincipal CustomUserDetails user,
                                                         @PathVariable Long storeId,
@@ -54,11 +64,15 @@ public class StoreController {
         return ResponseEntity.ok(itemService.save(user.getUserId(), storeId, itemCreateRequest));
     }
 
+    @Operation(summary = "가게 등록", description = "사장님이 가게를 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "가게 등록 성공")
     @GetMapping("/{storeId}/items")
     public ResponseEntity<List<ItemResponse>> getStoreItems(@PathVariable Long storeId) {
         return ResponseEntity.ok(itemService.findAllByStoreId(storeId));
     }
 
+    @Operation(summary = "상품 삭제", description = "사장님이 가게에 등록된 상품을 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "상품 삭제 성공")
     @DeleteMapping("/{storeId}/{itemId}")
     public ResponseEntity<Void> deleteItem(@AuthenticationPrincipal CustomUserDetails user,
                                            @PathVariable Long storeId,
@@ -67,6 +81,8 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "이벤트 등록", description = "사장님이 이벤트를 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "이벤트 등록 성공")
     @PostMapping("/{storeId}/events")
     public ResponseEntity<EventResponse> createEvents(@AuthenticationPrincipal CustomUserDetails user,
                                                       @PathVariable Long storeId,
@@ -74,11 +90,15 @@ public class StoreController {
         return ResponseEntity.ok(eventService.save(user.getUserId(), storeId, eventCreateRequest));
     }
 
+    @Operation(summary = "이벤트 목록 조회", description = "가게가 등록했던 이벤트들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "이벤트 목록 조회 성공")
     @GetMapping("/{storeId}/events")
     public ResponseEntity<List<EventResponse>> getEvents(@PathVariable Long storeId) {
         return ResponseEntity.ok(eventService.getAllEvents(storeId));
     }
 
+    @Operation(summary = "이벤트 적용된 상품정보 조회", description = "이벤트가 적용된 상품의 정보를 조회합니다. (할인)")
+    @ApiResponse(responseCode = "200", description = "이벤트 적용된 상품정보 조회 성공")
     @GetMapping("/{storeId}/{eventId}/items")
     public ResponseEntity<List<ItemResponse>> getItemListWithEvent(@PathVariable Long storeId,
                                                                    @PathVariable Long eventId) {

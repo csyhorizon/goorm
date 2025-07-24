@@ -29,6 +29,7 @@ public class Item extends BaseEntity {
     private int price;
 
     @ManyToOne
+    @JoinColumn(name = "store_id")
     private Store store;
 
     public Item(Long id, String name, String description, int price, Store store) {
