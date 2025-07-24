@@ -4,6 +4,8 @@ import com.example.backend.domain.comment.dto.CommentCreateRequest;
 import com.example.backend.domain.comment.dto.CommentResponse;
 import com.example.backend.domain.comment.service.CommentService;
 import com.example.backend.domain.security.adapter.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,8 @@ public class PostCommentController {
 
     private final CommentService commentService;
 
+    @Operation(summary = "댓글 생성", description = "특정 게시글에 댓글을 생성합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 생성 성공")
     @PostMapping
     public ResponseEntity<CommentResponse> createComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -29,6 +33,8 @@ public class PostCommentController {
         return ResponseEntity.ok(comment);
     }
 
+    @Operation(summary = "댓글 조회", description = "특정 게시글의 댓글을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "댓글 조회 성공")
     @GetMapping
     public ResponseEntity<Page<CommentResponse>> getComments(
             @PathVariable Long postId,
