@@ -4,6 +4,8 @@ import com.example.backend.domain.event.dto.EventResponse;
 import com.example.backend.domain.event.service.EventService;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.service.ItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
     private final EventService eventService;
 
+    @Operation(summary = "이벤트 상세 조회", description = "가게가 등록했던 이벤트들 상세 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "이벤트 상세 조회 성공")
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponse> getEventDetail(@PathVariable Long eventId) {
         return ResponseEntity.ok(eventService.getEventDetail(eventId));
     }
 
+    @Operation(summary = "이벤트 삭제", description = "가게가 등록했던 이벤트를 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "이벤트 삭제 성공")
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> delete(@PathVariable Long eventId) {
         eventService.delete(eventId);
