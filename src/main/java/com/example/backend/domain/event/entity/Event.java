@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 public class Event extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "event_id")
     private Long id;
 
     @Embedded

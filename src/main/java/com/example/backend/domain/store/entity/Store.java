@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "store_id")
     private Long id;
 
     private String name;

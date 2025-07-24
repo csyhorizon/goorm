@@ -14,7 +14,6 @@ public class StoreLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "store_like_id")
     private Long id;
 
     @ManyToOne
