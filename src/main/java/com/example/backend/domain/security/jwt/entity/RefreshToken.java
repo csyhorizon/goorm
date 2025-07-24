@@ -18,11 +18,12 @@ public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "refresh_token_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Member user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(nullable = false, unique = true)
     private String token;
