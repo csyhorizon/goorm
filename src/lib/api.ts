@@ -1,5 +1,5 @@
 
-const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
+const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
 
 interface LoginRequest {
   email: string;
