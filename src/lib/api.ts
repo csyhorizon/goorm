@@ -1,5 +1,5 @@
 
-const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
+const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
 
 interface LoginRequest {
   email: string;
@@ -92,7 +92,7 @@ export async function springBootRegister(userData: RegisterRequest): Promise<Reg
   } catch (error: unknown) {
     console.error('Spring Boot 회원가입 API 호출 중 오류 발생:', error);
     console.error('회원가입 요청 데이터:', userData);
-    console.error('API 호출 URL:', `${SPRING_BOOT_API_BASE_URL}/api/auth/join`);
+    console.error('API 호출 URL:', `${SPRING_BOOT_API_BASE_URL}/auth/join`);
     throw new Error(error instanceof Error ? error.message : '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
   }
 }
