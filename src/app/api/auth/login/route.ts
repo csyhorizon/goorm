@@ -1,30 +1,29 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { springBootLogin } from '@/lib/api';
+import { login } from '@/lib/apis/auth.api';
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const data = await springBootLogin({ email, password });
+    const data = await login({ email, password });
 
-    const { accessToken, refreshToken, ...userData } = data;
-
-    (await cookies()).set('accessToken', accessToken, {
+    (await
+      cookies()).set('accessToken', data.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60,
     });
 
-    (await cookies()).set('refreshToken', refreshToken, {
+    (await cookies()).set('refreshToken', data.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: 60 * 60 * 24 * 14,
     });
 
-    return NextResponse.json({ success: true, user: userData });
+    return NextResponse.json({ success: true, user: data.user });
 
   } catch (error: unknown) {
     console.error('API 라우트 - 로그인 처리 중 오류 발생:', error);
