@@ -16,7 +16,7 @@ export interface Page<T> {
   content: T[];
   totalPages: number;
   totalElements: number;
-  // Swagger 명세에 나온 나머지 필드들을 필요에 따라 추가할 수 있습니다.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
