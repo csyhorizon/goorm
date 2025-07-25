@@ -33,14 +33,28 @@ public class PostUpdateService {
         Member member = memberRepository.findOrThrow(memberId);
         validateIsOwner(member, post);
 
-        //기존 이미지 조회
-        List<PostMedia> allPosts = postMediaRepository.findAllByPost(post);
-
         //NPE 방지
         List<String> keepMediaUrls = postUpdateRequest.getKeepMediaUrls() != null
                 ? postUpdateRequest.getKeepMediaUrls()
                 : List.of();
 
+        deleteRemovedImages(post, keepMediaUrls);
+
+        List<String> newMediaUrls = uploadNewImages(imageFiles);
+
+        savePostMedia(post, newMediaUrls);
+
+        post.update(postUpdateRequest.getTitle(), postUpdateRequest.getContent(), postUpdateRequest.getLocation());
+
+        List<String> mediaUrls = postMediaRepository.findAllByPost(post)
+                .stream()
+                .map(PostMedia::getMediaUrl).toList();
+
+        return PostResponse.of(post, mediaUrls, post.getStore());
+    }
+
+    private void deleteRemovedImages(Post post, List<String> keepMediaUrls) {
+        List<PostMedia> allPosts = postMediaRepository.findAllByPost(post);
         List<PostMedia> toDelete = allPosts.stream()
                 .filter(media -> !keepMediaUrls.contains(media.getMediaUrl()))
                 .toList();
@@ -49,26 +63,26 @@ public class PostUpdateService {
             s3Service.deleteFile(media.getMediaUrl());
         }
         postMediaRepository.deleteAll(toDelete);
+    }
 
+    private List<String> uploadNewImages(List<MultipartFile> imageFiles) {
+        if (imageFiles == null || imageFiles.isEmpty()) return List.of();
+        return imageFiles.stream()
+                .map(file -> {
+                    try {
+                        return s3Service.uploadFile(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException("S3 업로드 실패", e);
+                    }
+                })
+                .toList();
+    }
 
-        if(imageFiles != null && !imageFiles.isEmpty()) {
-            List<String> newMediaUrls = imageFiles.stream().map(file -> {
-                try {
-                    return s3Service.uploadFile(file);
-                } catch (IOException e) {
-                    throw new RuntimeException("S3 업로드 실패", e);
-                }
-            }).toList();
-            List<PostMedia> newMedia = newMediaUrls.stream().map(url -> PostMedia.of(post, url)).toList();
-            postMediaRepository.saveAll(newMedia);
-        }
-
-        post.update(postUpdateRequest.getTitle(), postUpdateRequest.getContent(), postUpdateRequest.getLocation());
-
-        List<String> mediaUrls = postMediaRepository.findAllByPost(post)
-                .stream()
-                .map(PostMedia::getMediaUrl).toList();
-        return PostResponse.of(post, mediaUrls, post.getStore());
+    private void savePostMedia(Post post, List<String> mediaUrls) {
+        List<PostMedia> newMedia = mediaUrls.stream()
+                .map(url -> PostMedia.of(post, url))
+                .toList();
+        postMediaRepository.saveAll(newMedia);
     }
 
     private void validateIsOwner(Member member, Post post) {

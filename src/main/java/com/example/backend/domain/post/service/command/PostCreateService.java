@@ -34,29 +34,36 @@ public class PostCreateService {
 
         Store store = storeRepository.findOrThrow(postCreateRequest.getStoreId());
 
-        List<String> mediaUrls = imageFiles.stream()
-                .map(file -> {
-                    try {
-                        return s3Service.uploadFile(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException("S3 업로드 실패", e);
-                    }
-                })
-                .toList();
-
+        List<String> mediaUrls = uploadImages(imageFiles);
         validateMediaUrls(mediaUrls);
 
         //post 생성
         Post post = Post.of(member, store, postCreateRequest.getLocation(), postCreateRequest.getTitle(), postCreateRequest.getContent());
         postRepository.save(post);
 
-        //정적 팩토리 메서드 이미지 등록(추후 CQRS 패턴 대비)
+        saveMediaList(post, mediaUrls);
+
+        return PostResponse.of(post, mediaUrls, store);
+    }
+
+    private List<String> uploadImages(List<MultipartFile> imageFiles) {
+        return imageFiles.stream()
+                .map(file -> {
+                    try{
+                        return s3Service.uploadFile(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException("S3 업로드 실패", e);
+                    }
+                })
+                .toList();
+    }
+
+    private List<PostMedia> saveMediaList(Post post, List<String> mediaUrls) {
         List<PostMedia> mediaList = mediaUrls.stream()
                 .map(url -> PostMedia.of(post, url))
                 .toList();
         postMediaRepository.saveAll(mediaList);
-
-        return PostResponse.of(post, mediaUrls, store);
+        return mediaList;
     }
 
     private void validateMediaUrls(List<String> mediaUrls) {
