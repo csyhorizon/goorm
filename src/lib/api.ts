@@ -1,5 +1,5 @@
 
-const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
+const SPRING_BOOT_API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
 
 interface LoginRequest {
   email: string;
@@ -15,9 +15,10 @@ interface LoginResponse {
 }
 
 interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
-  name: string;
+  confirmPassword: string;
 }
 
 interface RegisterResponse {
@@ -38,7 +39,7 @@ export async function springBootLogin(credentials: LoginRequest): Promise<LoginR
   }
 
   try {
-    const response = await fetch(`${SPRING_BOOT_API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${SPRING_BOOT_API_BASE_URL}/auth/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ export async function springBootLogin(credentials: LoginRequest): Promise<LoginR
  * Spring Boot 백엔드의 회원가입 API를 호출하는 함수
  * Next.js API 라우트에서 사용
  *
- * @param {RegisterRequest} userData - 사용자 회원가입 정보 (이메일, 비밀번호, 이름)
+ * @param {RegisterRequest} userData - 사용자 회원가입 정보 (사용자 이름, 이메일, 비밀번호, 비밀번호 확인)
  * @returns {Promise<RegisterResponse>} - 회원가입 성공 시 백엔드의 응답 데이터
  * @throws {Error} - 회원가입 실패 시 에러 발생
  */
@@ -73,7 +74,7 @@ export async function springBootRegister(userData: RegisterRequest): Promise<Reg
   }
 
   try {
-    const response = await fetch(`${SPRING_BOOT_API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${SPRING_BOOT_API_BASE_URL}/auth/join`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,6 +91,8 @@ export async function springBootRegister(userData: RegisterRequest): Promise<Reg
 
   } catch (error: unknown) {
     console.error('Spring Boot 회원가입 API 호출 중 오류 발생:', error);
+    console.error('회원가입 요청 데이터:', userData);
+    console.error('API 호출 URL:', `${SPRING_BOOT_API_BASE_URL}/api/auth/join`);
     throw new Error(error instanceof Error ? error.message : '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
   }
 }

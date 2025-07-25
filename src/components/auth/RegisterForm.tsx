@@ -1,13 +1,13 @@
-// components/auth/RegisterForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -19,13 +19,19 @@ export default function RegisterForm() {
     setSuccess(null);
     setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ username, email, password, confirmPassword }),
       });
 
       if (!response.ok) {
@@ -36,7 +42,8 @@ export default function RegisterForm() {
       setSuccess('회원가입에 성공했습니다! 로그인 페이지로 이동합니다.');
       setEmail('');
       setPassword('');
-      setName('');
+      setConfirmPassword(''); // Clear confirmPassword field on success
+      setUsername('');
       setTimeout(() => {
         router.push('/auth/login');
       }, 2000);
@@ -57,14 +64,14 @@ export default function RegisterForm() {
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-          이름
+          닉네임
         </label>
         <input
           type="text"
           id="name"
-          name="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
@@ -95,6 +102,21 @@ export default function RegisterForm() {
           name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+          비밀번호 확인
+        </label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          value={confirmPassword} // Bind value to state
+          onChange={(e) => setConfirmPassword(e.target.value)} // Update state on change
           required
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
