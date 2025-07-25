@@ -18,7 +18,9 @@ spring:
         format_sql: true
     open-in-view: false
   config:
-    import: optional:file:./.env[.properties]
+    import:
+      - optional:file:./.env[.properties]
+      - optional:file:./env/db.env.properties
 logging:
   level:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

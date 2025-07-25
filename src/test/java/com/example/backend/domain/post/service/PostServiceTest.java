@@ -6,10 +6,10 @@ import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.post.dto.PostCreateRequest;
 import com.example.backend.domain.post.dto.PostResponse;
 import com.example.backend.domain.post.dto.PostUpdateRequest;
-import com.example.backend.domain.post.entity.Post;
 import com.example.backend.domain.post.entity.PostMedia;
 import com.example.backend.domain.post.repository.PostMediaRepository;
 import com.example.backend.domain.post.repository.PostRepository;
+import com.example.backend.domain.post.service.command.PostCommandService;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
 import com.example.backend.support.annotation.ServiceTest;
@@ -34,7 +34,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 public class PostServiceTest {
 
     @Autowired
-    PostService postService;
+    PostQueryService postQueryService;
+    @Autowired
+    PostCommandService postCommandService;
     @Autowired
     PostRepository postRepository;
     @Autowired
@@ -67,7 +69,7 @@ public class PostServiceTest {
             throw new RuntimeException(e);
         }
 
-        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
+        PostResponse postResponse = postCommandService.createPost(member.getId(), postCreateRequest, files);
 
         assertEquals(postFixture.getTitle(), postResponse.getTitle());
         assertEquals(postFixture.getContent(), postResponse.getContent());
@@ -93,7 +95,7 @@ public class PostServiceTest {
             throw new RuntimeException(e);
         }
 
-        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
+        PostResponse postResponse = postCommandService.createPost(member.getId(), postCreateRequest, files);
 
         Long postId = postResponse.getId();
         Long storeId = store.getId();
@@ -121,7 +123,7 @@ public class PostServiceTest {
                 .storeId(storeId)
                 .build();
 
-        PostResponse updated = postService.updatePost(postId, memberId, updateRequest, newFiles);
+        PostResponse updated = postCommandService.updatePost(postId, memberId, updateRequest, newFiles);
 
         assertEquals("수정된 제목", updated.getTitle());
         assertEquals("수정된 내용", updated.getContent());
@@ -149,7 +151,7 @@ public class PostServiceTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        PostResponse postResponse = postService.createPost(member.getId(), postCreateRequest, files);
+        PostResponse postResponse = postCommandService.createPost(member.getId(), postCreateRequest, files);
         Long postId = postResponse.getId();
         Long memberId = member.getId();
 
@@ -157,7 +159,7 @@ public class PostServiceTest {
         Mockito.doNothing().when(s3Service).deleteFile(anyString());
 
         // 2. 게시글 삭제
-        postService.deletePost(postId, memberId);
+        postCommandService.deletePost(postId, memberId);
 
         // 3. 실제로 DB에서 삭제되었는지 검증
         assertFalse(postRepository.findById(postId).isPresent());
