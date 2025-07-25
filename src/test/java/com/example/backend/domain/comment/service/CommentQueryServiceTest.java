@@ -2,6 +2,7 @@ package com.example.backend.domain.comment.service;
 
 import com.example.backend.domain.comment.entity.Comment;
 import com.example.backend.domain.comment.repository.CommentRepository;
+import com.example.backend.domain.comment.service.command.CommentCommandService;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.post.entity.Post;
@@ -13,7 +14,6 @@ import com.example.backend.support.fixture.CommentFixture;
 import com.example.backend.support.fixture.MemberFixture;
 import com.example.backend.support.fixture.PostFixture;
 import com.example.backend.support.fixture.StoreFixture;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,10 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ServiceTest
-public class CommentServiceTest {
+public class CommentQueryServiceTest {
 
     @Autowired
-    CommentService commentService;
+    CommentCommandService commentCommandService;
     @Autowired
     CommentRepository commentRepository;
     @Autowired
@@ -81,7 +81,7 @@ public class CommentServiceTest {
         commentRepository.save(comment);
 
         assertThatThrownBy(
-                () -> commentService.deleteComment(comment.getId(), member2.getId()))
+                () -> commentCommandService.deleteComment(comment.getId(), member2.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -96,7 +96,7 @@ public class CommentServiceTest {
         Comment comment = CommentFixture.댓글(member, post);
         commentRepository.save(comment);
 
-        commentService.deleteComment(comment.getId(), member.getId());
+        commentCommandService.deleteComment(comment.getId(), member.getId());
         assertThat(commentRepository.findAll()).hasSize(0);
     }
 }
