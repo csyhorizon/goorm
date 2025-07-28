@@ -41,7 +41,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encodedPassword)
-                .role(Role.USER)
+                .role(request.getRole())
                 .build();
 
         userRepository.save(user);
@@ -51,7 +51,7 @@ public class AuthService {
         // username / password 검증
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getEmail(),
                         request.getPassword()
                 )
         );
