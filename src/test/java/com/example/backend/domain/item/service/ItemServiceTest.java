@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
-class ItemQueryServiceTest {
+class ItemServiceTest {
     @Autowired
     StoreRepository storeRepository;
     @Autowired

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.backend.domain.event.entity.Event;
 import com.example.backend.domain.event.repository.EventRepository;
+import com.example.backend.domain.event.service.command.EventCommandService;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.store.entity.Store;
@@ -16,9 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
-public class EventQueryServiceTest {
+public class EventServiceTest {
     @Autowired
-    EventQueryService eventService;
+    EventCommandService eventService;
     @Autowired
     EventRepository eventRepository;
     @Autowired
