@@ -2,9 +2,8 @@ package com.example.backend.domain.like.controller;
 
 import com.example.backend.domain.like.dto.StoreLikeRequest;
 import com.example.backend.domain.like.dto.StoreLikeResponse;
-import com.example.backend.domain.like.repository.StoreLikeRepository;
 import com.example.backend.domain.like.service.StoreLikeService;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

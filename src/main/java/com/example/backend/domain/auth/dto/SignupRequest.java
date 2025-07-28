@@ -1,5 +1,6 @@
 package com.example.backend.domain.auth.dto;
 
+import com.example.backend.domain.member.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,10 +26,13 @@ public class SignupRequest {
     @NotBlank
     private String confirmPassword;
 
-    public SignupRequest(String username, String email, String password, String confirmPassword) {
+    private Role role;
+
+    public SignupRequest(String username, String email, String password, String confirmPassword, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.confirmPassword = confirmPassword;
+        this.role = role;
     }
 }

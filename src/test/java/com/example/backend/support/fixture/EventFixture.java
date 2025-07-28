@@ -6,7 +6,6 @@ import com.example.backend.domain.event.entity.EventCategory;
 import com.example.backend.domain.event.entity.EventDuration;
 import com.example.backend.domain.event.entity.EventInfo;
 import com.example.backend.domain.store.entity.Store;
-import com.example.backend.domain.store.service.StoreService;
 import java.time.LocalDateTime;
 import lombok.Getter;
 

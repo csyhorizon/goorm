@@ -12,7 +12,7 @@ import com.example.backend.domain.auth.dto.SigninRequest;
 import com.example.backend.domain.auth.dto.SignupRequest;
 import com.example.backend.domain.auth.exception.AuthErrorCode;
 import com.example.backend.domain.auth.exception.AuthException;
-import com.example.backend.domain.security.jwt.JwtTokenProvider;
+import com.example.backend.domain.auth.jwt.JwtTokenProvider;
 import com.example.backend.domain.member.entity.Role;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
@@ -41,7 +41,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encodedPassword)
-                .role(Role.USER)
+                .role(request.getRole())
                 .build();
 
         userRepository.save(user);
@@ -51,7 +51,7 @@ public class AuthService {
         // username / password 검증
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getEmail(),
                         request.getPassword()
                 )
         );

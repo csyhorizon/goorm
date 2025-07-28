@@ -3,7 +3,7 @@ package com.example.backend.domain.redis.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import com.example.backend.domain.redis.model.ActiveUser;
 
 import java.time.LocalDateTime;
