@@ -23,9 +23,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.backend.domain.security.adapter.CustomUserDetailsService;
-import com.example.backend.domain.security.jwt.JwtAuthenticationFilter;
-import com.example.backend.domain.security.jwt.JwtTokenProvider;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetailsService;
+import com.example.backend.domain.auth.jwt.JwtAuthenticationFilter;
+import com.example.backend.domain.auth.jwt.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity

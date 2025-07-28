@@ -1,11 +1,9 @@
 package com.example.backend.domain.store.controller;
 
-import com.example.backend.domain.security.adapter.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.command.StoreCommandService;
-import com.example.backend.domain.store.service.command.StoreCreateService;
-import com.example.backend.domain.store.service.command.StoreDeleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;

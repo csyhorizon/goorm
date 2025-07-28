@@ -2,13 +2,11 @@ package com.example.backend.domain.member.controller;
 
 import com.example.backend.domain.member.dto.MemberResponse;
 import com.example.backend.domain.member.service.MemberService;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

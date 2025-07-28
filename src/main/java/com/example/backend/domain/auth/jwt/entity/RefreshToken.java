@@ -1,4 +1,4 @@
-package com.example.backend.domain.security.jwt.entity;
+package com.example.backend.domain.auth.jwt.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

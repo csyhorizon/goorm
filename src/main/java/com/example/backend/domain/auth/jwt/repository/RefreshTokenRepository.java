@@ -1,7 +1,7 @@
-package com.example.backend.domain.security.jwt.repository;
+package com.example.backend.domain.auth.jwt.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.backend.domain.security.jwt.entity.RefreshToken;
+import com.example.backend.domain.auth.jwt.entity.RefreshToken;
 import com.example.backend.domain.member.entity.Member;
 
 import java.util.Optional;

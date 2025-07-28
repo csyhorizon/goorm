@@ -6,7 +6,7 @@ import com.example.backend.domain.event.service.EventService;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.service.ItemService;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;

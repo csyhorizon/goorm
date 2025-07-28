@@ -1,4 +1,4 @@
-package com.example.backend.domain.security.jwt;
+package com.example.backend.domain.auth.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -14,9 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.backend.domain.auth.dto.JwtToken;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
-import com.example.backend.domain.security.jwt.entity.RefreshToken;
-import com.example.backend.domain.security.jwt.repository.RefreshTokenRepository;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.entity.RefreshToken;
+import com.example.backend.domain.auth.jwt.repository.RefreshTokenRepository;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 

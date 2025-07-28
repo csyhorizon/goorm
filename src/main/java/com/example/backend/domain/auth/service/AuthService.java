@@ -12,7 +12,7 @@ import com.example.backend.domain.auth.dto.SigninRequest;
 import com.example.backend.domain.auth.dto.SignupRequest;
 import com.example.backend.domain.auth.exception.AuthErrorCode;
 import com.example.backend.domain.auth.exception.AuthException;
-import com.example.backend.domain.security.jwt.JwtTokenProvider;
+import com.example.backend.domain.auth.jwt.JwtTokenProvider;
 import com.example.backend.domain.member.entity.Role;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;

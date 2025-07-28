@@ -18,8 +18,8 @@ import com.example.backend.domain.auth.dto.JwtToken;
 import com.example.backend.domain.auth.dto.SigninRequest;
 import com.example.backend.domain.auth.dto.SignupRequest;
 import com.example.backend.domain.auth.service.AuthService;
-import com.example.backend.domain.security.adapter.CustomUserDetails;
-import com.example.backend.domain.security.jwt.JwtTokenProvider;
+import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
+import com.example.backend.domain.auth.jwt.JwtTokenProvider;
 import com.example.backend.domain.redis.service.ActiveUserService;
 
 import java.util.Map;
