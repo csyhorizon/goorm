@@ -13,9 +13,9 @@ import com.example.backend.support.fixture.MemberFixture;
 import com.example.backend.support.fixture.StoreFixture;
 
 @ServiceTest
-public class StoreServiceTest {
+public class StoreQueryServiceTest {
     @Autowired
-    StoreService storeService;
+    StoreQueryService storeService;
     @Autowired
     StoreRepository storeRepository;
     @Autowired
