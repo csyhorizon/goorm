@@ -5,7 +5,7 @@ import com.example.backend.domain.event.dto.EventResponse;
 import com.example.backend.domain.event.service.EventService;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.dto.ItemResponse;
-import com.example.backend.domain.item.service.ItemService;
+import com.example.backend.domain.item.service.ItemQueryService;
 import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.StoreQueryService;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class StoreQueryController {
     private final StoreQueryService storeService;
-    private final ItemService itemService;
+    private final ItemQueryService itemService;
     private final EventService eventService;
 
     @Operation(summary = "가게 상세조회", description = "가게를 상세 조회합니다.")
@@ -38,31 +38,11 @@ public class StoreQueryController {
         return ResponseEntity.ok(storeService.findById(storeId));
     }
 
-    //todo 아래의 코드들을 상품, 이벤트 도메인을 분리하면서 작업 예정
-    @Operation(summary = "가게의 상품 등록", description = "사장님이 가게에 판매상품을 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "상품 등록 성공")
-    @PostMapping("/{storeId}/items")
-    public ResponseEntity<ItemResponse> createStoreItem(@AuthenticationPrincipal CustomUserDetails user,
-                                                        @PathVariable("storeId") Long storeId,
-                                                        @RequestBody ItemCreateRequest itemCreateRequest) {
-        return ResponseEntity.ok(itemService.save(user.getUserId(), storeId, itemCreateRequest));
-    }
-
     @Operation(summary = "가게에 등록된 상품들 조회", description = "가게에 등록된 상품들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "상품목록 조회 성공")
     @GetMapping("/{storeId}/items")
     public ResponseEntity<List<ItemResponse>> getStoreItems(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(itemService.findAllByStoreId(storeId));
-    }
-
-    @Operation(summary = "상품 삭제", description = "사장님이 가게에 등록된 상품을 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "상품 삭제 성공")
-    @DeleteMapping("/{storeId}/{itemId}")
-    public ResponseEntity<Void> deleteItem(@AuthenticationPrincipal CustomUserDetails user,
-                                           @PathVariable("storeId") Long storeId,
-                                           @PathVariable("itemId") Long itemId) {
-        itemService.deleteItem(user.getUserId(), storeId, itemId);
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "이벤트 등록", description = "사장님이 이벤트를 등록합니다.")

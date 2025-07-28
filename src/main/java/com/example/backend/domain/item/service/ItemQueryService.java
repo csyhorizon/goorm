@@ -19,27 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class ItemService {
-    private final MemberRepository memberRepository;
+@Transactional(readOnly = true)
+public class ItemQueryService {
     private final StoreRepository storeRepository;
     private final ItemRepository itemRepository;
     private final EventRepository eventRepository;
-
-    public ItemResponse save(Long memberId, Long storeId, ItemCreateRequest itemCreateRequest) {
-        Member member = memberRepository.findOrThrow(memberId);
-        Store store = storeRepository.findOrThrow(storeId);
-        validateIsOwner(member, store);
-
-        Item item = itemRepository.save(itemCreateRequest.toEntity(store));
-        return ItemResponse.from(item);
-    }
-
-    private void validateIsOwner(Member member, Store store) {
-        if (!Objects.equals(member.getId(), store.getOwnerId())) {
-            throw new IllegalArgumentException("this member is not Owner to this store");
-        }
-    }
 
     //todo 추후 Slice로 변경 가능성 있음
     @Transactional(readOnly = true)
@@ -52,15 +36,6 @@ public class ItemService {
                 .toList();
     }
 
-    public void deleteItem(Long memberId, Long storeId, Long itemId) {
-        Member member = memberRepository.findOrThrow(memberId);
-        Store store = storeRepository.findOrThrow(storeId);
-        validateIsOwner(member, store);
-
-        itemRepository.delete(findOrThrow(itemId));
-    }
-
-    @Transactional(readOnly = true)
     public ItemResponse findById(Long itemId) {
         Item item = findOrThrow(itemId);
         return ItemResponse.from(item);
@@ -71,7 +46,6 @@ public class ItemService {
                 .orElseThrow(() -> new IllegalArgumentException("not found"));
     }
 
-    @Transactional(readOnly = true)
     public List<ItemResponse> getItemsWithEvent(Long storeId, Long eventId) {
         Store store = storeRepository.findOrThrow(storeId);
         List<Item> itemList = itemRepository.findAllByStoreId(store.getId());
