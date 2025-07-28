@@ -1,4 +1,4 @@
-package com.example.backend.domain.event.service;
+package com.example.backend.domain.event.service.command;
 
 import com.example.backend.domain.event.dto.EventCreateRequest;
 import com.example.backend.domain.event.dto.EventResponse;
@@ -8,7 +8,6 @@ import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
-import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EventService {
+public class EventCreateService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final EventRepository eventRepository;
@@ -35,26 +34,5 @@ public class EventService {
         if (!Objects.equals(store.getOwnerId(), member.getId())) {
             throw new IllegalArgumentException("this user is not owner");
         }
-    }
-
-    @Transactional(readOnly = true)
-    public List<EventResponse> getAllEvents(Long storeId) {
-        Store store = storeRepository.findOrThrow(storeId);
-        List<Event> events = eventRepository.findAllByStoreId(store.getId());
-
-        return events.stream()
-                .map(EventResponse::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public EventResponse getEventDetail(Long eventId) {
-        Event event = eventRepository.findOrThrow(eventId);
-        return EventResponse.from(event);
-    }
-
-    public void delete(Long eventId) {
-        Event event = eventRepository.findOrThrow(eventId);
-        eventRepository.delete(event);
     }
 }

@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
-public class EventServiceTest {
+public class EventQueryServiceTest {
     @Autowired
-    EventService eventService;
+    EventQueryService eventService;
     @Autowired
     EventRepository eventRepository;
     @Autowired

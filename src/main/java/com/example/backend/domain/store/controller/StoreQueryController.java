@@ -2,8 +2,7 @@ package com.example.backend.domain.store.controller;
 
 import com.example.backend.domain.event.dto.EventCreateRequest;
 import com.example.backend.domain.event.dto.EventResponse;
-import com.example.backend.domain.event.service.EventService;
-import com.example.backend.domain.item.dto.ItemCreateRequest;
+import com.example.backend.domain.event.service.EventQueryService;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.service.ItemQueryService;
 import com.example.backend.domain.auth.jwt.security.CustomUserDetails;
@@ -15,7 +14,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreQueryController {
     private final StoreQueryService storeService;
     private final ItemQueryService itemService;
-    private final EventService eventService;
+    private final EventQueryService eventService;
 
     @Operation(summary = "가게 상세조회", description = "가게를 상세 조회합니다.")
     @ApiResponse(responseCode = "200", description = "가게 상세조회 성공")
@@ -43,15 +41,6 @@ public class StoreQueryController {
     @GetMapping("/{storeId}/items")
     public ResponseEntity<List<ItemResponse>> getStoreItems(@PathVariable("storeId") Long storeId) {
         return ResponseEntity.ok(itemService.findAllByStoreId(storeId));
-    }
-
-    @Operation(summary = "이벤트 등록", description = "사장님이 이벤트를 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "이벤트 등록 성공")
-    @PostMapping("/{storeId}/events")
-    public ResponseEntity<EventResponse> createEvents(@AuthenticationPrincipal CustomUserDetails user,
-                                                      @PathVariable("storeId") Long storeId,
-                                                      @RequestBody EventCreateRequest eventCreateRequest) {
-        return ResponseEntity.ok(eventService.save(user.getUserId(), storeId, eventCreateRequest));
     }
 
     @Operation(summary = "이벤트 목록 조회", description = "가게가 등록했던 이벤트들을 조회합니다.")
