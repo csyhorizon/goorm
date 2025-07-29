@@ -78,7 +78,6 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/notifications/subscribe").permitAll()    // [임시] 테스트용
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
