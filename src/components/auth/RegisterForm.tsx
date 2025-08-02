@@ -46,7 +46,7 @@ export default function RegisterForm() {
       setUsername('');
       setTimeout(() => {
         router.push('/auth/login');
-      }, 2000);
+      }, 100);
 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류 발생';

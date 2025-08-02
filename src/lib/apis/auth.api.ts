@@ -25,6 +25,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
+  role: string;
 }
 
 // 회원가입 응답
@@ -54,7 +55,11 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
  * @param {RegisterRequest} userData - 사용자 회원가입 정보
  */
 export const register = async (userData: RegisterRequest): Promise<RegisterResponse> => {
-  const response = await apiAuthClient.post<RegisterResponse>('/auth/join', userData);
+  const response = await apiAuthClient.post<RegisterResponse>('/auth/join', userData, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
