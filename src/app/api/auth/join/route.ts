@@ -4,8 +4,7 @@ import { isAxiosError } from 'axios';
 
 export async function POST(request: Request) {
   try {
-    const { username, email, password, confirmPassword } = await request.json();
-    const role = 'USER';
+    const { username, email, password, confirmPassword, role } = await request.json();
 
     const data = await register({ username, email, password, confirmPassword, role });
 

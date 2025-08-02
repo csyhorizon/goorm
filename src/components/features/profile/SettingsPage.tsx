@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext'; // 1. AuthContext 훅 import
 import ProfileSection from './ProfileSection';
-import NotificationSection from './NotificationSection';
 import AccountSection from './AccountSection';
 
 // 알림 설정은 아직 API 연동 전이므로 임시로 유지합니다.
@@ -16,15 +15,11 @@ interface NotificationSettings {
 export default function SettingsPage() {
   const { user, logout, loading } = useAuth();
 
-  const [settings, setSettings] = useState<NotificationSettings>({
+  const [settings] = useState<NotificationSettings>({
     pushEnabled: true,
     emailEnabled: false,
   });
   const router = useRouter();
-
-  const handleNotificationChange = async (type: 'push' | 'email', value: boolean) => {
-    // ...
-  };
 
   const handleLogout = () => {
     logout();
@@ -48,11 +43,6 @@ export default function SettingsPage() {
 
       <ProfileSection
         user={user}
-      />
-
-      <NotificationSection
-        settings={settings}
-        onSettingChange={handleNotificationChange}
       />
 
       <AccountSection
