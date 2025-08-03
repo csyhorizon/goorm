@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.entity.Item;
 import com.example.backend.domain.item.repository.ItemRepository;
+import com.example.backend.domain.item.service.command.ItemCommandService;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
 import com.example.backend.domain.store.entity.Store;
@@ -26,7 +27,7 @@ class ItemServiceTest {
     @Autowired
     ItemRepository itemRepository;
     @Autowired
-    ItemService itemService;
+    ItemCommandService itemService;
 
     @Test
     void 상품을_저장할_수_있다() {
@@ -63,7 +64,7 @@ class ItemServiceTest {
         Item item = ItemFixture.사과(store);
         itemRepository.save(item);
 
-        itemService.deleteItem(member.getId(), store.getId(), item.getId());
+        itemService.delete(member.getId(), store.getId(), item.getId());
         assertThat(itemRepository.findAll()).hasSize(0);
     }
 
@@ -80,7 +81,7 @@ class ItemServiceTest {
         itemRepository.save(item);
 
         assertThatThrownBy(
-                () -> itemService.deleteItem(anotherMember.getId(), store.getId(), item.getId()))
+                () -> itemService.delete(anotherMember.getId(), store.getId(), item.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
