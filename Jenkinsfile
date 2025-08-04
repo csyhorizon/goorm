@@ -108,12 +108,12 @@ docker run -d \\
     -p 8080:8080 \\
     --name seot-backend \\
     --network seot \\
-    -e MYSQL_DATABASE_MASTER_URL="jdbc:mysql://${MASTER_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
-    -e MYSQL_MASTER_USERNAME="${MYSQL_MASTER_USERNAME}" \\
-    -e MYSQL_MASTER_PASSWORD="${MYSQL_MASTER_PASSWORD}" \\
-    -e MYSQL_DATABASE_SLAVE_URL="jdbc:mysql://${SUB_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
-    -e MYSQL_SLAVE_USERNAME=${MYSQL_SLAVE_USERNAME} \\
-    -e MYSQL_SLAVE_PASSWORD=${MYSQL_SLAVE_PASSWORD} \\
+    -e custom.datasource.write.jdbc-url="jdbc:mysql://${MASTER_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
+    -e custom.datasource.write.username="${MYSQL_MASTER_USERNAME}" \\
+    -e custom.datasource.write.password="${MYSQL_MASTER_PASSWORD}" \\
+    -e custom.datasource.read.jdbc-url="jdbc:mysql://${SUB_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
+    -e custom.datasource.read.username="${MYSQL_SLAVE_USERNAME}" \\
+    -e custom.datasource.read.password="${MYSQL_SLAVE_PASSWORD}" \\
     -e SPRING_REDIS_HOST=${REDIS_HOST} \\
     -e SPRING_REDIS_PORT=${REDIS_PORT} \\
     -e SPRING_REDIS_PASSWORD=${REDIS_PASSWORD} \\
