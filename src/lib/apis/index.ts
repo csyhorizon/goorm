@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshToken } from './auth.api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
 
@@ -26,21 +27,45 @@ export const apiV1Client = axios.create({
   withCredentials: true,
 });
 
+let isRefreshing = false;
+let refreshSubscribers: Array<(token?: string) => void> = [];
+
+function onRefreshed(token?: string) {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
+}
+
 /**
  * 요청 인터셉터 (v1 클라이언트에만 적용)
  * - 토큰이 필요한 모든 v1 API 요청에 자동으로 Authorization 헤더를 추가합니다.
  */
-apiV1Client.interceptors.request.use(
-  (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+apiV1Client.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if ((error.response?.status === 401 || error.response?.status === 419) && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise(resolve => {
+          refreshSubscribers.push(() => resolve(apiV1Client(originalRequest)));
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const data = await refreshToken();
+
+        onRefreshed(data.accessToken);
+        return apiV1Client(originalRequest);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
-    return config;
-  },
-  (error) => {
+
     return Promise.reject(error);
   }
 );

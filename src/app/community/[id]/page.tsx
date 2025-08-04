@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PostDetail from "@/components/features/community/PostDetail";
+import PostDetail from "@/components/features/community/detail/PostDetail";
 
 interface PostDetailData {
   id: number;

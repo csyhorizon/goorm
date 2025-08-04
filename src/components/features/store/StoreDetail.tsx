@@ -4,7 +4,7 @@ import StoreHeader from "./StoreHeader";
 import StoreMenuList from "./StoreMenuList";
 import StoreNoticeList from "./StoreNoticeList";
 import StoreLocationMap from "./StoreLocationMap";
-import CommentSection from "@/components/features/community/CommentSection";
+import CommentSection from "@/components/features/community/detail/CommentSection";
 
 interface StoreData {
   id: number;
