@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext'; // 1. AuthContext 훅 import
 import ProfileSection from './ProfileSection';
 import AccountSection from './AccountSection';
+import { logout } from '@/lib/apis/auth.api';
 
 export default function SettingsPage() {
-  const { user, logout, loading } = useAuth();
+  const { user, loading, deleteLocalData } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
+  async function handleLogout() {
     logout();
-    alert('로그아웃 되었습니다.');
-    router.push('/');
-  };
+    deleteLocalData();
+    await fetch('/api/auth/logout', { method: 'POST' });
+  }
 
   useEffect(() => {
     if (!loading && !user) {

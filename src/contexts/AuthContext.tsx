@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from 'console';
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface User {
@@ -9,49 +10,44 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  accessToken: string | null;
   isLoggedIn: boolean;
   loading: boolean;
-  login: (userData: User, token: string) => void;
-  logout: () => void;
+  login: (userData: User) => void;
+  deleteLocalData: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
-      const storedToken = localStorage.getItem('accessToken');
-      if (storedUser && storedToken) {
+      if (storedUser) {
         setUser(JSON.parse(storedUser));
-        setAccessToken(storedToken);
       }
       setLoading(false);
     }
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = (userData: User) => {
     setUser(userData);
-    setAccessToken(token);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const deleteLocalData = () => {
     setUser(null);
-    setAccessToken(null);
+    localStorage.removeItem('user');
   };
 
   const value = {
     user,
-    accessToken,
     isLoggedIn: !!user,
     loading,
     login,
-    logout,
+    deleteLocalData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

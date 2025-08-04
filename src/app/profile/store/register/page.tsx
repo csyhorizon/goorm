@@ -2,10 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext'; // 1. 인증 정보 사용을 위해 useAuth 훅 import
 
 export default function StoreRegistrationPage() {
-  const { accessToken } = useAuth();
   const router = useRouter();
 
   // 3. 폼 입력을 위한 state 정의
@@ -34,19 +32,6 @@ export default function StoreRegistrationPage() {
       };
 
       // 5. 백엔드 API 호출
-      const response = await fetch('/api/v1/stores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`, // 6. 헤더에 Access Token 추가
-        },
-        body: JSON.stringify(storeData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '가게 등록에 실패했습니다.');
-      }
 
       alert('가게가 성공적으로 등록되었습니다!');
       router.push('/profile'); // 등록 후 프로필 페이지로 이동

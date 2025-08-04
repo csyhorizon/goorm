@@ -16,6 +16,13 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 14,
     });
 
+    (await cookies()).set('accessToken', data.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60,
+    });
+
     return NextResponse.json({
       success: true,
       user: data.user,

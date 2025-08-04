@@ -67,7 +67,6 @@ export const register = async (userData: RegisterRequest): Promise<RegisterRespo
  * [POST] 쿠키에 담긴 리프레시 토큰으로 액세스 토큰을 갱신합니다.
  */
 export const refreshToken = async (): Promise<RefreshResponse> => {
-  // 쿠키는 브라우저가 자동으로 보내주므로, 별도의 인자는 필요 없습니다.
   const response = await apiAuthClient.post<RefreshResponse>('/auth/refresh');
   return response.data;
 };
@@ -76,5 +75,6 @@ export const refreshToken = async (): Promise<RefreshResponse> => {
  * [POST] 서버에 로그아웃을 요청하여 쿠키를 삭제합니다.
  */
 export const logout = async (): Promise<void> => {
+  console.log('Logging out...');
   await apiAuthClient.post('/auth/logout');
 };
