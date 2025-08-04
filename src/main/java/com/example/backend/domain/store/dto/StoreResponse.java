@@ -13,10 +13,12 @@ public record StoreResponse(
         String description,
         StoreCategory category,
         LocalTime startDate,
-        LocalTime endDate
+        LocalTime endDate,
+        double latitude,
+        double longitude
 ) {
     public static StoreResponse from(Store store) {
         return new StoreResponse(store.getId(), store.getName(), store.getAddress(), store.getPhone_number(),
-                store.getDescription(), store.getCategory(), store.getStartTime(), store.getEndTime());
+                store.getDescription(), store.getCategory(), store.getStartTime(), store.getEndTime(),store.getLatitude(),store.getLongitude());
     }
 }
