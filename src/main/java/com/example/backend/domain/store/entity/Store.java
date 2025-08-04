@@ -82,4 +82,8 @@ public class Store extends BaseEntity {
     public Long getOwnerId() {
         return member.getId();
     }
+
+    public void updateCoordinates(StoreCoordinates storeCoordinates) {
+        this.storeCoordinates = storeCoordinates;
+    }
 }
