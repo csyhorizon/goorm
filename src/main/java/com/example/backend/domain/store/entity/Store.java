@@ -31,6 +31,10 @@ public class Store extends BaseEntity {
 
     private String description;
 
+    private String instagramUrl;
+
+    private String blogUrl;
+
     @Enumerated
     private StoreCategory category;
 
