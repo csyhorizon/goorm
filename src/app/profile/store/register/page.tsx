@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext'; // 1. 인증 정보 사용을 위해 useAuth 훅 import
 
 export default function StoreRegistrationPage() {
-  const { accessToken } = useAuth(); // 2. API 호출 시 필요한 accessToken 가져오기
+  const { accessToken } = useAuth();
   const router = useRouter();
 
   // 3. 폼 입력을 위한 state 정의
@@ -51,8 +51,8 @@ export default function StoreRegistrationPage() {
       alert('가게가 성공적으로 등록되었습니다!');
       router.push('/profile'); // 등록 후 프로필 페이지로 이동
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }

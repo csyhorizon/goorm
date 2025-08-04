@@ -10,10 +10,9 @@ interface Notice {
 
 interface StoreManageFormProps {
   initialNotices: Notice[];
-  storeId: string;
 }
 
-export default function StoreManageForm({ initialNotices, storeId }: StoreManageFormProps) {
+export default function StoreManageForm({ initialNotices }: StoreManageFormProps) {
   const [notices, setNotices] = useState<Notice[]>(initialNotices);
   const [newTitle, setNewTitle] = useState('');
 

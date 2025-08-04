@@ -1,24 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext'; // 1. AuthContext 훅 import
 import ProfileSection from './ProfileSection';
 import AccountSection from './AccountSection';
 
-// 알림 설정은 아직 API 연동 전이므로 임시로 유지합니다.
-interface NotificationSettings {
-  pushEnabled: boolean;
-  emailEnabled: boolean;
-}
-
 export default function SettingsPage() {
   const { user, logout, loading } = useAuth();
-
-  const [settings] = useState<NotificationSettings>({
-    pushEnabled: true,
-    emailEnabled: false,
-  });
   const router = useRouter();
 
   const handleLogout = () => {

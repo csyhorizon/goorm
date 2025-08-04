@@ -16,7 +16,7 @@ export default async function ManageStorePage({ params }: { params: Promise<{ id
   return (
     <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px' }}>
       <h1 style={{ marginBottom: '20px' }}>가게 관리</h1>
-      <StoreManageForm initialNotices={storeData.notices} storeId={resolvedParams.id} />
+      <StoreManageForm initialNotices={storeData.notices} />
     </div>
   );
 }
