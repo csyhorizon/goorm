@@ -6,8 +6,8 @@ pipeline {
         DB_PORT = '3306'
         DB_NAME = 'seot'
 
-        MASTER_DB_HOST = 'mysql-master-db'
-        SUB_DB_HOST = 'mysql-slave-db'
+        MASTER_DB_HOST = 'mysql-master'
+        SUB_DB_HOST = 'mysql-slave'
 
         // Redis
         REDIS_HOST = 'redis-cache'
@@ -81,11 +81,11 @@ pipeline {
                         string(credentialsId: 'host-vm-user', variable: 'GCP_VM_USER'),
                         string(credentialsId: 'host-vm-ip-address-or-hostname', variable: 'GCP_VM_HOST'),
 
-                        string(credentialsId: 'mysql-master-username', variable: 'MYSQL_MASTER_USERNAME'),
-                        string(credentialsId: 'mysql-master-password', variable: 'MYSQL_MASTER_PASSWORD'),
+                        string(credentialsId: 'mysql-username', variable: 'MYSQL_MASTER_USERNAME'),
+                        string(credentialsId: 'mysql-password', variable: 'MYSQL_MASTER_PASSWORD'),
 
-                        string(credentialsId: 'mysql-slave-username', variable: 'MYSQL_SLAVE_USERNAME'),
-                        string(credentialsId: 'mysql-slave-password', variable: 'MYSQL_SLAVE_PASSWORD'),
+                        string(credentialsId: 'mysql-username', variable: 'MYSQL_SLAVE_USERNAME'),
+                        string(credentialsId: 'mysql-password', variable: 'MYSQL_SLAVE_PASSWORD'),
 
                         string(credentialsId: 'redis-password', variable: 'REDIS_PASSWORD'),
 
