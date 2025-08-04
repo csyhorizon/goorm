@@ -3,9 +3,11 @@ pipeline {
 
     environment {
         // MySQL
-        DB_HOST = 'mysql-db'
         DB_PORT = '3306'
         DB_NAME = 'seot'
+
+        MASTER_DB_HOST = 'mysql-master'
+        SUB_DB_HOST = 'mysql-slave'
 
         // Redis
         REDIS_HOST = 'redis-cache'
@@ -78,12 +80,20 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'host-vm-user', variable: 'GCP_VM_USER'),
                         string(credentialsId: 'host-vm-ip-address-or-hostname', variable: 'GCP_VM_HOST'),
-                        string(credentialsId: 'mysql-username', variable: 'MYSQL_USER'),
-                        string(credentialsId: 'mysql-password', variable: 'MYSQL_PASSWORD'),
+
+                        string(credentialsId: 'mysql-username', variable: 'MYSQL_MASTER_USERNAME'),
+                        string(credentialsId: 'mysql-password', variable: 'MYSQL_MASTER_PASSWORD'),
+
+                        string(credentialsId: 'mysql-username', variable: 'MYSQL_SLAVE_USERNAME'),
+                        string(credentialsId: 'mysql-password', variable: 'MYSQL_SLAVE_PASSWORD'),
+
                         string(credentialsId: 'redis-password', variable: 'REDIS_PASSWORD'),
+
                         string(credentialsId: 'mongo-username', variable: 'MONGO_USER'),
                         string(credentialsId: 'mongo-password', variable: 'MONGO_PASSWORD'),
+
                         string(credentialsId: 'jwt-secret-text', variable: 'JWT_SECRET'),
+
                         string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY'),
                         string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_KEY')
                     ]) {
@@ -98,9 +108,12 @@ docker run -d \\
     -p 8080:8080 \\
     --name seot-backend \\
     --network seot \\
-    -e SPRING_DATASOURCE_USERNAME=${MYSQL_USER} \\
-    -e SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD} \\
-    -e SPRING_DATASOURCE_URL="jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}" \\
+    -e custom.datasource.write.jdbc-url="jdbc:mysql://${MASTER_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
+    -e custom.datasource.write.username="${MYSQL_MASTER_USERNAME}" \\
+    -e custom.datasource.write.password="${MYSQL_MASTER_PASSWORD}" \\
+    -e custom.datasource.read.jdbc-url="jdbc:mysql://${SUB_DB_HOST}:${DB_PORT}/${DB_NAME}" \\
+    -e custom.datasource.read.username="${MYSQL_SLAVE_USERNAME}" \\
+    -e custom.datasource.read.password="${MYSQL_SLAVE_PASSWORD}" \\
     -e SPRING_REDIS_HOST=${REDIS_HOST} \\
     -e SPRING_REDIS_PORT=${REDIS_PORT} \\
     -e SPRING_REDIS_PASSWORD=${REDIS_PASSWORD} \\
