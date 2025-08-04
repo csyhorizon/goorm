@@ -37,17 +37,25 @@ public class Store extends BaseEntity {
     @Embedded
     private StoreDuration storeDuration;
 
+    @Embedded
+    private StoreCoordinates storeCoordinates;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
                  StoreDuration storeDuration, Member member) {
-        this(null, name, address, phone_number, description, category, storeDuration, member);
+        this(null, name, address, phone_number, description, category, storeDuration, null, member);
+    }
+
+    public Store(String name, String address, String phone_number, String description, StoreCategory category,
+                 StoreDuration storeDuration, StoreCoordinates storeCoordinates, Member member) {
+        this(null, name, address, phone_number, description, category, storeDuration, storeCoordinates, member);
     }
 
     public Store(Long id, String name, String address, String phone_number, String description, StoreCategory category,
-                 StoreDuration storeDuration, Member member) {
+                 StoreDuration storeDuration, StoreCoordinates storeCoordinates, Member member) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -55,6 +63,7 @@ public class Store extends BaseEntity {
         this.description = description;
         this.category = category;
         this.storeDuration = storeDuration;
+        this.storeCoordinates = storeCoordinates;
         this.member = member;
     }
 
