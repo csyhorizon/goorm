@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createStore } from '@/lib/apis/store.api';
 
 export default function StoreRegistrationPage() {
   const router = useRouter();
@@ -10,11 +11,24 @@ export default function StoreRegistrationPage() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState('KOREAN'); // 기본값 설정
+  const [category, setCategory] = useState<'FRUIT_SHOP' | 'OTHER_CATEGORY'>('FRUIT_SHOP'); // 기본값 설정
   const [description, setDescription] = useState('');
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('18:00');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to convert time string to TimeOfDay object
+  const timeStringToTimeOfDay = (timeString: string) => {
+    const [hour, minute] = timeString.split(':').map(Number);
+    return {
+      hour,
+      minute,
+      second: 0,
+      nano: 0,
+    };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +40,15 @@ export default function StoreRegistrationPage() {
       const storeData = {
         name,
         address,
-        phone,
+        phone_number: phone,
         category,
         description,
+        startDate: timeStringToTimeOfDay(startTime),
+        endDate: timeStringToTimeOfDay(endTime),
       };
 
       // 5. 백엔드 API 호출
+      await createStore(storeData);
 
       alert('가게가 성공적으로 등록되었습니다!');
       router.push('/profile'); // 등록 후 프로필 페이지로 이동
@@ -90,15 +107,34 @@ export default function StoreRegistrationPage() {
           <select
             id="category"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value as 'FRUIT_SHOP' | 'OTHER_CATEGORY')}
             style={inputStyle}
           >
-            <option value="KOREAN">한식</option>
-            <option value="CHINESE">중식</option>
-            <option value="JAPANESE">일식</option>
-            <option value="WESTERN">양식</option>
-            <option value="CAFE">카페</option>
+            <option value="FRUIT_SHOP">과일가게</option>
+            <option value="OTHER_CATEGORY">기타</option>
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="startTime" style={labelStyle}>영업시작 시간</label>
+          <input
+            id="startTime"
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="endTime" style={labelStyle}>영업종료 시간</label>
+          <input
+            id="endTime"
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            style={inputStyle}
+          />
         </div>
 
         <div>

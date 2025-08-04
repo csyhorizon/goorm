@@ -1,6 +1,5 @@
 'use client';
 
-import { log } from 'console';
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface User {
@@ -12,7 +11,7 @@ interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   loading: boolean;
-  login: (userData: User) => void;
+  login: (userData: User, accessToken?: string) => void;
   deleteLocalData: () => void;
 }
 
@@ -32,14 +31,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: User, accessToken?: string) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
+    }
   };
 
   const deleteLocalData = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
   };
 
   const value = {
