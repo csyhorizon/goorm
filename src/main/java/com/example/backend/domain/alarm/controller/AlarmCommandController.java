@@ -31,4 +31,13 @@ public class AlarmCommandController {
         alarmCommandService.deleteAlarm(alarmId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "알림 개별 읽음 처리", description = "특정 알림을 읽음 처리합니다.")
+    @ApiResponse(responseCode = "204", description = "읽음 처리 성공")
+    @PostMapping("/{alarmId}/read")
+    public ResponseEntity<Void> readAlarm(@AuthenticationPrincipal CustomUserDetails user,
+                                          @PathVariable Long alarmId) {
+        alarmCommandService.readAlarm(user.getUserId(), alarmId);
+        return ResponseEntity.noContent().build();
+    }
 }
