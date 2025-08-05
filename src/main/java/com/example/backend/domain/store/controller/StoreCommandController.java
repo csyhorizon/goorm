@@ -7,6 +7,7 @@ import com.example.backend.domain.event.service.command.EventCommandService;
 import com.example.backend.domain.item.dto.ItemCreateRequest;
 import com.example.backend.domain.item.dto.ItemResponse;
 import com.example.backend.domain.item.service.command.ItemCommandService;
+import com.example.backend.domain.store.dto.CoordinateRequest;
 import com.example.backend.domain.store.dto.StoreCreateRequest;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.service.command.StoreCommandService;
@@ -73,5 +74,14 @@ public class StoreCommandController {
                                                       @PathVariable("storeId") Long storeId,
                                                       @RequestBody EventCreateRequest eventCreateRequest) {
         return ResponseEntity.ok(eventCommandService.save(user.getUserId(), storeId, eventCreateRequest));
+    }
+
+    @Operation(summary = "가게 좌표 등록", description = "사장님이 가게의 좌표를 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "가게 좌표 등록 성공")
+    @PostMapping("/{storeId}/insertCoordinate")
+    public ResponseEntity<StoreResponse> insertCoordinate(@AuthenticationPrincipal CustomUserDetails user,
+                                                          @PathVariable("storeId") Long storeId,
+                                                          @RequestBody CoordinateRequest coordinateRequest) {
+        return ResponseEntity.ok(storeCommandService.insertCoordinate(user.getUserId(), storeId, coordinateRequest));
     }
 }
