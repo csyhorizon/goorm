@@ -3,15 +3,25 @@ package com.example.backend.domain.alarm.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.backend.domain.alarm.entity.Alarm;
+import com.example.backend.domain.alarm.entity.AlarmType;
 import com.example.backend.domain.alarm.repository.AlarmRepository;
 import com.example.backend.domain.alarm.service.command.AlarmCommandService;
+import com.example.backend.domain.event.dto.EventCreateRequest;
+import com.example.backend.domain.event.entity.EventCategory;
+import com.example.backend.domain.event.service.command.EventCreateService;
+import com.example.backend.domain.like.entity.StoreLike;
+import com.example.backend.domain.like.repository.StoreLikeRepository;
 import com.example.backend.domain.member.entity.Member;
 import com.example.backend.domain.member.repository.MemberRepository;
+import com.example.backend.domain.store.entity.Store;
+import com.example.backend.domain.store.repository.StoreRepository;
 import com.example.backend.support.annotation.ServiceTest;
 import com.example.backend.support.fixture.MemberFixture;
+import com.example.backend.support.fixture.StoreFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ServiceTest
@@ -24,6 +34,12 @@ class AlarmServiceTest {
     AlarmRepository alarmRepository;
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    StoreRepository storeRepository;
+    @Autowired
+    StoreLikeRepository storeLikeRepository;
+    @Autowired
+    EventCreateService eventCreateService;
 
     @Test
     void 알림을_생성할_수_있다() {
@@ -87,4 +103,36 @@ class AlarmServiceTest {
         // then
         assertThat(unreadCount).isEqualTo(2);
     }
+
+    @Test
+    void 이벤트_생성시_좋아요한_회원에게_알림이_전송된다() {
+        // given
+        Member owner = MemberFixture.김회원();
+        memberRepository.save(owner);
+
+        Store store = storeRepository.save(StoreFixture.과일가게(owner));
+        Member liker = MemberFixture.김회투();
+        memberRepository.save(liker);
+        storeLikeRepository.save(new StoreLike(liker, store));
+
+        EventCreateRequest request = new EventCreateRequest(
+                "이벤트 제목",
+                "할인 이벤트 설명",
+                EventCategory.DISCOUNT_PERCENTAGE,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(10),
+                10.0, // discountRate
+                null  // discountAmount
+        );
+
+        // when
+        eventCreateService.save(owner.getId(), store.getId(), request);
+
+        // then
+        List<Alarm> alarms = alarmQueryService.getMyAlarms(liker.getId());
+        assertThat(alarms).hasSize(1);
+        assertThat(alarms.get(0).getType()).isEqualTo(AlarmType.NEW_EVENT);
+        assertThat(alarms.get(0).getTargetUrl()).contains("/store/" + store.getId());
+    }
+
 }

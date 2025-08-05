@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface StoreLikeRepository extends JpaRepository<StoreLike,Long> {
     Optional<StoreLike> findByMemberAndStore(Member member, Store store);
     List<StoreLike> findAllByMember(Member member);
+    List<StoreLike> findAllByStore(Store store);
 }

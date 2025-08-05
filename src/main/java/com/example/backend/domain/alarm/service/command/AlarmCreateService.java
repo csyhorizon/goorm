@@ -1,6 +1,7 @@
 package com.example.backend.domain.alarm.service.command;
 
 import com.example.backend.domain.alarm.entity.Alarm;
+import com.example.backend.domain.alarm.entity.AlarmType;
 import com.example.backend.domain.alarm.repository.AlarmRepository;
 import com.example.backend.domain.alarm.repository.EmitterRepository;
 import com.example.backend.domain.member.entity.Member;
@@ -23,6 +24,14 @@ public class AlarmCreateService {
     private final EmitterRepository emitterRepository;
 
     public void create(Long memberId, String message) {
+        create(memberId, message, AlarmType.SYSTEM, null); // 기본값 SYSTEM + targetUrl 없음
+    }
+
+    public void create(Long memberId, String message, AlarmType type) {
+        create(memberId, message, type, null); // targetUrl 없음
+    }
+
+    public void create(Long memberId, String message, AlarmType type, String targetUrl) {
         Member member = findOrThrow(memberId);
         SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
@@ -36,6 +45,8 @@ public class AlarmCreateService {
         Alarm alarm = Alarm.builder()
                 .member(member)
                 .content(message)
+                .type(type)
+                .targetUrl(targetUrl)
                 .build();
         alarmRepository.save(alarm);
     }
