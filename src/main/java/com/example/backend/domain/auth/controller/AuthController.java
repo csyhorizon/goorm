@@ -37,9 +37,16 @@ public class AuthController {
     @PostMapping("/join")
     public ResponseEntity<SimpleResponse> signup(@Valid @RequestBody SignupRequest request) {
         authService.signup(request);
-        log.info("[회원가입 성공] username='{}'", request.getUsername());
+        log.info("[회원가입 성공] email='{}'", request.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SimpleResponse("회원가입 성공"));
+    }
+    @PostMapping("/join/admin")
+    public ResponseEntity<SimpleResponse> signupAdmin(@Valid @RequestBody SignupRequest request) {
+        authService.signupAdmin(request);
+        log.info("[회원가입 성공] email='{}'", request.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new SimpleResponse("관리자 계정 생성 완료"));
     }
 
     @PostMapping("/signin")
@@ -48,8 +55,8 @@ public class AuthController {
                                                 HttpServletRequest httpRequest) {
         JwtToken jwtToken = authService.signin(request);
 
-        addCookie("access_token", jwtToken.getAccessToken(), 3600, response);
-        addCookie("refresh_token", jwtToken.getRefreshToken(), 14 * 24 * 3600, response);
+        addCookie("accessToken", jwtToken.getAccessToken(), 3600, response);
+        addCookie("refreshToken", jwtToken.getRefreshToken(), 14 * 24 * 3600, response);
 
         Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken.getAccessToken());
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -57,7 +64,7 @@ public class AuthController {
 
         activeUserService.addActiveUser(userDetails, ip);
 
-        log.info("[로그인 성공] username='{}', userId={}, ip='{}'", userDetails.getUsername(), userDetails.getUserId(), ip);
+        log.info("[로그인 성공] email='{}', userId={}, ip='{}'", userDetails.getUsername(), userDetails.getUserId(), ip);
 
         return ResponseEntity.ok(new LoginResponse(
                 jwtToken.getAccessToken(),
@@ -69,7 +76,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+    public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken", required = false) String refreshToken,
                                           HttpServletResponse response) {
         if (refreshToken == null) {
             log.warn("[토큰 갱신 실패] 리프레시 토큰 없음");
@@ -78,8 +85,8 @@ public class AuthController {
 
         JwtToken jwtToken = jwtTokenProvider.refreshToken(refreshToken);
 
-        addCookie("access_token", jwtToken.getAccessToken(), 3600, response);
-        addCookie("refresh_token", jwtToken.getRefreshToken(), 14 * 24 * 3600, response);
+        addCookie("accessToken", jwtToken.getAccessToken(), 3600, response);
+        addCookie("refreshToken", jwtToken.getRefreshToken(), 14 * 24 * 3600, response);
 
         log.info("[토큰 갱신 성공] 새로운 accessToken 발급 완료");
 
@@ -90,17 +97,17 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "access_token", required = false) Cookie accessTokenCookie,
+    public ResponseEntity<?> logout(@CookieValue(name = "accessToken", required = false) Cookie accessTokenCookie,
                                     HttpServletResponse response,
                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
-        deleteCookie("access_token", response);
-        deleteCookie("refresh_token", response);
+        deleteCookie("accessToken", response);
+        deleteCookie("refreshToken", response);
 
         if (userDetails != null) {
             jwtTokenProvider.deleteRefreshTokenByUserDetails(userDetails);
             activeUserService.removeActiveUser(userDetails.getUserId());
 
-            log.info("[로그아웃 완료] userId={}, username='{}'", userDetails.getUserId(), userDetails.getUsername());
+            log.info("[로그아웃 완료] userId={}, email='{}'", userDetails.getUserId(), userDetails.getUsername());
         } else {
             log.warn("[로그아웃 실패] 인증된 사용자 정보가 없음 (userDetails == null)");
         }
@@ -149,7 +156,7 @@ public class AuthController {
     @AllArgsConstructor
     static class UserDto {
         private Long id;
-        private String username;
+        private String email;
         private String role;
     }
 }

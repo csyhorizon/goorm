@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override
@@ -48,6 +48,8 @@ public class CustomUserDetails implements UserDetails, Serializable {
     public Long getUserId() {
         return user.getId();
     }
+
+    public String getUserName() {return user.getUsername();}
 
     public String getRole() { return user.getRole().name(); }
 }

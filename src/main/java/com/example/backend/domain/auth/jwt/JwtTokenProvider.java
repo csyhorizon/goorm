@@ -63,9 +63,9 @@ public class JwtTokenProvider {
         Date refreshTokenExpires = Date.from(refreshTokenExpiryDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         // 인증 정보 가져오기
-        String username = authentication.getName();
-        Member user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+        String email = authentication.getName();
+        Member user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
 
         String accessToken = Jwts.builder()
@@ -100,9 +100,9 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰");
         }
 
-        String username = claims.getSubject();
+        String email = claims.getSubject();
 
-        Member user = userRepository.findByUsername(username)
+        Member user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
 
 
@@ -165,7 +165,7 @@ public class JwtTokenProvider {
             refreshTokenRepository.save(refreshToken);
         }
         redisTemplate.opsForValue().set(
-                "refresh_token:" + member.getUsername(),
+                "refreshToken:" + member.getEmail(),
                 token,
                 Duration.between(LocalDateTime.now(), expiryDate)
         );
@@ -207,8 +207,8 @@ public class JwtTokenProvider {
     }
 
     @Transactional
-    public void deleteRefreshTokenByUsername(String username) {
-        userRepository.findByUsername(username)
+    public void deleteRefreshTokenByUsername(String email) {
+        userRepository.findByEmail(email)
                 .ifPresent(this::deleteRefreshTokenByUser);
     }
   
