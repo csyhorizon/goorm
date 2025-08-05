@@ -1,3 +1,4 @@
+import { AxiosInstance } from 'axios';
 import { apiAuthClient } from './index';
 
 // 로그인 요청
@@ -74,7 +75,6 @@ export const refreshToken = async (): Promise<RefreshResponse> => {
 /**
  * [POST] 서버에 로그아웃을 요청하여 쿠키를 삭제합니다.
  */
-export const logout = async (): Promise<void> => {
-  console.log('Logging out...');
-  await apiAuthClient.post('/auth/logout');
+export const logout = async (serverApi: AxiosInstance): Promise<void> => {
+  await serverApi.post('/auth/logout');
 };

@@ -1,20 +1,23 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext'; // 1. AuthContext 훅 import
 import ProfileSection from './ProfileSection';
 import AccountSection from './AccountSection';
-import { logout } from '@/lib/apis/auth.api';
 
 export default function SettingsPage() {
   const { user, loading, deleteLocalData } = useAuth();
   const router = useRouter();
 
   async function handleLogout() {
-    logout();
-    deleteLocalData();
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+    } finally {
+      deleteLocalData();
+    }
   }
 
   useEffect(() => {
