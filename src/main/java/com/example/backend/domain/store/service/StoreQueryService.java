@@ -3,6 +3,7 @@ package com.example.backend.domain.store.service;
 import com.example.backend.domain.store.dto.StoreResponse;
 import com.example.backend.domain.store.entity.Store;
 import com.example.backend.domain.store.repository.StoreRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,5 +17,12 @@ public class StoreQueryService {
     public StoreResponse findById(Long storeId) {
         Store store = storeRepository.findOrThrow(storeId);
         return StoreResponse.from(store);
+    }
+
+    public List<StoreResponse> findByMemberId(Long memberId) {
+        List<Store> stores = storeRepository.findByMemberId(memberId);
+        return stores.stream()
+                .map(StoreResponse::from)
+                .toList();
     }
 }

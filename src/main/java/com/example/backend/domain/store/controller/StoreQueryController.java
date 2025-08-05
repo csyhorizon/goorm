@@ -57,4 +57,11 @@ public class StoreQueryController {
                                                                    @PathVariable("eventId") Long eventId) {
         return ResponseEntity.ok(itemService.getItemsWithEvent(storeId, eventId));
     }
+
+    @Operation(summary = "사장님이 등록한 가게 목록조회", description = "사장님이 등록한 가게 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "사장님이 등록한 가게 목록을 조회 성공")
+    @GetMapping("/{memberId}")
+    public ResponseEntity<List<StoreResponse>> getStoreList(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok(storeService.findByMemberId(memberId));
+    }
 }

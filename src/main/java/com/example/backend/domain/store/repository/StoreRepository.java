@@ -1,6 +1,7 @@
 package com.example.backend.domain.store.repository;
 
 import com.example.backend.domain.store.entity.Store;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         return findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found")); // 에러코드 추후 통일화 필요
     }
+
+    List<Store> findByMemberId(Long memberId);
 }
