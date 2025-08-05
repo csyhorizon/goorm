@@ -44,7 +44,9 @@ apiV1Client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // 401(Unauthorized) 또는 419(Authentication Timeout) 에러 처리
     if ((error.response?.status === 401 || error.response?.status === 419) && !originalRequest._retry) {
+      // 토큰 갱신 중인 다른 요청이 있다면 대기
       if (isRefreshing) {
         return new Promise(resolve => {
           refreshSubscribers.push(() => resolve(apiV1Client(originalRequest)));
@@ -55,17 +57,25 @@ apiV1Client.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // refreshToken() 함수를 호출하여 새로운 토큰 발급 시도
         const data = await refreshToken();
 
+        // 갱신 성공 시 대기 중인 요청 재시도
         onRefreshed(data.accessToken);
         return apiV1Client(originalRequest);
       } catch (refreshError) {
+        // 토큰 갱신 실패 시 로그인 페이지로 리디렉션
+        console.error("토큰 갱신 실패: ", refreshError);
+        window.location.href = '/auth/login';
+        
+        // 리디렉션 후에는 더 이상 에러를 전파하지 않음
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
 
+    // 다른 모든 에러는 그대로 반환
     return Promise.reject(error);
   }
 );

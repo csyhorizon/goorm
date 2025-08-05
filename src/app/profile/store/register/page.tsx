@@ -11,7 +11,7 @@ export default function StoreRegistrationPage() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState<'FRUIT_SHOP' | 'OTHER_CATEGORY'>('FRUIT_SHOP'); // 기본값 설정
+  const [category, setCategory] = useState<'FRUIT_SHOP'>('FRUIT_SHOP'); // 기본값 설정
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('18:00');
@@ -43,8 +43,8 @@ export default function StoreRegistrationPage() {
         phone_number: phone,
         category,
         description,
-        startDate: timeStringToTimeOfDay(startTime),
-        endDate: timeStringToTimeOfDay(endTime),
+        startDate: startTime,
+        endDate: endTime,
       };
 
       // 5. 백엔드 API 호출
@@ -107,11 +107,10 @@ export default function StoreRegistrationPage() {
           <select
             id="category"
             value={category}
-            onChange={(e) => setCategory(e.target.value as 'FRUIT_SHOP' | 'OTHER_CATEGORY')}
+            onChange={(e) => setCategory(e.target.value as 'FRUIT_SHOP')}
             style={inputStyle}
           >
             <option value="FRUIT_SHOP">과일가게</option>
-            <option value="OTHER_CATEGORY">기타</option>
           </select>
         </div>
 

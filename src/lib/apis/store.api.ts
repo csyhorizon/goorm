@@ -1,13 +1,25 @@
 import { apiV1Client } from ".";
 
+export type StoreCategory = "CAFE" | "RESTAURANT" | "PARK" | "SHOPPING" | "TOURIST_ATTRACTION" | "HOSPITAL" | "FRUIT_SHOP" | "OTHER";
+
+// UI에서 사용할 카테고리 옵션과 값을 매핑하는 상수
+export const STORE_CATEGORY_OPTIONS = [
+  { value: "CAFE", label: "카페" },
+  { value: "RESTAURANT", label: "음식점" },
+  { value: "PARK", label: "공원" },
+  { value: "SHOPPING", label: "쇼핑" },
+  { value: "TOURIST_ATTRACTION", label: "관광지" },
+  { value: "HOSPITAL", label: "병원" },
+  { value: "FRUIT_SHOP", label: "과일가게" },
+  { value: "OTHER", label: "기타" },
+];
+
 type TimeOfDay = {
   hour: number;
   minute: number;
   second: number;
   nano: number;
 };
-
-type StoreCategory = "FRUIT_SHOP" | "OTHER_CATEGORY";
 
 type EventCategory = "DISCOUNT_PERCENTAGE" | "DISCOUNT_AMOUNT";
 
@@ -17,8 +29,8 @@ export type CreateStoreRequest = {
   phone_number: string;
   description: string;
   category: StoreCategory;
-  startDate: TimeOfDay;
-  endDate: TimeOfDay;
+  startDate: string;
+  endDate: string;
 };
 
 export type StoreResponse = {

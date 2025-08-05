@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server';
-import { register } from '@/lib/apis/auth.api';
+import { register } from '@/lib/apis/auth.api'; // register 함수만 사용
 import { isAxiosError } from 'axios';
 
 export async function POST(request: Request) {
   try {
-    const { username, email, password, confirmPassword, role } = await request.json();
+    const body = await request.json();
+    const { username, email, password, confirmPassword, role } = body;
 
-    const data = await register({ username, email, password, confirmPassword, role });
-
-    return NextResponse.json({ success: true, message: data.message || '회원가입에 성공했습니다.' });
+    // 1. 회원가입 API 호출만 처리
+    const registerResponse = await register({ username, email, password, confirmPassword, role });
+    
+    // 2. 성공 시 응답 반환
+    return NextResponse.json({ success: true, message: registerResponse.message || '회원가입에 성공했습니다.' });
 
   } catch (error: unknown) {
     console.error('API 라우트 - 회원가입 처리 중 오류 발생:', error);

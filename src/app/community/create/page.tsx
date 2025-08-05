@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { createPost } from '@/lib/apis/post.api';
 
 export default function CreatePostPage() {
@@ -129,7 +130,7 @@ export default function CreatePostPage() {
                 {/* 이미지 미리보기 */}
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {imagePreviews.map((preview, index) => (
-                        <img key={index} src={preview} alt="preview" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                        <Image key={index} src={preview} alt="preview" width={100} height={100} style={{ objectFit: 'cover' }} />
                     ))}
                 </div>
 
@@ -148,7 +149,7 @@ const inputStyle = {
     width: '100%',
     padding: '8px',
     marginTop: '4px',
-    boxSizing: 'border-box' as 'border-box',
+    boxSizing: 'border-box' as const,
     border: '1px solid #ccc',
     borderRadius: '4px',
 };
