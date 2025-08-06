@@ -9,8 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long> , PostRepositoryCustom {
     Page<Post> findAllByStoreIdOrderByCreatedAtDesc(Long storeId, Pageable pageable);
+
+//    Page<Post> findAllOrderByCreatedAtDesc(Pageable pageable);
 
     default Post findOrThrow(Long id) {
         return findById(id)
