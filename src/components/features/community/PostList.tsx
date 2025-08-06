@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import axios, { AxiosError } from 'axios';
-import { getPostsByStore, PostResponse, Page } from '@/lib/apis/post.api';
+import { getPostsByStore, PostResponse, Page, getAllPosts } from '@/lib/apis/post.api';
 import PostItem from './PostItem';
 import FloatingWriteButton from './FloatingWriteButton';
 
 const Loader = () => <div style={{ textAlign: 'center', padding: '20px' }}>불러오는 중...</div>;
 
-export default function PostList({ storeId }: { storeId: number }) {
+export default function PostList() {
   const [posts, setPosts] = useState<PostResponse[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -24,7 +24,7 @@ export default function PostList({ storeId }: { storeId: number }) {
 
     setIsLoading(true);
     try {
-      const data: Page<PostResponse> = await getPostsByStore(storeId, { page, size: 10 });
+      const data: Page<PostResponse> = await getAllPosts({ page, size: 10 });
 
       setPosts(prevPosts => [...prevPosts, ...data.content]);
       setPage(prevPage => prevPage + 1);
@@ -47,16 +47,15 @@ export default function PostList({ storeId }: { storeId: number }) {
     } finally {
       setIsLoading(false);
     }
-  }, [storeId, page, isLoading, hasMore]);
+  }, [page, isLoading, hasMore]);
 
-  // 'storeId'가 변경될 때마다 새로운 게시글을 초기화하고 불러옵니다.
   useEffect(() => {
     setPosts([]);
     setPage(0);
     setHasMore(true);
     setIsLoading(false);
     loadMorePosts(true); // 초기 로딩임을 명시
-  }, [storeId]);
+  }, []);
 
   // 'inView' 상태가 변경될 때마다 추가 게시글을 불러옵니다.
   useEffect(() => {

@@ -28,7 +28,11 @@ const Tab = ({ label, onClick, isActive }: TabProps) => (
       fontWeight: isActive ? 'bold' : 'normal',
       cursor: 'pointer',
       backgroundColor: 'transparent',
-      border: 'none',
+      // 'border: 'none'' 속성을 제거하여 'borderBottom'과의 충돌을 방지합니다.
+      // 다른 테두리가 필요 없다면 명시적으로 'borderTop: "none"' 등을 추가할 수 있습니다.
+      borderTop: 'none',
+      borderLeft: 'none',
+      borderRight: 'none',
       fontSize: '1rem'
     }}
   >
@@ -83,6 +87,7 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
             <p><strong>설명:</strong> {initialStoreData.description}</p>
             <p><strong>카테고리:</strong> {initialStoreData.category}</p>
             <p><strong>운영 시간:</strong> {initialStoreData.startDate.hour}:{initialStoreData.startDate.minute} ~ {initialStoreData.endDate.hour}:{initialStoreData.endDate.minute}</p>
+            {/* latitude와 longitude는 initialStoreData에 포함되어야 합니다. */}
             <p><strong>좌표:</strong> 위도 {initialStoreData.latitude}, 경도 {initialStoreData.longitude}</p>
           </div>
         );

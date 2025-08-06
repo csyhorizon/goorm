@@ -6,7 +6,7 @@ import { apiV1Client } from './index'; // v1 API 클라이언트 import
 export interface Pageable {
   page?: number;
   size?: number;
-  sort?: string[]; // 예: ["createdAt,desc"]
+  sort?: string; // 예: "createdAt,desc"
 }
 
 /**
@@ -89,11 +89,13 @@ export const createComment = async (
  * @param request - 수정할 내용
  */
 export const updateComment = async (
+  postId: number,
   commentId: number,
   request: CommentUpdateRequest
 ): Promise<CommentResponse> => {
   const response = await apiV1Client.patch<CommentResponse>(
-    `/comments/${commentId}`,
+    // [수정] 올바른 API 경로로 수정
+    `/posts/${postId}/comments/${commentId}`,
     request
   );
   return response.data;
@@ -103,6 +105,9 @@ export const updateComment = async (
  * [DELETE] 특정 댓글을 삭제합니다.
  * @param commentId - 삭제할 댓글 ID
  */
-export const deleteComment = async (commentId: number): Promise<void> => {
-  await apiV1Client.delete(`/comments/${commentId}`);
+export const deleteComment = async (
+  postId: number,
+  commentId: number
+): Promise<void> => {
+  await apiV1Client.delete(`/posts/${postId}/comments/${commentId}`);
 };
