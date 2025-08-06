@@ -27,10 +27,19 @@ public class Alarm extends BaseEntity {
 
     private Boolean isDeleted = false; // 삭제 여부
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AlarmType type;          // 알림 유형
+
+    @Column(length = 2048)
+    private String targetUrl;
+
     @Builder
-    public Alarm(Member member, String content) {
+    public Alarm(Member member, String content, AlarmType type, String targetUrl) {
         this.member = member;
         this.content = content;
+        this.type = type;
+        this.targetUrl = targetUrl;
         this.isRead = false;
         this.isDeleted = false;
     }
