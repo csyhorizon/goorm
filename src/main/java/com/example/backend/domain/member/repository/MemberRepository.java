@@ -11,4 +11,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                 .orElseThrow(() -> new IllegalArgumentException("not found")); // 에러코드 추후 통일화 필요
     }
     Optional<Member> findByUsername(String username);
+    Optional<Member> findByEmail(String email);
 }

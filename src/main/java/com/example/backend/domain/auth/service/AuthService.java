@@ -47,8 +47,29 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    public void signupAdmin(SignupRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new AuthException(AuthErrorCode.PASSWORD_MISMATCH);
+        }
+
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        Member user = Member.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(encodedPassword)
+                .role(Role.ADMIN)
+                .build();
+
+        userRepository.save(user);
+    }
+
     public JwtToken signin(SigninRequest request) {
-        // username / password 검증
+        // email / password 검증
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),

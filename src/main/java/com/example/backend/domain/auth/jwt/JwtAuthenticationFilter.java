@@ -21,7 +21,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // 인증 불필요 경로 예외 처리
         String uri = request.getRequestURI();
-        if (uri.startsWith("/api/auth")) {
+        if (uri.startsWith("/api/auth") && !uri.equals("/api/auth/logout")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("access_token".equals(cookie.getName())) {
+                if ("accessToken".equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
