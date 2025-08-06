@@ -35,6 +35,10 @@ public class AuthService {
             throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AuthException(AuthErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         Member user = Member.builder()
@@ -54,6 +58,10 @@ public class AuthService {
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AuthException(AuthErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
