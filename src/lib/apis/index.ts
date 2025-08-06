@@ -20,7 +20,7 @@ export const apiAuthClient = axios.create({
  * - baseURL: .../api/v1
  */
 export const apiV1Client = axios.create({
-  baseURL: `${API_BASE_URL}/v1`,
+  baseURL: API_BASE_URL + '/v1',
   headers: {
     'Content-Type': 'application/json',
   },

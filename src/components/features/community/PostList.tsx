@@ -20,7 +20,6 @@ export default function PostList({ storeId }: { storeId: number }) {
   });
 
   const loadMorePosts = useCallback(async (isInitialLoad = false) => {
-    // 초기 로딩이 아니면서, 현재 로딩 중이거나 더 이상 불러올 게시글이 없으면 요청 중단
     if (!isInitialLoad && (isLoading || !hasMore)) return;
 
     setIsLoading(true);
