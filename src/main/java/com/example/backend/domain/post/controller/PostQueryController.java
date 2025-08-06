@@ -38,4 +38,12 @@ public class PostQueryController {
                                                        @PathVariable Long postId) {
         return ResponseEntity.ok(postQueryService.getPostDetail(postId));
     }
+
+    @Operation(summary = "전체 게시글 조회", description = "전체 게시글을 최신순으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "게시글 조회 성공")
+    @GetMapping
+    public ResponseEntity<Page<PostResponse>> getRecentPosts(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postQueryService.getRecentPosts(pageable));
+    }
 }

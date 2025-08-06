@@ -1,0 +1,72 @@
+package com.example.backend.domain.post.repository;
+
+import com.example.backend.domain.post.dto.PostResponse;
+import com.example.backend.domain.post.entity.Post;
+import com.example.backend.domain.post.entity.QPost;
+import com.example.backend.domain.post.entity.QPostMedia;
+import com.example.backend.domain.store.entity.QStore;
+import com.example.backend.domain.store.entity.Store;
+import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+public class PostRepositoryImpl implements PostRepositoryCustom {
+    private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Page<PostResponse> findAllRecentPosts(Pageable pageable) {
+        QPost post = QPost.post;
+        QPostMedia postMedia = QPostMedia.postMedia;
+        QStore store = QStore.store;
+
+        List<Tuple> results = queryFactory
+                .select(post, postMedia, store)
+                .from(post)
+                .join(post.store, store)
+                .leftJoin(post.mediaList, postMedia).fetchJoin()
+                .orderBy(post.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Map<Long, List<String>> postIdToMediaUrls = results.stream()
+                .filter(tuple -> tuple.get(postMedia) != null)
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(post).getId(),
+                        Collectors.mapping(
+                                tuple -> tuple.get(postMedia).getMediaUrl(),
+                                Collectors.toList()
+                        )
+                ));
+
+        //PostResponse 변환
+        List<PostResponse> content = results.stream()
+                .map(tuple -> {
+                    Post p = tuple.get(post);
+                    Store s = tuple.get(store);
+                    List<String> mediaUrls = postIdToMediaUrls.getOrDefault(p.getId(), List.of());
+                    return PostResponse.of(p, mediaUrls, s);
+                })
+                .distinct()
+                .toList();
+
+        Long total = queryFactory
+                .select(post.count())
+                .from(post)
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        return new PageImpl<>(content, pageable, totalCount);
+
+    }
+}
