@@ -7,11 +7,50 @@ import { register, login } from '@/lib/apis/auth.api';
 import { isAxiosError } from 'axios';
 import { createStoreLocation } from '@/lib/apis/store.api';
 
-declare global {
-  interface Window {
-    kakao: any;
-    daum: any;
-  }
+// TypeScript 타입 정의
+interface PostcodeData {
+  userSelectedType: string;
+  roadAddress: string;
+  jibunAddress: string;
+}
+
+interface KakaoSearchResult {
+  x: string;
+  y: string;
+}
+
+interface KakaoGeocoder {
+  addressSearch: (
+    address: string, 
+    callback: (result: KakaoSearchResult[], status: string) => void
+  ) => void;
+}
+
+interface KakaoLatLng {
+  getLat: () => number;
+  getLng: () => number;
+}
+
+type WindowWithKakao = Window & {
+  kakao?: {
+    maps: {
+      load: (callback: () => void) => void;
+      services: {
+        Status: {
+          OK: string;
+        };
+        Geocoder: new () => KakaoGeocoder;
+      };
+      LatLng: new (lat: number, lng: number) => KakaoLatLng;
+    };
+  };
+  daum?: {
+    Postcode: new (options: {
+      oncomplete: (data: PostcodeData) => void;
+    }) => {
+      open: () => void;
+    };
+  };
 }
 
 export default function RegisterForm() {
@@ -38,13 +77,16 @@ export default function RegisterForm() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [geocoder, setGeocoder] = useState<any>(null);
+  const [geocoder, setGeocoder] = useState<KakaoGeocoder | null>(null);
 
   useEffect(() => {
-    if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(() => {
+    const windowWithKakao = window as WindowWithKakao;
+    if (windowWithKakao.kakao?.maps) {
+      windowWithKakao.kakao.maps.load(() => {
         setMapLoaded(true);
-        setGeocoder(new window.kakao.maps.services.Geocoder());
+        if (windowWithKakao.kakao?.maps.services) {
+          setGeocoder(new windowWithKakao.kakao.maps.services.Geocoder());
+        }
       });
     }
   }, []);
@@ -55,16 +97,22 @@ export default function RegisterForm() {
       return;
     }
 
-    new window.daum.Postcode({
-      oncomplete: function (data: { userSelectedType: string; roadAddress: any; jibunAddress: any; }) {
+    const windowWithKakao = window as WindowWithKakao;
+    if (!windowWithKakao.daum) {
+      setError("주소 검색 API가 로드되지 않았습니다.");
+      return;
+    }
+
+    new windowWithKakao.daum.Postcode({
+      oncomplete: function (data: PostcodeData) {
         const selectedAddress = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
         setStoreAddress(selectedAddress);
 
         // 주소-좌표 변환
-        if (geocoder) {
-          geocoder.addressSearch(selectedAddress, (result: any[], status: any) => {
-            if (status === window.kakao.maps.services.Status.OK) {
-              const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+        if (geocoder && windowWithKakao.kakao?.maps) {
+          geocoder.addressSearch(selectedAddress, (result: KakaoSearchResult[], status: string) => {
+            if (status === windowWithKakao.kakao?.maps.services.Status.OK && result.length > 0) {
+              const coords = new windowWithKakao.kakao.maps.LatLng(parseFloat(result[0].y), parseFloat(result[0].x));
               setLatitude(coords.getLat());
               setLongitude(coords.getLng());
               setError(null);

@@ -35,7 +35,6 @@ export default function SettingsPage() {
       <h1 style={{ fontSize: '2rem', marginBottom: '40px', color: 'black' }}>설정</h1>
 
       <ProfileSection
-        user={user}
       />
 
       <AccountSection

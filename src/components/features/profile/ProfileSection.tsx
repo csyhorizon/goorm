@@ -29,7 +29,7 @@ export default function ProfileSection() {
           try {
             const storeData = await getMyStore();
             setStore(storeData);
-          } catch (storeError) {
+          } catch {
             // 가게 정보가 없는 경우 500 에러가 반환될 수 있으므로,
             // 이 경우 store 상태를 null로 유지하고 별도 에러 처리는 하지 않음.
             console.warn("사장님의 가게 정보가 없습니다.");

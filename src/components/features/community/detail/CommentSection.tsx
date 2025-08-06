@@ -83,7 +83,7 @@ const CommentItem = ({
   const isAuthor = true; // 임시로 모든 댓글에 수정/삭제가 가능하도록 설정
 
   // [수정] 날짜 포맷팅 함수 (더욱 안정적으로 변경)
-  const formatDate = (dateInput: any) => {
+  const formatDate = (dateInput: number[] | string | Date) => {
     if (Array.isArray(dateInput) && dateInput.length >= 6) {
       // 2. 배열의 각 요소를 사용하여 Date 객체를 생성합니다.
       // 자바스크립트의 월(month)은 0부터 시작하므로, 서버에서 받은 월(1~12)에서 1을 빼줍니다.

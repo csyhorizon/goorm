@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import axios, { AxiosError } from 'axios';
-import { getPostsByStore, PostResponse, Page, getAllPosts } from '@/lib/apis/post.api';
+import { PostResponse, Page, getAllPosts } from '@/lib/apis/post.api';
 import PostItem from './PostItem';
 import FloatingWriteButton from './FloatingWriteButton';
 

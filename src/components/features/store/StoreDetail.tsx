@@ -24,7 +24,7 @@ export default function StoreDetail({ store }: { store: StoreData }) {
       <StoreMenuList menuItems={store.menuItems} />
       <StoreNoticeList notices={store.notices} />
       <StoreLocationMap lat={store.lat} lng={store.lng} />
-      <CommentSection />
+      <CommentSection postId={store.id} />
     </div>
   );
 }

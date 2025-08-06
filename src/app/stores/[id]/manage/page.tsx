@@ -1,12 +1,12 @@
 // app/stores/[id]/manage/page.tsx
 
 import StoreManageForm from "@/components/features/store/manage/StoreManageForm";
-import { getStoreDetail, StoreResponse, getStoreItems, ItemResponse, getStoreEvents, EventResponse } from '@/lib/apis/store.api';
+import { StoreResponse, ItemResponse, EventResponse } from '@/lib/apis/store.api';
 import { cookies } from 'next/headers';
 import { createServerApi } from '@/lib/apis/serverClient';
 
 // Next.js 서버 컴포넌트로 데이터를 불러옵니다.
-export default async function ManageStorePage({ params }: { params: { id: string } }) {
+export default async function ManageStorePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const storeId = parseInt(resolvedParams.id, 10);
   let storeData: StoreResponse | null = null;

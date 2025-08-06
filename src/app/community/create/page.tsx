@@ -55,7 +55,7 @@ export default function CreatePostPage() {
                 storeId: Number(storeId),
             };
 
-            const response = await createPost(postCreateRequest, images);
+            await createPost(postCreateRequest, images);
             alert('게시글이 성공적으로 등록되었습니다.');
             // 성공 시 생성된 게시글 상세 페이지나 목록 페이지로 이동합니다.
             router.push(`/community`);

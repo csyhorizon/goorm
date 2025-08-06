@@ -5,8 +5,6 @@ import {
   StoreResponse, 
   ItemResponse, 
   EventResponse, 
-  CreateItemRequest, 
-  createStoreItem, 
   deleteStoreItem, 
 } from '@/lib/apis/store.api';
 
@@ -51,18 +49,8 @@ interface StoreManageFormProps {
 export default function StoreManageForm({ storeId, initialStoreData, initialItems, initialEvents }: StoreManageFormProps) {
   const [activeTab, setActiveTab] = useState('info');
   const [items, setItems] = useState<ItemResponse[]>(initialItems);
-  const [events, setEvents] = useState<EventResponse[]>(initialEvents);
+  const [events] = useState<EventResponse[]>(initialEvents);
   const [error, setError] = useState<string | null>(null);
-
-  const handleCreateItem = async (newItem: CreateItemRequest) => {
-    try {
-      const createdItem = await createStoreItem(storeId, newItem);
-      setItems(prev => [...prev, createdItem]);
-    } catch (err) {
-      console.error("상품 등록 실패:", err);
-      setError("상품 등록에 실패했습니다.");
-    }
-  };
 
   const handleDeleteItem = async (itemId: number) => {
     try {
@@ -122,7 +110,7 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
               <p>등록된 이벤트가 없습니다.</p>
             ) : (
               <ul>
-                {events.map(event => (
+                {events.map((event: EventResponse) => (
                   <li key={event.id} style={{ marginBottom: '10px' }}>
                     <strong>{event.title}</strong> - {event.description}
                   </li>
