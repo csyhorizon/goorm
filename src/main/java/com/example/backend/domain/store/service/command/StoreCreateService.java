@@ -19,14 +19,25 @@ public class StoreCreateService {
 
     public StoreResponse save(Long memberId, StoreCreateRequest storeCreateRequest) {
         Member member = memberRepository.findOrThrow(memberId);
-        validateOwnerRole(member);
+        validateAll(member);
         Store store = storeRepository.save(storeCreateRequest.toEntity(member));
         return StoreResponse.from(store);
     }
 
-    private static void validateOwnerRole(Member member) {
-        if (!member.isOwner()){
+    private void validateAll(Member member) {
+        validateOwnerRole(member);
+        validateHasStore(member);
+    }
+
+    private void validateOwnerRole(Member member) {
+        if (!member.isOwner()) {
             throw new IllegalArgumentException("this member is not owner");
+        }
+    }
+
+    private void validateHasStore(Member member) {
+        if (storeRepository.existsByMemberId(member.getId())) {
+            throw new IllegalArgumentException("this member is already exist");
         }
     }
 }

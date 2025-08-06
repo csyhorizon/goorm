@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class StoreCoordinates {
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
 
-    public StoreCoordinates(double latitude, double longitude) {
+    public StoreCoordinates(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

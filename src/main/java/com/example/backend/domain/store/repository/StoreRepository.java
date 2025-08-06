@@ -10,4 +10,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         return findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found")); // 에러코드 추후 통일화 필요
     }
+
+    Store findByMemberId(Long memberId);
+
+    boolean existsByMemberId(Long memberId);
 }
