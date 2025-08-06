@@ -9,7 +9,7 @@ import Link from 'next/link'; // Next.js의 Link 컴포넌트 임포트
 const roleMapping = {
   'USER': '일반 사용자',
   'ADMIN': '관리자',
-  'OWNER': '사장님',
+  'OWNER': '사업자',
 };
 
 export default function ProfileSection() {
@@ -91,7 +91,7 @@ export default function ProfileSection() {
       {/* 사장님(OWNER)이면서 가게 정보가 있을 때만 가게 관리 링크를 표시 */}
       {user.role === 'OWNER' && store && (
         <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-          <Link href={`/store-manager/${store.id}`} passHref>
+          <Link href={`/stores/${store.id}/manage`} passHref>
             <button style={{
               padding: '10px 20px',
               backgroundColor: '#4a90e2',

@@ -1,69 +1,144 @@
 'use client';
 
 import { useState } from 'react';
+import { 
+  StoreResponse, 
+  ItemResponse, 
+  EventResponse, 
+  CreateItemRequest, 
+  createStoreItem, 
+  deleteStoreItem, 
+} from '@/lib/apis/store.api';
 
-interface Notice {
-  id: number;
-  title: string;
-  content: string;
+// 탭 컴포넌트를 위한 props 정의
+interface TabProps {
+  label: string;
+  onClick: () => void;
+  isActive: boolean;
 }
+
+// 탭 UI 컴포넌트
+const Tab = ({ label, onClick, isActive }: TabProps) => (
+  <button
+    onClick={onClick}
+    style={{
+      padding: '10px 20px',
+      borderBottom: isActive ? '2px solid #4a90e2' : '2px solid transparent',
+      color: isActive ? '#4a90e2' : '#555',
+      fontWeight: isActive ? 'bold' : 'normal',
+      cursor: 'pointer',
+      backgroundColor: 'transparent',
+      border: 'none',
+      fontSize: '1rem'
+    }}
+  >
+    {label}
+  </button>
+);
 
 interface StoreManageFormProps {
-  initialNotices: Notice[];
+  storeId: number;
+  initialStoreData: StoreResponse;
+  initialItems: ItemResponse[];
+  initialEvents: EventResponse[];
 }
 
-export default function StoreManageForm({ initialNotices }: StoreManageFormProps) {
-  const [notices, setNotices] = useState<Notice[]>(initialNotices);
-  const [newTitle, setNewTitle] = useState('');
+// 메인 관리 폼 컴포넌트
+export default function StoreManageForm({ storeId, initialStoreData, initialItems, initialEvents }: StoreManageFormProps) {
+  const [activeTab, setActiveTab] = useState('info');
+  const [items, setItems] = useState<ItemResponse[]>(initialItems);
+  const [events, setEvents] = useState<EventResponse[]>(initialEvents);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddNotice = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-
-    const newNotice: Notice = {
-      id: Date.now(),
-      title: newTitle,
-      content: '새로운 공지 내용입니다.',
-    };
-
-    setNotices([newNotice, ...notices]);
-    setNewTitle('');
+  const handleCreateItem = async (newItem: CreateItemRequest) => {
+    try {
+      const createdItem = await createStoreItem(storeId, newItem);
+      setItems(prev => [...prev, createdItem]);
+    } catch (err) {
+      console.error("상품 등록 실패:", err);
+      setError("상품 등록에 실패했습니다.");
+    }
   };
 
-  const handleDeleteNotice = (id: number) => {
-    if (!confirm('정말로 이 공지를 삭제하시겠습니까?')) return;
-    setNotices(notices.filter(n => n.id !== id));
+  const handleDeleteItem = async (itemId: number) => {
+    try {
+      await deleteStoreItem(storeId, itemId);
+      setItems(prev => prev.filter(item => item.itemId !== itemId));
+    } catch (err) {
+      console.error("상품 삭제 실패:", err);
+      setError("상품 삭제에 실패했습니다.");
+    }
+  };
+
+  const renderTabContent = () => {
+    if (error) return <p style={{ color: 'red' }}>{error}</p>;
+
+    switch (activeTab) {
+      case 'info':
+        return (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>가게 정보</h3>
+            <p><strong>주소:</strong> {initialStoreData.address}</p>
+            <p><strong>전화번호:</strong> {initialStoreData.phone_number}</p>
+            <p><strong>설명:</strong> {initialStoreData.description}</p>
+            <p><strong>카테고리:</strong> {initialStoreData.category}</p>
+            <p><strong>운영 시간:</strong> {initialStoreData.startDate.hour}:{initialStoreData.startDate.minute} ~ {initialStoreData.endDate.hour}:{initialStoreData.endDate.minute}</p>
+            <p><strong>좌표:</strong> 위도 {initialStoreData.latitude}, 경도 {initialStoreData.longitude}</p>
+          </div>
+        );
+      case 'items':
+        return (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>상품 목록</h3>
+            {items.length === 0 ? (
+              <p>등록된 상품이 없습니다.</p>
+            ) : (
+              <ul>
+                {items.map(item => (
+                  <li key={item.itemId} style={{ marginBottom: '10px' }}>
+                    <strong>{item.name}</strong> - {item.price}원
+                    <button 
+                      onClick={() => handleDeleteItem(item.itemId)} 
+                      style={{ marginLeft: '10px', color: 'red', cursor: 'pointer', backgroundColor: 'transparent', border: 'none' }}
+                    >
+                      삭제
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      case 'events':
+        return (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>이벤트 목록</h3>
+            {events.length === 0 ? (
+              <p>등록된 이벤트가 없습니다.</p>
+            ) : (
+              <ul>
+                {events.map(event => (
+                  <li key={event.id} style={{ marginBottom: '10px' }}>
+                    <strong>{event.title}</strong> - {event.description}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <div>
-      {/* 새 공지 등록 폼 */}
-      <form onSubmit={handleAddNotice} style={{ background: '#f8f9fa', padding: '16px', borderRadius: '8px', marginBottom: '32px' }}>
-        <h3 style={{ marginTop: 0 }}>새 공지/이벤트 등록</h3>
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="제목을 입력하세요"
-          style={{ width: '100%', padding: '10px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-        />
-        <button type="submit" style={{ width: '100%', padding: '10px', border: 'none', background: '#007bff', color: 'white', borderRadius: '4px', cursor: 'pointer' }}>
-          등록하기
-        </button>
-      </form>
-
-      {/* 기존 공지 목록 */}
-      <div>
-        <h3>등록된 공지 목록</h3>
-        {notices.map(notice => (
-          <div key={notice.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #eee' }}>
-            <span>{notice.title}</span>
-            <button onClick={() => handleDeleteNotice(notice.id)} style={{ background: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>
-              삭제
-            </button>
-          </div>
-        ))}
+      <div style={{ display: 'flex', borderBottom: '1px solid #ccc', marginBottom: '20px' }}>
+        <Tab label="가게 정보" onClick={() => setActiveTab('info')} isActive={activeTab === 'info'} />
+        <Tab label="상품 관리" onClick={() => setActiveTab('items')} isActive={activeTab === 'items'} />
+        <Tab label="이벤트 관리" onClick={() => setActiveTab('events')} isActive={activeTab === 'events'} />
       </div>
+      {renderTabContent()}
     </div>
   );
 }

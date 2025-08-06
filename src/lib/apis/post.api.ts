@@ -119,6 +119,15 @@ export const updatePost = async (
 };
 
 
+/**
+ * [GET] 전체 게시글을 페이징하여 조회합니다.
+ */
+export const getAllPosts = async (pageable: Pageable): Promise<Page<PostResponse>> => {
+  const response = await apiV1Client.get<Page<PostResponse>>('/posts', {
+    params: pageable, // { page: 0, size: 10 } 객체를 쿼리 파라미터로 자동 변환
+  });
+  return response.data;
+};
 
 
 /**

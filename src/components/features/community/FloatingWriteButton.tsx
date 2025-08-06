@@ -1,8 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getMyProfile } from '@/lib/apis/member.api';
 
 export default function FloatingWriteButton() {
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [isLoadingRole, setIsLoadingRole] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const profileData = await getMyProfile();
+                setUserRole(profileData.role);
+            } catch (error) {
+                console.error("사용자 프로필을 불러오는 데 실패했습니다:", error);
+                setUserRole(null);
+            } finally {
+                setIsLoadingRole(false);
+            }
+        };
+        fetchUserRole();
+    }, []);
+
+    if (isLoadingRole || userRole !== 'OWNER') {
+        return null;
+    }
+
     return (
         <Link href="/community/create" passHref>
             <button style={{
