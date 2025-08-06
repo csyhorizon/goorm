@@ -60,8 +60,8 @@ public class StoreQueryController {
 
     @Operation(summary = "사장님이 등록한 가게 목록조회", description = "사장님이 등록한 가게 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사장님이 등록한 가게 목록을 조회 성공")
-    @GetMapping("/{memberId}")
-    public ResponseEntity<List<StoreResponse>> getStoreList(@PathVariable("memberId") Long memberId) {
-        return ResponseEntity.ok(storeService.findByMemberId(memberId));
+    @GetMapping("/myStore")
+    public ResponseEntity<StoreResponse> getStoreList(@AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.ok(storeService.findByMemberId(user.getUserId()));
     }
 }
