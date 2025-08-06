@@ -50,7 +50,7 @@ public class Store extends BaseEntity {
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
                  StoreDuration storeDuration, Member member) {
-        this(null, name, address, phone_number, description, category, storeDuration, null, member);
+        this(null, name, address, phone_number, description, category, storeDuration, new StoreCoordinates(), member);
     }
 
     public Store(String name, String address, String phone_number, String description, StoreCategory category,
@@ -87,11 +87,11 @@ public class Store extends BaseEntity {
         this.storeCoordinates = storeCoordinates;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return storeCoordinates.getLatitude();
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return storeCoordinates.getLongitude();
     }
 }

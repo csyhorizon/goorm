@@ -14,8 +14,8 @@ public record StoreResponse(
         StoreCategory category,
         LocalTime startDate,
         LocalTime endDate,
-        double latitude,
-        double longitude
+        Double latitude,
+        Double longitude
 ) {
     public static StoreResponse from(Store store) {
         return new StoreResponse(store.getId(), store.getName(), store.getAddress(), store.getPhone_number(),
