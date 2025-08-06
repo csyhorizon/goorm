@@ -2,6 +2,7 @@ import axios from 'axios';
 import { refreshToken } from './auth.api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
+const API_BASE_HARD_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL?.trim() || '/be/api';
 
 /**
  * 인증 관련 API 클라이언트 (ex: /api/auth/signin)
@@ -20,7 +21,7 @@ export const apiAuthClient = axios.create({
  * - baseURL: .../api/v1
  */
 export const apiV1Client = axios.create({
-  baseURL: API_BASE_URL + '/v1',
+  baseURL: API_BASE_HARD_URL + '/v1',
   headers: {
     'Content-Type': 'application/json',
   },
