@@ -1,7 +1,7 @@
 import PostList from "@/components/features/community/PostList";
 
 export default function CommunityPage() {
-  const storeId = 1;
+  const storeId = 3;
 
   return (
     <div style={{

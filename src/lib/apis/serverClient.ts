@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from 'axios';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL + '/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
 
 /**
  * Next.js 서버 환경(API Routes, 서버 컴포넌트)에서 사용할 API 클라이언트를 생성하는 팩토리 함수입니다.

@@ -42,6 +42,8 @@ export type StoreResponse = {
   category: StoreCategory;
   startDate: TimeOfDay;
   endDate: TimeOfDay;
+  latitude: number;
+  longitude: number;
 };
 
 export type ItemResponse = {
@@ -76,6 +78,11 @@ export type CreateEventRequest = {
   endTime: string;
   discountRate: number;
   discountAmount: number;
+};
+
+export type CreateStoreLocationRequest = {
+  latitude: number;
+  longitude: number;
 };
 
 
@@ -148,4 +155,21 @@ export const getEventItems = async (storeId: number, eventId: number): Promise<I
   // Swagger 명세상 경로가 `/stores/{storeId}/{eventId}/items` 이므로 그대로 따름
   const response = await apiV1Client.get(`/stores/${storeId}/${eventId}/items`);
   return response.data;
+};
+
+/**
+ * [GET] 본인의 가게를 조회합니다.
+ * @returns 없으면 500 에러를 반환합니다.
+ */
+export const getMyStore = async (): Promise<StoreResponse> => {
+  const response = await apiV1Client.get('/stores/myStore');
+  return response.data;
+};
+
+
+/**
+ * [POST] 가게 좌표를 등록합니다.
+ */
+export const createStoreLocation = async (storeId: number, locationData: CreateStoreLocationRequest): Promise<void> => {
+  await apiV1Client.post(`/stores/${storeId}/insertCoordinate`, locationData);
 };

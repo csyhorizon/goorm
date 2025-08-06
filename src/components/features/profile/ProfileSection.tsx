@@ -1,18 +1,72 @@
 'use client';
 
-interface User {
-  name: string;
-  email: string;
-}
+import { useState, useEffect } from 'react';
+import { getMyProfile, MemberResponse } from '@/lib/apis/member.api';
+import { getMyStore, StoreResponse } from '@/lib/apis/store.api'; // getMyStore API 임포트
+import Link from 'next/link'; // Next.js의 Link 컴포넌트 임포트
 
-interface ProfileSectionProps {
-  user: User | null;
-}
+// 역할(role) 값을 한글로 매핑하는 객체
+const roleMapping = {
+  'USER': '일반 사용자',
+  'ADMIN': '관리자',
+  'OWNER': '사장님',
+};
 
-export default function ProfileSection({ user }: ProfileSectionProps) {
+export default function ProfileSection() {
+  const [user, setUser] = useState<MemberResponse | null>(null);
+  const [store, setStore] = useState<StoreResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const profileData = await getMyProfile();
+        setUser(profileData);
+
+        // 사용자의 역할이 사장님(OWNER)일 경우에만 본인의 가게 정보 조회
+        if (profileData.role === 'OWNER') {
+          try {
+            const storeData = await getMyStore();
+            setStore(storeData);
+          } catch (storeError) {
+            // 가게 정보가 없는 경우 500 에러가 반환될 수 있으므로,
+            // 이 경우 store 상태를 null로 유지하고 별도 에러 처리는 하지 않음.
+            console.warn("사장님의 가게 정보가 없습니다.");
+          }
+        }
+      } catch (err) {
+        console.error("프로필 정보를 불러오는 데 실패했습니다:", err);
+        setError("프로필 정보를 불러오는 데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section style={{ marginBottom: '40px' }}>
+        <p>프로필 정보를 불러오는 중...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section style={{ marginBottom: '40px' }}>
+        <p style={{ color: 'red' }}>{error}</p>
+      </section>
+    );
+  }
+
   if (!user) {
     return null;
   }
+
+  const userRoleText = roleMapping[user.role as keyof typeof roleMapping] || user.role;
 
   return (
     <section style={{ marginBottom: '40px' }}>
@@ -24,12 +78,33 @@ export default function ProfileSection({ user }: ProfileSectionProps) {
 
       <div style={{ padding: '20px 0' }}>
         <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: 'black' }}>
-          {user.name}
+          {user.username}
         </p>
         <p style={{ margin: '5px 0 0', color: '#555' }}>
           {user.email}
         </p>
+        <p style={{ margin: '5px 0 0', color: '#555' }}>
+          역할: {userRoleText}
+        </p>
       </div>
+
+      {/* 사장님(OWNER)이면서 가게 정보가 있을 때만 가게 관리 링크를 표시 */}
+      {user.role === 'OWNER' && store && (
+        <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+          <Link href={`/store-manager/${store.id}`} passHref>
+            <button style={{
+              padding: '10px 20px',
+              backgroundColor: '#4a90e2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}>
+              가게 관리하기
+            </button>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

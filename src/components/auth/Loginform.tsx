@@ -36,6 +36,8 @@ export default function LoginForm() {
       const frontUser = {
         name: dataUser.username,
         email: email,
+        id: dataUser.id,
+        role: dataUser.role,
       }
 
       console.log('로그인 데이터:', frontUser, data.accessToken);
