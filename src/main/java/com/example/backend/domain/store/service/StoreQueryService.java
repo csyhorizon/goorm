@@ -19,10 +19,7 @@ public class StoreQueryService {
         return StoreResponse.from(store);
     }
 
-    public List<StoreResponse> findByMemberId(Long memberId) {
-        List<Store> stores = storeRepository.findByMemberId(memberId);
-        return stores.stream()
-                .map(StoreResponse::from)
-                .toList();
+    public StoreResponse findByMemberId(Long memberId) {
+        return StoreResponse.from(storeRepository.findByMemberId(memberId));
     }
 }
