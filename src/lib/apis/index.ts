@@ -10,7 +10,7 @@ const API_BASE_HARD_URL = (baseUrl && baseUrl.trim()) || '/be/api';
  * - baseURL: .../api
  */
 export const apiAuthClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_HARD_URL,
   headers: {
     'Content-Type': 'application/json',
   },
