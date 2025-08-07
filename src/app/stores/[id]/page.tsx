@@ -1,55 +1,71 @@
-import Link from 'next/link';
-import StoreDetail from "@/components/features/store/StoreDetail";
+// app/stores/[id]/page.tsx
 
-// API mock
-async function getStoreData(id: string) {
-  const mockStore = {
-    id: parseInt(id),
-    ownerId: 123, // 가게 주인의 ID (예시)
-    name: "다운타우너 안국",
-    category: "수제버거",
-    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1998&auto=format=fit=crop',
-    lat: 37.5779,
-    lng: 126.9855,
-    menuItems: [
-      { id: 1, name: "아보카도 버거", price: 9800 },
-      { id: 2, name: "베이컨 치즈 버거", price: 8800 },
-    ],
-    notices: [
-      { id: 1, title: "여름 신메뉴 출시!", date: "2025-07-20" },
-    ]
+import { cookies } from 'next/headers';
+import { createServerApi } from '@/lib/apis/serverClient';
+import { StoreResponse, ItemResponse, EventResponse } from '@/lib/apis/store.api';
+import { PostResponse, Page } from '@/lib/apis/post.api';
+import StoreDetail from "@/components/features/store/StoreDetail"; // 아래에서 만들 클라이언트 컴포지션
+
+// 서버에서 페이지에 필요한 모든 데이터를 가져오는 함수
+async function getPageData(storeId: number, serverApi: any) {
+  // 여러 API를 동시에 요청하여 페이지 로딩 속도를 높입니다.
+  const [storeRes, itemsRes, eventsRes, postsRes] = await Promise.all([
+    serverApi.get(`/v1/stores/${storeId}`),
+    serverApi.get(`/v1/stores/${storeId}/items`),
+    serverApi.get(`/v1/stores/${storeId}/events`),
+    serverApi.get(`/v1/posts/${storeId}?page=0&size=5&sort=createdAt,desc`), 
+  ]);
+
+  return {
+    storeData: storeRes.data as StoreResponse,
+    itemsData: itemsRes.data as ItemResponse[],
+    eventsData: eventsRes.data as EventResponse[],
+    postsPage: postsRes.data as Page<PostResponse>,
   };
-  return mockStore;
 }
 
-export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const store = await getStoreData(resolvedParams.id);
+// 현재 로그인한 유저가 가게 주인인지 확인하는 함수
+async function checkOwnership(storeId: number, serverApi: any): Promise<boolean> {
+  try {
+    const myStoreRes = await serverApi.get('/v1/stores/myStore');
+    const myStore: StoreResponse = myStoreRes.data;
+    return myStore.id === storeId;
+  } catch (error) {
+    // getMyStore API가 실패하면 가게 주인이 아니라는 의미입니다.
+    return false;
+  }
+}
+
+export default async function StoreDetailPage({ params }: { params: { id: string } }) {
+  const storeId = parseInt(params.id, 10);
   
-  const currentUserId = 123;
-  const isOwner = store.ownerId === currentUserId;
+  const cookieStore = cookies();
+  const serverApi = createServerApi(await cookieStore);
 
-  return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '80px', position: 'relative' }}>
-      {/* 주인일 경우 관리 버튼 표시 */}
-      {isOwner && (
-        <Link href={`/stores/${store.id}/manage`} style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          padding: '10px 15px',
-          background: 'white',
-          color: 'black',
-          borderRadius: '8px',
-          textDecoration: 'none',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          zIndex: 10
-        }}>
-          가게 관리
-        </Link>
-      )}
+  try {
+    // 데이터 조회와 소유권 확인을 동시에 진행합니다.
+    const [pageData, isOwner] = await Promise.all([
+      getPageData(storeId, serverApi),
+      checkOwnership(storeId, serverApi)
+    ]);
 
-      <StoreDetail store={store} />
-    </div>
-  );
+    return (
+      <StoreDetail
+        initialStoreData={pageData.storeData}
+        initialItems={pageData.itemsData}
+        initialEvents={pageData.eventsData} 
+        initialPostsPage={pageData.postsPage}
+        isOwner={isOwner}
+      />
+    );
+
+  } catch (error) {
+    console.error("가게 상세 정보를 불러오는 데 실패했습니다:", error);
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <h1>오류</h1>
+        <p>가게 정보를 불러오는 데 실패했습니다. 다시 시도해 주세요.</p>
+      </div>
+    );
+  }
 }
