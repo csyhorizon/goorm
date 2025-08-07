@@ -37,8 +37,9 @@ async function checkOwnership(storeId: number, serverApi: any): Promise<boolean>
 }
 
 export default async function StoreDetailPage({ params }: { params: { id: string } }) {
-  const storeId = parseInt(params.id, 10);
-  
+  const resolvedParams = await params;
+  const storeId = parseInt(resolvedParams.id, 10);
+
   const cookieStore = cookies();
   const serverApi = createServerApi(await cookieStore);
 

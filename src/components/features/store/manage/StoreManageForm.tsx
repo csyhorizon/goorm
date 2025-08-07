@@ -11,22 +11,22 @@ import {
   CreateItemRequest,
   CreateEventRequest,
 } from '@/lib/apis/store.api';
+import { deleteEvent } from '@/lib/apis/event.api';
 
-// --- [추가] 카카오맵 타입 선언 ---
-// window 객체에 kakao 속성을 추가하기 위한 타입 확장
+// --- 카카오맵 타입 선언 ---
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
-// --- [추가] 카카오맵 컴포넌트 ---
+// --- 카카오맵 컴포넌트 ---
 const StoreMap = ({ latitude, longitude }: { latitude: number; longitude: number; }) => {
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
       window.kakao.maps.load(() => {
         const mapContainer = document.getElementById('map');
-        if (!mapContainer) return; // mapContainer가 없을 경우 실행 중단
+        if (!mapContainer) return;
         const mapOption = {
           center: new window.kakao.maps.LatLng(latitude, longitude),
           level: 3,
@@ -70,7 +70,7 @@ const Tab = ({ label, onClick, isActive }: TabProps) => (
   </button>
 );
 
-// [수정] 공통 스타일 객체 추가
+// --- 공통 스타일 객체 ---
 const formStyles = {
   input: {
     width: '100%',
@@ -240,6 +240,18 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
     }
   };
 
+  // [추가] 이벤트 삭제 핸들러
+  const handleDeleteEvent = async (eventId: number) => {
+    if (!window.confirm("정말로 이 이벤트를 삭제하시겠습니까?")) return;
+    try {
+      await deleteEvent(eventId);
+      setEvents(prev => prev.filter(event => event.id !== eventId));
+    } catch (err) {
+      console.error("이벤트 삭제 실패:", err);
+      setError("이벤트 삭제에 실패했습니다.");
+    }
+  };
+
   const handleItemAdded = (newItem: ItemResponse) => {
     setItems(prev => [...prev, newItem]);
     setShowAddItemForm(false);
@@ -255,25 +267,24 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
 
     switch (activeTab) {
       case 'info':
-        // [수정] 데이터가 없을 경우를 대비한 안전장치 추가
         if (!initialStoreData) {
           return <p>가게 정보를 불러올 수 없습니다.</p>;
         }
-
         const { address, phone_number, description, category, startDate, endDate, latitude, longitude } = initialStoreData;
-
-        
-        const formatTime = (time: string | [number, number] | { hour: number; minute: number }) => {
-          if (Array.isArray(time) && time.length === 2) {
+        const formatTime = (time: any) => {
+          if (Array.isArray(time) && time.length >= 2) {
             const [hours, minutes] = time;
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
           }
           if (typeof time === 'object' && time !== null && 'hour' in time && 'minute' in time) {
             return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
           }
-          return time as string;
+          if (typeof time === 'string' && time.includes(':')) {
+            const parts = time.split(':');
+            return `${parts[0]}:${parts[1]}`;
+          }
+          return '미정';
         };
-
         return (
           <div style={{ marginTop: '20px' }}>
             <div style={{ marginBottom: '20px' }}>
@@ -286,7 +297,6 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
             </div>
             <div>
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>가게 위치</h3>
-                {/* [수정] 위도/경도 값이 유효할 때만 지도를 렌더링 */}
                 {typeof latitude === 'number' && typeof longitude === 'number' ? (
                   <StoreMap latitude={latitude} longitude={longitude} />
                 ) : (
@@ -332,9 +342,13 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
             ) : (
               <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
                 {events.map((event: EventResponse) => (
-                  <li key={event.id} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
-                    <strong>{event.title}</strong>
-                    <p style={{ margin: '5px 0', fontSize: '0.9rem' }}>{event.description}</p>
+                  <li key={event.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee' }}>
+                    <div>
+                      <strong>{event.title}</strong>
+                      <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#555' }}>{event.description}</p>
+                    </div>
+                    {/* [추가] 이벤트 삭제 버튼 */}
+                    <button onClick={() => handleDeleteEvent(event.id)} style={{ color: 'red', cursor: 'pointer', backgroundColor: 'transparent', border: 'none' }}>삭제</button>
                   </li>
                 ))}
               </ul>
