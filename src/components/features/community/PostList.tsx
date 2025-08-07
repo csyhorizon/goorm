@@ -14,7 +14,9 @@ export default function PostList() {
     const fetchPosts = async () => {
       try {
         const data: Page<PostResponse> = await getAllPosts({ page, size: 10 });
-        setPosts(data.content);
+        const reversedContext = data.content.reverse(); // 최신 게시글이 위에 오도록 역순으로 정렬
+
+        setPosts(reversedContext);
         setTotalPages(data.totalPages);
       } catch (error) {
         console.error("게시글 불러오기 실패", error);

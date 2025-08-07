@@ -4,7 +4,6 @@ import StoreHeader from "./StoreHeader";
 import StoreMenuList from "./StoreMenuList";
 import StoreNoticeList from "./StoreNoticeList";
 import StoreLocationMap from "./StoreLocationMap";
-import CommentSection from "@/components/features/community/detail/CommentSection";
 
 interface StoreData {
   id: number;
@@ -24,7 +23,6 @@ export default function StoreDetail({ store }: { store: StoreData }) {
       <StoreMenuList menuItems={store.menuItems} />
       <StoreNoticeList notices={store.notices} />
       <StoreLocationMap lat={store.lat} lng={store.lng} />
-      <CommentSection postId={store.id} />
     </div>
   );
 }
