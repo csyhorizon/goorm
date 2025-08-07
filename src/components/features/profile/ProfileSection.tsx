@@ -100,6 +100,23 @@ export default function ProfileSection() {
           </Link>
         </div>
       )}
+
+      {user.role === 'ADMIN' && (
+        <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+          <Link href="/admin/dashboard" passHref>
+            <button style={{
+              padding: '10px 20px',
+              backgroundColor: '#4a90e2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}>
+              관리자 대시보드
+            </button>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }
