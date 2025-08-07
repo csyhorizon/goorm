@@ -7,42 +7,40 @@ export interface AlarmResponse {
   id: number;
   content: string;
   isRead: boolean;
-  isDeleted: boolean;
-  createdAt: string; // ISO 8601 형식의 날짜 문자열
+  createdAt: string; // ISO 8601 형식 또는 배열
+  type: string; // [추가] 알림 타입 (예: "NEW_EVENT")
+  targetUrl: string; // [추가] 클릭 시 이동할 경로
 }
 
 
 /**
  * [GET] 내 알림 목록을 조회합니다.
- * @param memberId - 회원 ID
+ * (memberId는 토큰을 통해 서버에서 자동으로 인식합니다)
  */
-export const getAlarms = async (memberId: number): Promise<AlarmResponse[]> => {
-  const response = await apiV1Client.get<AlarmResponse[]>('/notifications', {
-    params: { memberId },
-  });
+export const getAlarms = async (): Promise<AlarmResponse[]> => {
+  // [수정] params에서 memberId 제거
+  const response = await apiV1Client.get<AlarmResponse[]>('/notifications');
   return response.data;
 };
 
 
 /**
  * [GET] 안 읽은 알림 개수를 조회합니다.
- * @param memberId - 회원 ID
+ * (memberId는 토큰을 통해 서버에서 자동으로 인식합니다)
  */
-export const getUnreadAlarmCount = async (memberId: number): Promise<number> => {
-  const response = await apiV1Client.get<number>('/notifications/unread-count', {
-    params: { memberId },
-  });
+export const getUnreadAlarmCount = async (): Promise<number> => {
+  // [수정] params에서 memberId 제거
+  const response = await apiV1Client.get<number>('/notifications/unread-count');
   return response.data;
 };
 
 /**
- * [POST] 특정 회원의 모든 알림을 읽음 처리합니다.
- * @param memberId - 회원 ID
+ * [POST] 현재 로그인한 유저의 모든 알림을 읽음 처리합니다.
+ * (memberId는 토큰을 통해 서버에서 자동으로 인식합니다)
  */
-export const readAllAlarms = async (memberId: number): Promise<void> => {
-  await apiV1Client.post('/notifications/read-all', null, { // body가 없으므로 null 전달
-    params: { memberId },
-  });
+export const readAllAlarms = async (): Promise<void> => {
+  // [수정] params에서 memberId 제거
+  await apiV1Client.post('/notifications/read-all');
 };
 
 
@@ -54,19 +52,14 @@ export const deleteAlarm = async (alarmId: number): Promise<void> => {
   await apiV1Client.delete(`/notifications/${alarmId}`);
 };
 
-
-
-
 /**
  * [SSE] 실시간 알림 SSE 구독을 요청합니다.
- * * @param memberId - 구독할 회원 ID
- * @param accessToken - 인증을 위한 JWT 토큰
- * @returns {EventSource} - SSE 연결 객체
+ * (accessToken은 Axios 인터셉터 등을 통해 헤더에 자동으로 포함되어야 합니다)
  */
-export const subscribeToAlarms = (memberId: number, accessToken: string): EventSource => {
-  const eventSourceUrl = `${process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}/api/v1/notifications/subscribe?memberId=${memberId}&token=${accessToken}`;
+export const subscribeToAlarms = (): EventSource => {
+  const eventSourceUrl = `${process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL}/api/v1/notifications/subscribe`;
   
-  const eventSource = new EventSource(eventSourceUrl);
+  const eventSource = new EventSource(eventSourceUrl, { withCredentials: true });
 
   eventSource.onopen = () => {
     console.log('SSE connection opened.');

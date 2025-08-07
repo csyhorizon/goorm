@@ -17,6 +17,7 @@ interface StoreDetailProps {
   initialEvents: EventResponse[];
   initialPostsPage: Page<PostResponse>;
   isOwner: boolean;
+  initialIsLiked: boolean;
 }
 
 export default function StoreDetail({ 
@@ -24,7 +25,8 @@ export default function StoreDetail({
   initialItems,
   initialEvents,
   initialPostsPage, 
-  isOwner 
+  isOwner,
+  initialIsLiked
 }: StoreDetailProps) {
   
   const store = initialStoreData;
@@ -52,8 +54,10 @@ export default function StoreDetail({
 
       {/* 가게 대표 이미지 및 이름 */}
       <StoreHeader 
+        storeId={store.id}
         name={store.name} 
         category={store.category}
+        initialIsLiked={initialIsLiked}
       />
       
       {/* 메뉴 목록 */}

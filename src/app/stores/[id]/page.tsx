@@ -57,6 +57,7 @@ export default async function StoreDetailPage({ params }: { params: { id: string
         initialEvents={pageData.eventsData} 
         initialPostsPage={pageData.postsPage}
         isOwner={isOwner}
+        initialIsLiked={false}
       />
     );
 

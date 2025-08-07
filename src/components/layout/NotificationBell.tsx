@@ -1,11 +1,36 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ToastContext } from '@/contexts/ToastContext';
-import { getAlarms, readAllAlarms, deleteAlarm, AlarmResponse } from '@/lib/apis/alarm.api';
+import { useToast } from '@/contexts/ToastContext';
+import { getAlarms, getUnreadAlarmCount, readAllAlarms, deleteAlarm, AlarmResponse } from '@/lib/apis/alarm.api';
 
-// 벨 아이콘 SVG
+// --- Helper Functions ---
+const formatDate = (dateInput: any) => {
+    if (!dateInput) return '';
+    if (Array.isArray(dateInput)) {
+        const [year, month, day] = dateInput;
+        return `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+    }
+    if (typeof dateInput === 'string') {
+        const date = new Date(dateInput);
+        if (!isNaN(date.getTime())) return date.toLocaleString('ko-KR');
+    }
+    return '날짜 정보 없음';
+};
+
+const parseRedirectUrl = (targetUrl?: string): string | null => {
+    if (!targetUrl) return null;
+    const eventMatch = targetUrl.match(/\/event\/(\d+)/);
+    if (eventMatch && eventMatch[1]) {
+        return `/events/${eventMatch[1]}`;
+    }
+    // TODO: 다른 종류의 알림 URL 파싱 규칙 추가 (예: 게시글)
+    return null;
+};
+
+// --- UI Components ---
 const BellIcon = ({ hasNew }: { hasNew: boolean }) => (
   <div style={{ position: 'relative', cursor: 'pointer' }}>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -17,28 +42,41 @@ const BellIcon = ({ hasNew }: { hasNew: boolean }) => (
 );
 
 export default function NotificationBell() {
-  const { user, isLoggedIn } = useAuth();
-  const toastContext = useContext(ToastContext);
+  const { isLoggedIn } = useAuth();
+  const { notifications, hasNew, setHasNew, setInitialAlarms, removeNotification } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [alarms, setAlarms] = useState<AlarmResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // 벨을 클릭했을 때의 동작
+  // 주기적으로 안 읽은 알림 개수 확인
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const checkUnread = async () => {
+        try {
+            const count = await getUnreadAlarmCount();
+            setHasNew(count > 0);
+        } catch (error) {
+            console.error("Failed to get unread count:", error);
+        }
+    };
+    checkUnread();
+    const interval = setInterval(checkUnread, 60000); // 1분마다 확인
+    return () => clearInterval(interval);
+  }, [isLoggedIn, setHasNew]);
+
   const handleBellClick = async () => {
-    if (!isLoggedIn || !user) return;
+    if (!isLoggedIn) return;
     
     setIsOpen(prev => !prev);
     
-    // 드롭다운이 열릴 때, 알림 목록을 불러오고 '읽음' 처리
     if (!isOpen) {
       setIsLoading(true);
       try {
-        const fetchedAlarms = await getAlarms(user.id);
-        setAlarms(fetchedAlarms);
-        // 안 읽은 알림이 있을 때만 '모두 읽음' API 호출
-        if (toastContext?.hasNew) {
-          await readAllAlarms(user.id);
-          toastContext.markAsRead();
+        const fetchedAlarms = await getAlarms();
+        setInitialAlarms(fetchedAlarms);
+        if (hasNew) {
+          await readAllAlarms();
+          setHasNew(false);
         }
       } catch (error) {
         console.error('Failed to fetch alarms:', error);
@@ -48,13 +86,21 @@ export default function NotificationBell() {
     }
   };
 
-  // 특정 알림 삭제
-  const handleDelete = async (alarmId: number) => {
+  const handleDelete = async (e: React.MouseEvent, alarmId: number) => {
+    e.stopPropagation();
     try {
       await deleteAlarm(alarmId);
-      setAlarms(prev => prev.filter(alarm => alarm.id !== alarmId));
+      removeNotification(alarmId);
     } catch (error) {
       console.error('Failed to delete alarm:', error);
+    }
+  };
+
+  const handleNotificationClick = (alarm: AlarmResponse) => {
+    const path = parseRedirectUrl(alarm.targetUrl);
+    if (path) {
+        router.push(path);
+        setIsOpen(false);
     }
   };
 
@@ -63,38 +109,31 @@ export default function NotificationBell() {
   return (
     <div style={{ position: 'relative' }}>
       <div onClick={handleBellClick}>
-        <BellIcon hasNew={toastContext?.hasNew || false} />
+        <BellIcon hasNew={hasNew} />
       </div>
 
       {isOpen && (
         <div style={{
-          position: 'absolute',
-          top: '40px',
-          right: 0,
-          width: '300px',
-          maxHeight: '400px',
-          overflowY: 'auto',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          border: '1px solid #eee',
-          zIndex: 1001,
+          position: 'absolute', top: '40px', right: 0, width: '320px',
+          maxHeight: '400px', overflowY: 'auto', backgroundColor: 'white',
+          borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          border: '1px solid #eee', zIndex: 1001,
         }}>
           <div style={{ padding: '16px', borderBottom: '1px solid #eee' }}>
             <h4 style={{ margin: 0 }}>알림</h4>
           </div>
           {isLoading ? (
             <div style={{ padding: '20px', textAlign: 'center' }}>로딩 중...</div>
-          ) : alarms.length > 0 ? (
-            alarms.map(alarm => (
-              <div key={alarm.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #eee' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: '0.9rem' }}>{alarm.content}</p>
-                  <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#888' }}>
-                    {new Date(alarm.createdAt).toLocaleString()}
-                  </p>
+          ) : notifications.length > 0 ? (
+            notifications.map(alarm => (
+              <div key={alarm.id} onClick={() => handleNotificationClick(alarm)} style={{ cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #eee' }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{alarm.content}</p>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#888' }}>{formatDate(alarm.createdAt)}</p>
+                  </div>
+                  <button onClick={(e) => handleDelete(e, alarm.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#aaa' }}>×</button>
                 </div>
-                <button onClick={() => handleDelete(alarm.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}>×</button>
               </div>
             ))
           ) : (
