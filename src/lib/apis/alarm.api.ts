@@ -65,8 +65,7 @@ export const subscribeToAlarms = (): EventSource => {
     console.log('SSE connection opened.');
   };
 
-  eventSource.onerror = (error) => {
-    console.error('SSE connection error:', error);
+  eventSource.onerror = () => {
     eventSource.close();
   };
 

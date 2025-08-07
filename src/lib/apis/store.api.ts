@@ -46,6 +46,37 @@ export type StoreResponse = {
   longitude: number;
 };
 
+export interface Store {
+  id: number;
+  name: string;
+  category: string; // UI에 표시할 한글 카테고리 이름
+  lat: number;
+  lng: number;
+  description: string;
+  address: string;
+}
+
+const categoryMap: { [key: string]: string } = {
+  CAFE: "카페",
+  RESTAURANT: "음식점",
+  PARK: "공원",
+  SHOPPING: "쇼핑",
+  TOURIST_ATTRACTION: "관광지",
+  HOSPITAL: "병원",
+  FRUIT_SHOP: "과일가게",
+  OTHER: "기타",
+};
+
+const mapStoreResponseToStore = (res: StoreResponse): Store => ({
+  id: res.id,
+  name: res.name,
+  category: categoryMap[res.category] || "기타", // 영문 카테고리를 한글로 변환
+  lat: res.latitude,  // latitude -> lat
+  lng: res.longitude, // longitude -> lng
+  description: res.description,
+  address: res.address,
+});
+
 export type ItemResponse = {
   itemId: number;
   name: string;
@@ -172,4 +203,13 @@ export const getMyStore = async (): Promise<StoreResponse> => {
  */
 export const createStoreLocation = async (storeId: number, locationData: CreateStoreLocationRequest): Promise<void> => {
   await apiV1Client.post(`/stores/${storeId}/insertCoordinate`, locationData);
+};
+
+
+/**
+ * [GET] 가게 전체를 조회합니다.
+ */
+export const getAllStores = async (): Promise<Store[]> => {
+  const response = await apiV1Client.get<StoreResponse[]>('/stores/all');
+  return response.data.map(mapStoreResponseToStore);
 };
