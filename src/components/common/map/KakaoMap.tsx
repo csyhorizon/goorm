@@ -5,37 +5,26 @@ import CategoryFilter from './CategoryFilter';
 import CustomOverlays from './CustomOverlays';
 import SearchControl from './SearchControl';
 import PlaceDetailOverlay from './PlaceDetailOverlay';
+import { getAllStores, Store } from '@/lib/apis/store.api';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     kakao: any;
   }
 }
 
-interface CustomPlace {
-  id: number;
-  name: string;
-  category: string;
-  lat: number;
-  lng: number;
-  imageUrl?: string;
-  description: string;
-}
-
 export default function KakaoMap() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [map, setMap] = useState<any>(null);
-  const [dbPlaces, setDbPlaces] = useState<CustomPlace[]>([]);
+  const [dbPlaces, setDbPlaces] = useState<Store[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
-  const [selectedPlace, setSelectedPlace] = useState<CustomPlace | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<Store | null>(null);
 
   useEffect(() => {
     window.kakao.maps.load(() => {
       const container = document.getElementById('map');
       const options = {
         center: new window.kakao.maps.LatLng(37.5665, 126.978),
-        level: 3,
+        level: 8,
       };
       const newMap = new window.kakao.maps.Map(container, options);
       
@@ -48,12 +37,16 @@ export default function KakaoMap() {
   }, []);
   
   useEffect(() => {
-    const testData: CustomPlace[] = [
-      { id: 1, name: '스타벅스 강남점', category: '카페', lat: 37.498086, lng: 127.028001, imageUrl: 'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?q=80&w=2070&auto=format&fit=crop', description: '강남역 근처의 넓고 쾌적한 스타벅스입니다.' },
-      { id: 2, name: '다운타우너 안국', category: '음식점', lat: 37.5779, lng: 126.9855, imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1998&auto=format&fit=crop', description: '아보카도 버거가 유명한 수제버거 맛집입니다.' },
-      { id: 3, name: '블루보틀 역삼', category: '카페', lat: 37.5009, lng: 127.0374, imageUrl: 'https://images.unsplash.com/photo-1511920183353-3c9c93da54e2?q=80&w=1974&auto=format&fit=crop', description: '맛있는 커피와 함께 조용한 시간을 즐겨보세요.' },
-    ];
-    setDbPlaces(testData);
+    const fetchStores = async () => {
+      try {
+        const stores = await getAllStores();
+        setDbPlaces(stores);
+      } catch (error) {
+        console.error("가게 정보를 불러오는 데 실패했습니다:", error);
+      }
+    };
+    
+    fetchStores();
   }, []);
 
   useEffect(() => {
@@ -61,7 +54,7 @@ export default function KakaoMap() {
 
     const showPlaceOnIdle = () => {
       const center = map.getCenter();
-      let closestPlace = null;
+      let closestPlace: Store | null = null;
       let minDistance = Infinity;
 
       const placesToShow = selectedCategory === '전체' 
@@ -96,7 +89,7 @@ export default function KakaoMap() {
     };
   }, [map, dbPlaces, selectedCategory]);
 
-  const handleSelectPlace = (place: CustomPlace) => {
+  const handleSelectPlace = (place: Store) => {
     setSelectedPlace(place);
     map.panTo(new window.kakao.maps.LatLng(place.lat, place.lng));
   };

@@ -1,25 +1,86 @@
 'use client';
 
-import Image from 'next/image';
+import { useState } from 'react';
+import { toggleStoreLike } from '@/lib/apis/like.api';
+
+const HeartIcon = ({ isLiked }: { isLiked: boolean }) => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 24 24"
+    fill={isLiked ? '#e85757' : 'none'}
+    stroke={isLiked ? '#e85757' : 'white'}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+  </svg>
+);
 
 interface StoreHeaderProps {
+  storeId: number;
   name: string;
   category: string;
-  imageUrl: string;
+  initialIsLiked: boolean;
 }
 
-export default function StoreHeader({ name, category, imageUrl }: StoreHeaderProps) {
+export default function StoreHeader({ storeId, name, category, initialIsLiked }: StoreHeaderProps) {
+  const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLikeClick = async () => {
+    setIsLoading(true);
+    try {
+      const response = await toggleStoreLike({ storeId });
+      setIsLiked(response.becomeLike);
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+      alert("로그인이 필요하거나 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-      <Image 
-        src={imageUrl} 
-        alt={name} 
-        fill
-        style={{ objectFit: 'cover' }} 
-      />
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px', background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-        <h1 style={{ margin: 0, color: 'white', fontSize: '2rem' }}>{name}</h1>
-        <p style={{ margin: '4px 0 0', color: '#eee', fontSize: '1rem' }}>{category}</p>
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '250px',
+      backgroundColor: '#2c3e50',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-end',
+      padding: '24px',
+      boxSizing: 'border-box',
+      color: 'white',
+    }}>
+      {/* [추가] 좋아요 버튼 */}
+      <button
+        onClick={handleLikeClick}
+        disabled={isLoading}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          borderRadius: '50%',
+          width: '50px',
+          height: '50px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          backdropFilter: 'blur(5px)',
+        }}
+      >
+        <HeartIcon isLiked={isLiked} />
+      </button>
+
+      <div>
+        <p style={{ margin: '0 0 4px 0', color: '#bdc3c7', fontSize: '1rem' }}>{category}</p>
+        <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: 'bold' }}>{name}</h1>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { AxiosInstance } from 'axios';
 import { apiAuthClient } from './index';
 
 // 로그인 요청
@@ -25,6 +26,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
+  role: string;
 }
 
 // 회원가입 응답
@@ -45,7 +47,11 @@ export interface RefreshResponse {
  * @param {LoginRequest} credentials - 사용자 로그인 정보
  */
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  const response = await apiAuthClient.post<LoginResponse>('/auth/signin', credentials);
+  const response = await apiAuthClient.post<LoginResponse>('/auth/signin', credentials, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
@@ -54,7 +60,11 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
  * @param {RegisterRequest} userData - 사용자 회원가입 정보
  */
 export const register = async (userData: RegisterRequest): Promise<RegisterResponse> => {
-  const response = await apiAuthClient.post<RegisterResponse>('/auth/join', userData);
+  const response = await apiAuthClient.post<RegisterResponse>('/auth/join', userData, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
@@ -62,7 +72,6 @@ export const register = async (userData: RegisterRequest): Promise<RegisterRespo
  * [POST] 쿠키에 담긴 리프레시 토큰으로 액세스 토큰을 갱신합니다.
  */
 export const refreshToken = async (): Promise<RefreshResponse> => {
-  // 쿠키는 브라우저가 자동으로 보내주므로, 별도의 인자는 필요 없습니다.
   const response = await apiAuthClient.post<RefreshResponse>('/auth/refresh');
   return response.data;
 };
@@ -70,6 +79,6 @@ export const refreshToken = async (): Promise<RefreshResponse> => {
 /**
  * [POST] 서버에 로그아웃을 요청하여 쿠키를 삭제합니다.
  */
-export const logout = async (): Promise<void> => {
-  await apiAuthClient.post('/auth/logout');
+export const logout = async (serverApi: AxiosInstance): Promise<void> => {
+  await serverApi.post('/auth/logout');
 };

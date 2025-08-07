@@ -1,37 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface CustomPlace {
-  id: number;
-  name: string;
-  category: string;
-  lat: number;
-  lng: number;
-  imageUrl?: string;
-  description: string;
-}
+import { Store } from '@/lib/apis/store.api';
 
 interface CustomOverlaysProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any;
-  places: CustomPlace[];
+  places: Store[];
   selectedCategory: string;
-  onSelect: (place: CustomPlace) => void;
+  onSelect: (place: Store) => void;
 }
 
 export default function CustomOverlays({ map, places, selectedCategory, onSelect }: CustomOverlaysProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [markers, setMarkers] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [overlays, setOverlays] = useState<any[]>([]);
 
   useEffect(() => {
     if (!map) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newMarkers: any[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newOverlays: any[] = [];
 
     const placesToShow =

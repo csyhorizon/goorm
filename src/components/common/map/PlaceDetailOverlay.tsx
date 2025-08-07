@@ -2,19 +2,10 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface CustomPlace {
-  id: number;
-  name: string;
-  imageUrl?: string;
-  lat: number;
-  lng: number;
-  description: string;
-}
+import { Store } from '@/lib/apis/store.api';
 
 interface PlaceDetailOverlayProps {
-  place: CustomPlace;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  place: Store;
   map: any;
   onClose: () => void;
 }
@@ -23,8 +14,6 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
   const router = useRouter();
 
   useEffect(() => {
-    const imageUrl = place.imageUrl || 'https://via.placeholder.com/280x150.png?text=No+Image';
-    
     const contentNode = document.createElement('div');
     contentNode.className = 'detail-overlay';
     
@@ -34,8 +23,11 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
         <button class="close-btn" title="닫기">X</button>
       </div>
       <div class="detail-body">
-        <img src="${imageUrl}" alt="${place.name}" class="detail-img"/>
         <p class="description">${place.description}</p>
+        <div class="address-container">
+            <span class="address-label">주소</span>
+            <span class="address-text">${place.address}</span>
+        </div>
       </div>
     `;
 
@@ -50,7 +42,6 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
     
     overlay.setMap(map);
 
-    // 정보창 위에서 발생하는 마우스/터치 이벤트가 지도에 전달되지 않도록 막습니다.
     const stopPropagation = (e: Event) => e.stopPropagation();
     const eventsToStop = ['mousedown', 'touchstart', 'mouseup', 'touchend', 'click'];
     eventsToStop.forEach(eventType => {
@@ -60,18 +51,12 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
     const closeBtn = contentNode.querySelector('.close-btn');
     const body = contentNode.querySelector('.detail-body');
 
-    const handleClose = () => {
-      onClose();
-    };
-    
-    const handleDetailClick = () => {
-      router.push(`/stores/${place.id}`);
-    };
+    const handleClose = () => onClose();
+    const handleDetailClick = () => router.push(`/stores/${place.id}`);
 
     if (closeBtn) closeBtn.addEventListener('click', handleClose);
     if (body) body.addEventListener('click', handleDetailClick);
 
-    // 컴포넌트가 사라질 때 이벤트 리스너를 정리합니다.
     return () => {
       eventsToStop.forEach(eventType => {
           contentNode.removeEventListener(eventType, stopPropagation);

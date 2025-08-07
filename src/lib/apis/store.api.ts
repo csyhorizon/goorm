@@ -1,13 +1,25 @@
 import { apiV1Client } from ".";
 
+export type StoreCategory = "CAFE" | "RESTAURANT" | "PARK" | "SHOPPING" | "TOURIST_ATTRACTION" | "HOSPITAL" | "FRUIT_SHOP" | "OTHER";
+
+// UI에서 사용할 카테고리 옵션과 값을 매핑하는 상수
+export const STORE_CATEGORY_OPTIONS = [
+  { value: "CAFE", label: "카페" },
+  { value: "RESTAURANT", label: "음식점" },
+  { value: "PARK", label: "공원" },
+  { value: "SHOPPING", label: "쇼핑" },
+  { value: "TOURIST_ATTRACTION", label: "관광지" },
+  { value: "HOSPITAL", label: "병원" },
+  { value: "FRUIT_SHOP", label: "과일가게" },
+  { value: "OTHER", label: "기타" },
+];
+
 type TimeOfDay = {
   hour: number;
   minute: number;
   second: number;
   nano: number;
 };
-
-type StoreCategory = "FRUIT_SHOP" | "OTHER_CATEGORY";
 
 type EventCategory = "DISCOUNT_PERCENTAGE" | "DISCOUNT_AMOUNT";
 
@@ -17,8 +29,8 @@ export type CreateStoreRequest = {
   phone_number: string;
   description: string;
   category: StoreCategory;
-  startDate: TimeOfDay;
-  endDate: TimeOfDay;
+  startDate: string;
+  endDate: string;
 };
 
 export type StoreResponse = {
@@ -30,7 +42,40 @@ export type StoreResponse = {
   category: StoreCategory;
   startDate: TimeOfDay;
   endDate: TimeOfDay;
+  latitude: number;
+  longitude: number;
 };
+
+export interface Store {
+  id: number;
+  name: string;
+  category: string; // UI에 표시할 한글 카테고리 이름
+  lat: number;
+  lng: number;
+  description: string;
+  address: string;
+}
+
+const categoryMap: { [key: string]: string } = {
+  CAFE: "카페",
+  RESTAURANT: "음식점",
+  PARK: "공원",
+  SHOPPING: "쇼핑",
+  TOURIST_ATTRACTION: "관광지",
+  HOSPITAL: "병원",
+  FRUIT_SHOP: "과일가게",
+  OTHER: "기타",
+};
+
+const mapStoreResponseToStore = (res: StoreResponse): Store => ({
+  id: res.id,
+  name: res.name,
+  category: categoryMap[res.category] || "기타", // 영문 카테고리를 한글로 변환
+  lat: res.latitude,  // latitude -> lat
+  lng: res.longitude, // longitude -> lng
+  description: res.description,
+  address: res.address,
+});
 
 export type ItemResponse = {
   itemId: number;
@@ -64,6 +109,11 @@ export type CreateEventRequest = {
   endTime: string;
   discountRate: number;
   discountAmount: number;
+};
+
+export type CreateStoreLocationRequest = {
+  latitude: number;
+  longitude: number;
 };
 
 
@@ -136,4 +186,30 @@ export const getEventItems = async (storeId: number, eventId: number): Promise<I
   // Swagger 명세상 경로가 `/stores/{storeId}/{eventId}/items` 이므로 그대로 따름
   const response = await apiV1Client.get(`/stores/${storeId}/${eventId}/items`);
   return response.data;
+};
+
+/**
+ * [GET] 본인의 가게를 조회합니다.
+ * @returns 없으면 500 에러를 반환합니다.
+ */
+export const getMyStore = async (): Promise<StoreResponse> => {
+  const response = await apiV1Client.get('/stores/myStore');
+  return response.data;
+};
+
+
+/**
+ * [POST] 가게 좌표를 등록합니다.
+ */
+export const createStoreLocation = async (storeId: number, locationData: CreateStoreLocationRequest): Promise<void> => {
+  await apiV1Client.post(`/stores/${storeId}/insertCoordinate`, locationData);
+};
+
+
+/**
+ * [GET] 가게 전체를 조회합니다.
+ */
+export const getAllStores = async (): Promise<Store[]> => {
+  const response = await apiV1Client.get<StoreResponse[]>('/stores/all');
+  return response.data.map(mapStoreResponseToStore);
 };

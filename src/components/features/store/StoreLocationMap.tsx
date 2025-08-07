@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     kakao: any;
   }
 }
@@ -16,8 +15,12 @@ interface StoreLocationMapProps {
 
 export default function StoreLocationMap({ lat, lng }: StoreLocationMapProps) {
   useEffect(() => {
+    if (!lat || !lng || !window.kakao || !window.kakao.maps) return;
+
     window.kakao.maps.load(() => {
       const container = document.getElementById('store-map');
+      if (!container) return;
+
       const options = {
         center: new window.kakao.maps.LatLng(lat, lng),
         level: 3,
@@ -29,6 +32,15 @@ export default function StoreLocationMap({ lat, lng }: StoreLocationMapProps) {
       marker.setMap(map);
     });
   }, [lat, lng]);
+
+  if (!lat || !lng) {
+    return (
+      <section style={{ padding: '16px' }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '16px' }}>위치 정보</h2>
+        <p>위치 정보가 등록되지 않았습니다.</p>
+      </section>
+    );
+  }
 
   return (
     <section style={{ padding: '16px' }}>

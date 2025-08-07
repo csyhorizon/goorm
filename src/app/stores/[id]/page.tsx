@@ -1,55 +1,66 @@
-import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { createServerApi } from '@/lib/apis/serverClient';
+import { StoreResponse, ItemResponse, EventResponse } from '@/lib/apis/store.api';
+import { PostResponse, Page } from '@/lib/apis/post.api';
 import StoreDetail from "@/components/features/store/StoreDetail";
 
-// API mock
-async function getStoreData(id: string) {
-  const mockStore = {
-    id: parseInt(id),
-    ownerId: 123, // 가게 주인의 ID (예시)
-    name: "다운타우너 안국",
-    category: "수제버거",
-    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1998&auto=format=fit=crop',
-    lat: 37.5779,
-    lng: 126.9855,
-    menuItems: [
-      { id: 1, name: "아보카도 버거", price: 9800 },
-      { id: 2, name: "베이컨 치즈 버거", price: 8800 },
-    ],
-    notices: [
-      { id: 1, title: "여름 신메뉴 출시!", date: "2025-07-20" },
-    ]
+async function getPageData(storeId: number, serverApi: any) {
+  const [storeRes, itemsRes, eventsRes, postsRes] = await Promise.all([
+    serverApi.get(`/v1/stores/${storeId}`),
+    serverApi.get(`/v1/stores/${storeId}/items`),
+    serverApi.get(`/v1/stores/${storeId}/events`),
+    serverApi.get(`/v1/posts/${storeId}?page=0&size=5&sort=createdAt,desc`), 
+  ]);
+
+  return {
+    storeData: storeRes.data as StoreResponse,
+    itemsData: itemsRes.data as ItemResponse[],
+    eventsData: eventsRes.data as EventResponse[],
+    postsPage: postsRes.data as Page<PostResponse>,
   };
-  return mockStore;
+}
+
+async function checkOwnership(storeId: number, serverApi: any): Promise<boolean> {
+  try {
+    const myStoreRes = await serverApi.get('/v1/stores/myStore');
+    const myStore: StoreResponse = myStoreRes.data;
+    return myStore.id === storeId;
+  } catch {
+    return false;
+  }
 }
 
 export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const store = await getStoreData(resolvedParams.id);
-  
-  const currentUserId = 123;
-  const isOwner = store.ownerId === currentUserId;
+  const { id } = await params;
+  const storeId = parseInt(id, 10);
 
-  return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '80px', position: 'relative' }}>
-      {/* 주인일 경우 관리 버튼 표시 */}
-      {isOwner && (
-        <Link href={`/stores/${store.id}/manage`} style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          padding: '10px 15px',
-          background: 'white',
-          color: 'black',
-          borderRadius: '8px',
-          textDecoration: 'none',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          zIndex: 10
-        }}>
-          가게 관리
-        </Link>
-      )}
+  const cookieStore = cookies();
+  const serverApi = createServerApi(await cookieStore);
 
-      <StoreDetail store={store} />
-    </div>
-  );
+  try {
+    const [pageData, isOwner] = await Promise.all([
+      getPageData(storeId, serverApi),
+      checkOwnership(storeId, serverApi)
+    ]);
+
+    return (
+      <StoreDetail
+        initialStoreData={pageData.storeData}
+        initialItems={pageData.itemsData}
+        initialEvents={pageData.eventsData} 
+        initialPostsPage={pageData.postsPage}
+        isOwner={isOwner}
+        initialIsLiked={false}
+      />
+    );
+
+  } catch (error) {
+    console.error("가게 상세 정보를 불러오는 데 실패했습니다:", error);
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <h1>오류</h1>
+        <p>가게 정보를 불러오는 데 실패했습니다. 다시 시도해 주세요.</p>
+      </div>
+    );
+  }
 }

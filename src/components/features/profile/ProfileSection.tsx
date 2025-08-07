@@ -1,82 +1,105 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { getMyProfile, MemberResponse } from '@/lib/apis/member.api';
+import { getMyStore, StoreResponse } from '@/lib/apis/store.api';
+import Link from 'next/link';
 
-interface User {
-  name: string;
-  email: string;
-  avatarUrl: string;
-}
+const roleMapping = {
+  'USER': '일반 사용자',
+  'ADMIN': '관리자',
+  'OWNER': '사업자',
+};
 
-const UserAvatar = ({ url }: { url: string }) => (
-  <Image 
-    src={url} 
-    alt="Profile Avatar" 
-    width={80} 
-    height={80} 
-    style={{ borderRadius: '50%', objectFit: 'cover' }} 
-  />
-);
-
-interface ProfileSectionProps {
-  user: User | null;
-  onUpdateProfile: (newName: string) => void;
-}
-
-export default function ProfileSection({ user, onUpdateProfile }: ProfileSectionProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(user?.name || '');
+export default function ProfileSection() {
+  const [user, setUser] = useState<MemberResponse | null>(null);
+  const [store, setStore] = useState<StoreResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name);
-    }
-  }, [user]);
+    const fetchProfileData = async () => {
+      try {
+        const profileData = await getMyProfile();
+        setUser(profileData);
 
-  if (!user) return null;
+        if (profileData.role === 'OWNER') {
+          try {
+            const storeData = await getMyStore();
+            setStore(storeData);
+          } catch {
+            console.warn("사장님의 가게 정보가 없습니다.");
+          }
+        }
+      } catch (err) {
+        console.error("프로필 정보를 불러오는 데 실패했습니다:", err);
+        setError("프로필 정보를 불러오는 데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleSave = () => {
-    onUpdateProfile(name);
-    setIsEditing(false);
-  };
+    fetchProfileData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section style={{ marginBottom: '40px' }}>
+        <p>프로필 정보를 불러오는 중...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section style={{ marginBottom: '40px' }}>
+        <p style={{ color: 'red' }}>{error}</p>
+      </section>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const userRoleText = roleMapping[user.role as keyof typeof roleMapping] || user.role;
 
   return (
     <section style={{ marginBottom: '40px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-        <h2 style={{ fontSize: '1.2rem', margin: 0, color: 'black' }}>프로필 정보</h2>
-        {!isEditing ? (
-          <button onClick={() => setIsEditing(true)} style={{ padding: '8px 16px', border: '1px solid #ddd', borderRadius: '8px', background: '#fff', cursor: 'pointer' }}>
-            수정
-          </button>
-        ) : (
-          <div>
-            <button onClick={() => setIsEditing(false)} style={{ padding: '8px 16px', border: 'none', background: 'none', cursor: 'pointer', marginRight: '8px' }}>
-              취소
-            </button>
-            <button onClick={handleSave} style={{ padding: '8px 16px', border: 'none', borderRadius: '8px', background: '#007bff', color: 'white', cursor: 'pointer' }}>
-              저장
-            </button>
-          </div>
-        )}
+      <div style={{ borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+        <h2 style={{ fontSize: '1.2rem', margin: 0, color: 'black' }}>
+          프로필 정보
+        </h2>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', padding: '20px 0' }}>
-        <UserAvatar url={user.avatarUrl} />
-        <div style={{ marginLeft: '20px' }}>
-          {isEditing ? (
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{ fontSize: '1.5rem', fontWeight: 'bold', border: '1px solid #ccc', borderRadius: '4px', padding: '5px' }}
-            />
-          ) : (
-            <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: 'black' }}>{user.name}</p>
-          )}
-          <p style={{ margin: '5px 0 0', color: '#555' }}>{user.email}</p>
-        </div>
+      <div style={{ padding: '20px 0' }}>
+        <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: 'black' }}>
+          {user.username}
+        </p>
+        <p style={{ margin: '5px 0 0', color: '#555' }}>
+          {user.email}
+        </p>
+        <p style={{ margin: '5px 0 0', color: '#555' }}>
+          역할: {userRoleText}
+        </p>
       </div>
+
+      {user.role === 'OWNER' && store && (
+        <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+          <Link href={`/stores/${store.id}/manage`} passHref>
+            <button style={{
+              padding: '10px 20px',
+              backgroundColor: '#4a90e2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}>
+              가게 관리하기
+            </button>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

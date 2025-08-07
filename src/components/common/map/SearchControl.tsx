@@ -10,12 +10,10 @@ interface Place {
   y: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function SearchControl({ map }: { map: any }) {
   const [keyword, setKeyword] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const psRef = useRef<any>(null);
 
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function SearchControl({ map }: { map: any }) {
       setPlaces([]);
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     psRef.current.keywordSearch(keyword, (data: Place[], status: any) => {
       if (status === window.kakao.maps.services.Status.OK) {
         setPlaces(data);
@@ -41,7 +38,7 @@ export default function SearchControl({ map }: { map: any }) {
 
   const showPlaceOnMap = (place: Place) => {
     setKeyword(place.place_name);
-    setShowSuggestions(false); // 목록 숨기기
+    setShowSuggestions(false);
 
     const position = new window.kakao.maps.LatLng(place.y, place.x);
     map.panTo(position);

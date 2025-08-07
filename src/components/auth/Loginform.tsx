@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,14 +26,26 @@ export default function LoginForm() {
         },
         body: JSON.stringify({ email, password }),
       });
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '로그인 실패');
+        throw new Error(data.message || '로그인 실패');
       }
 
+      const dataUser = data.user;
+      const frontUser = {
+        name: dataUser.username,
+        email: email,
+        id: dataUser.id,
+        role: dataUser.role,
+      }
+
+      console.log('로그인 데이터:', frontUser, data.accessToken);
+
+      login(frontUser, data.accessToken);
+
       console.log('로그인 성공!');
-      router.push('/dashboard');
+      router.push('/');
 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류 발생';
