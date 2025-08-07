@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { refreshToken } from './auth.api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
 const baseUrl = process.env.NEXT_PUBLIC_SPRING_BOOT_API_BASE_URL;
 const API_BASE_HARD_URL = (baseUrl && baseUrl.trim()) || '/be/api';
 

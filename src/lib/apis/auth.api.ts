@@ -47,7 +47,11 @@ export interface RefreshResponse {
  * @param {LoginRequest} credentials - 사용자 로그인 정보
  */
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
-  const response = await apiAuthClient.post<LoginResponse>('/auth/signin', credentials);
+  const response = await apiAuthClient.post<LoginResponse>('/auth/signin', credentials, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
