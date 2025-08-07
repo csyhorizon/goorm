@@ -64,4 +64,11 @@ public class StoreQueryController {
     public ResponseEntity<StoreResponse> getStoreList(@AuthenticationPrincipal CustomUserDetails user) {
         return ResponseEntity.ok(storeService.findByMemberId(user.getUserId()));
     }
+
+    @Operation(summary = "가게 전체조회", description = "등록된 모든 가게를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "등록된 모든 가게 조회 성공")
+    @GetMapping("/all")
+    public ResponseEntity<List<StoreResponse>> getAllStores() {
+        return ResponseEntity.ok(storeService.findAll());
+    }
 }

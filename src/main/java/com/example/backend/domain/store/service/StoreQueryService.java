@@ -22,4 +22,11 @@ public class StoreQueryService {
     public StoreResponse findByMemberId(Long memberId) {
         return StoreResponse.from(storeRepository.findByMemberId(memberId));
     }
+
+    public List<StoreResponse> findAll() {
+        List<Store> stores = storeRepository.findAll();
+        return stores.stream()
+                .map(StoreResponse::from)
+                .toList();
+    }
 }
