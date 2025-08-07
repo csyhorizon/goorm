@@ -12,8 +12,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> , PostRepositoryCustom {
     Page<Post> findAllByStoreIdOrderByCreatedAtDesc(Long storeId, Pageable pageable);
 
-//    Page<Post> findAllOrderByCreatedAtDesc(Pageable pageable);
-
     default Post findOrThrow(Long id) {
         return findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));

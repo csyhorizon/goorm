@@ -2,6 +2,7 @@ package com.example.backend.domain.post.repository;
 
 import com.example.backend.domain.post.dto.PostResponse;
 import com.example.backend.domain.post.entity.Post;
+import com.example.backend.domain.post.entity.PostMedia;
 import com.example.backend.domain.post.entity.QPost;
 import com.example.backend.domain.post.entity.QPostMedia;
 import com.example.backend.domain.store.entity.QStore;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,32 +33,30 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         List<Tuple> results = queryFactory
                 .select(post, postMedia, store)
                 .from(post)
-                .join(post.store, store)
-                .leftJoin(post.mediaList, postMedia).fetchJoin()
+                .leftJoin(post.store, store).fetchJoin()
+                .leftJoin(post.mediaList, postMedia)
                 .orderBy(post.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Map<Long, List<String>> postIdToMediaUrls = results.stream()
-                .filter(tuple -> tuple.get(postMedia) != null)
-                .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(post).getId(),
-                        Collectors.mapping(
-                                tuple -> tuple.get(postMedia).getMediaUrl(),
-                                Collectors.toList()
-                        )
-                ));
+        Map<Long, List<Tuple>> postIdToTuples = results.stream()
+                .collect(Collectors.groupingBy(tuple -> tuple.get(post).getId()));
 
-        //PostResponse 변환
-        List<PostResponse> content = results.stream()
-                .map(tuple -> {
-                    Post p = tuple.get(post);
-                    Store s = tuple.get(store);
-                    List<String> mediaUrls = postIdToMediaUrls.getOrDefault(p.getId(), List.of());
+        List<PostResponse> content = postIdToTuples.values().stream()
+                .map(tupleList -> {
+                    Tuple first = tupleList.get(0);
+                    Post p = first.get(post);
+                    Store s = first.get(store);
+                    List<String> mediaUrls = tupleList.stream()
+                            .map(t -> {
+                                PostMedia pm = t.get(postMedia);
+                                return pm != null ? pm.getMediaUrl() : null;
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
                     return PostResponse.of(p, mediaUrls, s);
                 })
-                .distinct()
                 .toList();
 
         Long total = queryFactory
