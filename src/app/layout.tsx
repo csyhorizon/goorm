@@ -4,9 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import BottomNav from "@/components/layout/BottomNav";
 import { ToastProvider } from "@/contexts/ToastContext";
-import NotificationBell from "@/components/layout/NotificationBell";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { SSEProvider } from "@/contexts/SSEProvider"; // SSEProvider import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,28 +33,24 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ToastProvider>
-            <SSEProvider>
-              <header style={{
-                position: 'fixed',  
-                top: 0,
-                left: 0,
-                right: 0,
-                display: 'flex',
-                justifyContent: 'flex-end',
-                padding: '10px 20px',
-                zIndex: 1000,
-                pointerEvents: 'none',
-              }}>
-                <div style={{ pointerEvents: 'auto' }}>
-                  <NotificationBell />
-                </div>
-              </header>
+            <header style={{
+              position: 'fixed',  
+              top: 0,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              padding: '10px 20px',
+              zIndex: 1000,
+              pointerEvents: 'none',
+            }}>
+              {/* 알림 벨을 여기서 제거합니다 */}
+            </header>
 
-              <main style={{ paddingBottom: '60px' }}>
-                {children}
-              </main>
-              <BottomNav />
-            </SSEProvider>
+            <main style={{ paddingBottom: '60px' }}>
+              {children}
+            </main>
+            <BottomNav />
           </ToastProvider>
         </AuthProvider>
 
