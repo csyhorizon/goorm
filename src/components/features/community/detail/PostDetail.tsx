@@ -1,9 +1,7 @@
-// PostDetail.tsx (최종 수정 코드)
 import Image from 'next/image';
 import AuthorInfo from './AuthorInfo';
 import CommentSection from './CommentSection';
 
-// 타입을 export하여 page.tsx에서도 사용할 수 있게 합니다.
 export interface PostDetailData {
   id: number;
   title: string;
@@ -25,10 +23,10 @@ export default function PostDetail({ post }: { post: PostDetailData }) {
       {post.mediaUrls && post.mediaUrls.length > 0 && (
         <div style={{ 
           display: 'flex', 
-          overflowX: 'auto', // 가로 스크롤 활성화
-          scrollSnapType: 'x mandatory', // 스크롤 시 이미지에 딱 맞게 멈춤
-          WebkitOverflowScrolling: 'touch', // 모바일에서 부드러운 스크롤
-          scrollbarWidth: 'none', // 스크롤바 숨기기 (Firefox)
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
         }}>
           <style>{`
             .scroll-container::-webkit-scrollbar {
@@ -38,18 +36,18 @@ export default function PostDetail({ post }: { post: PostDetailData }) {
 
           {post.mediaUrls.map((url, index) => (
             <div key={index} style={{
-              flex: '0 0 100%', // 각 아이템이 컨테이너 너비를 100% 차지
-              scrollSnapAlign: 'center', // 스크롤 시 중앙에 위치
+              flex: '0 0 100%',
+              scrollSnapAlign: 'center',
               position: 'relative',
-              aspectRatio: '16 / 10', // 이미지 비율 유지 (레이아웃 깨짐 방지)
+              aspectRatio: '16 / 10',
             }}>
               <Image 
                 src={url}
                 alt={`${post.title} 이미지 ${index + 1}`} 
-                fill // 부모 요소(div)를 꽉 채우도록 설정
+                fill
                 style={{ objectFit: 'cover' }}
                 priority={index === 0}
-                sizes="(max-width: 768px) 100vw, 700px" // 뷰포트에 따른 이미지 사이즈 최적화
+                sizes="(max-width: 768px) 100vw, 700px"
               />
             </div>
           ))}
@@ -66,7 +64,6 @@ export default function PostDetail({ post }: { post: PostDetailData }) {
               </p>
             )}
           </div>
-          {/* 수정된 AuthorInfo는 author 객체만 받습니다. */}
           <AuthorInfo author={post.author} />
         </div>
 

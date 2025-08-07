@@ -1,5 +1,3 @@
-// app/stores/[id]/manage/page.tsx
-
 import StoreManageForm from "@/components/features/store/manage/StoreManageForm";
 import { StoreResponse, ItemResponse, EventResponse } from '@/lib/apis/store.api';
 import { cookies } from 'next/headers';
@@ -13,33 +11,25 @@ export default async function ManageStorePage({ params }: { params: Promise<{ id
   const cookieStore = cookies();
   const serverApi = createServerApi(await cookieStore);
 
-  // --- 1. 권한 확인 단계 ---
   try {
-    // '내 가게' 정보를 먼저 조회합니다.
     const myStoreResponse = await serverApi.get('/v1/stores/myStore');
     const myStoreData: StoreResponse = myStoreResponse.data;
 
-    // 내 가게 ID와 접속하려는 가게 ID가 다른지 확인합니다.
     if (myStoreData.id !== storeId) {
-      // 다르다면 권한이 없으므로 홈페이지로 리다이렉트합니다.
       console.log("접근 권한 없음: 내 가게 ID와 URL의 가게 ID가 다릅니다.");
       redirect('/forbidden');
     }
-  } catch (e) {
-    // getMyStore API 호출 자체가 실패하면, 이 사용자는 가게 주인이 아닌 것입니다.
-    // 따라서 권한이 없으므로 홈페이지로 리다이렉트합니다.
+  } catch {
     console.log("권한 확인 실패: 사용자가 가게를 소유하고 있지 않습니다.");
     redirect('/forbidden');
   }
 
-  // --- 2. 데이터 조회 단계 (권한 확인을 통과한 경우에만 실행됨) ---
   let storeData: StoreResponse | null = null;
   let itemsData: ItemResponse[] = [];
   let eventsData: EventResponse[] = [];
-  let error = null;
+  let error: string | null = null;
 
   try {
-    // 이제 안심하고 나머지 데이터를 조회합니다.
     const [storeResponse, itemsResponse, eventsResponse] = await Promise.all([
       serverApi.get(`/v1/stores/${storeId}`),
       serverApi.get(`/v1/stores/${storeId}/items`),

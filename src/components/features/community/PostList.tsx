@@ -7,14 +7,14 @@ import FloatingWriteButton from './FloatingWriteButton';
 
 export default function PostList() {
   const [posts, setPosts] = useState<PostResponse[]>([]);
-  const [page, setPage] = useState<number>(0); // 현재 페이지 번호 (0부터 시작)
+  const [page, setPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const data: Page<PostResponse> = await getAllPosts({ page, size: 10 });
-        const reversedContext = data.content.reverse(); // 최신 게시글이 위에 오도록 역순으로 정렬
+        const reversedContext = data.content.reverse();
 
         setPosts(reversedContext);
         setTotalPages(data.totalPages);

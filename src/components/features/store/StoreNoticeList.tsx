@@ -1,9 +1,8 @@
 'use client';
 
 import { EventResponse } from '@/lib/apis/store.api';
-import Link from 'next/link'; // Link 컴포넌트 import
+import Link from 'next/link';
 
-// 백엔드의 날짜 배열을 JS Date 객체로 변환하는 헬퍼 함수
 const createDateFromInput = (dateInput: any): Date | null => {
   if (Array.isArray(dateInput) && dateInput.length >= 3) {
     const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateInput;
@@ -18,7 +17,6 @@ const createDateFromInput = (dateInput: any): Date | null => {
   return null;
 };
 
-// 날짜 포맷팅 함수
 const formatDate = (dateInput: any) => {
   const date = createDateFromInput(dateInput);
   if (!date) return '날짜 정보 없음';
@@ -29,7 +27,7 @@ const formatDate = (dateInput: any) => {
   return `${year}.${month}.${day}`;
 };
 
-// 할인 정보를 텍스트로 변환하는 함수
+
 const getDiscountText = (event: EventResponse) => {
   if (event.eventCategory === 'DISCOUNT_PERCENTAGE' && event.discountRate > 0) {
     return `${event.discountRate}% 할인`;
@@ -59,7 +57,6 @@ export default function StoreNoticeList({ events }: StoreNoticeListProps) {
           {activeEvents.map(event => {
             const discountText = getDiscountText(event);
             return (
-              // [수정] li 전체를 Link로 감싸서 클릭 가능하게 만듭니다.
               <li key={event.id}>
                 <Link href={`/events/${event.id}`} style={{ 
                     display: 'block',

@@ -13,14 +13,12 @@ import {
 } from '@/lib/apis/store.api';
 import { deleteEvent } from '@/lib/apis/event.api';
 
-// --- 카카오맵 타입 선언 ---
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
-// --- 카카오맵 컴포넌트 ---
 const StoreMap = ({ latitude, longitude }: { latitude: number; longitude: number; }) => {
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
@@ -45,7 +43,6 @@ const StoreMap = ({ latitude, longitude }: { latitude: number; longitude: number
 };
 
 
-// --- 탭 UI 컴포넌트 ---
 interface TabProps {
   label: string;
   onClick: () => void;
@@ -70,14 +67,13 @@ const Tab = ({ label, onClick, isActive }: TabProps) => (
   </button>
 );
 
-// --- 공통 스타일 객체 ---
 const formStyles = {
   input: {
     width: '100%',
     padding: '10px',
     border: '1px solid #ccc',
     borderRadius: '4px',
-    boxSizing: 'border-box' as 'border-box',
+    boxSizing: 'border-box',
   },
   textarea: {
     width: '100%',
@@ -85,7 +81,7 @@ const formStyles = {
     border: '1px solid #ccc',
     borderRadius: '4px',
     minHeight: '80px',
-    boxSizing: 'border-box' as 'border-box',
+    boxSizing: 'border-box',
   },
   label: {
     display: 'block',
@@ -107,9 +103,8 @@ const formStyles = {
     backgroundColor: '#f0f0f0',
     color: '#333',
   }
-};
+} as const;
 
-// --- 상품 추가 폼 컴포넌트 ---
 const AddItemForm = ({ storeId, onItemAdded, onCancel }: { storeId: number; onItemAdded: (newItem: ItemResponse) => void; onCancel: () => void; }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -156,7 +151,6 @@ const AddItemForm = ({ storeId, onItemAdded, onCancel }: { storeId: number; onIt
   );
 };
 
-// --- 이벤트 추가 폼 컴포넌트 ---
 const AddEventForm = ({ storeId, onEventAdded, onCancel }: { storeId: number; onEventAdded: (newEvent: EventResponse) => void; onCancel: () => void; }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -212,7 +206,6 @@ const AddEventForm = ({ storeId, onEventAdded, onCancel }: { storeId: number; on
 };
 
 
-// --- 메인 관리 폼 컴포넌트 ---
 interface StoreManageFormProps {
   storeId: number;
   initialStoreData: StoreResponse;
@@ -240,7 +233,6 @@ export default function StoreManageForm({ storeId, initialStoreData, initialItem
     }
   };
 
-  // [추가] 이벤트 삭제 핸들러
   const handleDeleteEvent = async (eventId: number) => {
     if (!window.confirm("정말로 이 이벤트를 삭제하시겠습니까?")) return;
     try {

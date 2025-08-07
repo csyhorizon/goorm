@@ -2,7 +2,7 @@
 
 import { createContext, useState, ReactNode, useCallback, useEffect, useContext } from 'react';
 import ToastModal from '@/components/common/ToastModal';
-import { AlarmResponse } from '@/lib/apis/alarm.api'; // AlarmResponse import
+import { AlarmResponse } from '@/lib/apis/alarm.api';
 
 interface ToastContextType {
   notifications: AlarmResponse[];
@@ -54,7 +54,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// useToast 훅
 export const useToast = () => {
     const context = useContext(ToastContext);
     if (!context) {

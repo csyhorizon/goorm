@@ -1,14 +1,10 @@
-// app/events/[id]/page.tsx
-
 import { cookies } from 'next/headers';
 import { createServerApi } from '@/lib/apis/serverClient';
 import { EventDetailResponse } from '@/lib/apis/event.api';
 
-// [수정] 백엔드의 날짜 배열을 JS Date 객체로 변환하는 헬퍼 함수
 const createDateFromInput = (dateInput: any): Date | null => {
     if (Array.isArray(dateInput) && dateInput.length >= 3) {
         const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateInput;
-        // 자바스크립트의 월은 0부터 시작하므로, 서버에서 받은 월(1~12)에서 1을 빼줍니다.
         return new Date(year, month - 1, day, hours, minutes, seconds);
     }
     if (typeof dateInput === 'string') {
@@ -20,12 +16,10 @@ const createDateFromInput = (dateInput: any): Date | null => {
     return null;
 };
 
-// 날짜를 보기 좋은 형식으로 변환하는 헬퍼 함수
 const formatDate = (dateInput: any) => {
     const date = createDateFromInput(dateInput);
     if (!date) return '미정';
 
-    // '년 월 일 시간:분' 형식으로 표시
     return date.toLocaleString('ko-KR', {
         year: 'numeric',
         month: 'long',
@@ -35,7 +29,6 @@ const formatDate = (dateInput: any) => {
     });
 };
 
-// 할인 정보를 텍스트로 변환하는 헬퍼 함수
 const getDiscountText = (event: EventDetailResponse) => {
     if (event.eventCategory === 'DISCOUNT_PERCENTAGE' && event.discountRate > 0) {
         return `${event.discountRate}% 할인`;
@@ -47,7 +40,7 @@ const getDiscountText = (event: EventDetailResponse) => {
 };
 
 
-export default async function EventDetailPage({ params }: { params: { id: string } }) {
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params;
     const eventId = parseInt(resolvedParams.id, 10);
     let eventData: EventDetailResponse | null = null;

@@ -1,14 +1,10 @@
-// app/stores/[id]/page.tsx
-
 import { cookies } from 'next/headers';
 import { createServerApi } from '@/lib/apis/serverClient';
 import { StoreResponse, ItemResponse, EventResponse } from '@/lib/apis/store.api';
 import { PostResponse, Page } from '@/lib/apis/post.api';
-import StoreDetail from "@/components/features/store/StoreDetail"; // 아래에서 만들 클라이언트 컴포지션
+import StoreDetail from "@/components/features/store/StoreDetail";
 
-// 서버에서 페이지에 필요한 모든 데이터를 가져오는 함수
 async function getPageData(storeId: number, serverApi: any) {
-  // 여러 API를 동시에 요청하여 페이지 로딩 속도를 높입니다.
   const [storeRes, itemsRes, eventsRes, postsRes] = await Promise.all([
     serverApi.get(`/v1/stores/${storeId}`),
     serverApi.get(`/v1/stores/${storeId}/items`),
@@ -24,27 +20,24 @@ async function getPageData(storeId: number, serverApi: any) {
   };
 }
 
-// 현재 로그인한 유저가 가게 주인인지 확인하는 함수
 async function checkOwnership(storeId: number, serverApi: any): Promise<boolean> {
   try {
     const myStoreRes = await serverApi.get('/v1/stores/myStore');
     const myStore: StoreResponse = myStoreRes.data;
     return myStore.id === storeId;
-  } catch (error) {
-    // getMyStore API가 실패하면 가게 주인이 아니라는 의미입니다.
+  } catch {
     return false;
   }
 }
 
-export default async function StoreDetailPage({ params }: { params: { id: string } }) {
-  const resolvedParams = await params;
-  const storeId = parseInt(resolvedParams.id, 10);
+export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const storeId = parseInt(id, 10);
 
   const cookieStore = cookies();
   const serverApi = createServerApi(await cookieStore);
 
   try {
-    // 데이터 조회와 소유권 확인을 동시에 진행합니다.
     const [pageData, isOwner] = await Promise.all([
       getPageData(storeId, serverApi),
       checkOwnership(storeId, serverApi)

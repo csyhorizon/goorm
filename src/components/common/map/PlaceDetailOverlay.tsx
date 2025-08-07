@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Store } from '@/lib/apis/store.api';
 
 interface PlaceDetailOverlayProps {
-  place: Store; // 타입을 Store로 변경
+  place: Store;
   map: any;
   onClose: () => void;
 }
@@ -17,7 +17,6 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
     const contentNode = document.createElement('div');
     contentNode.className = 'detail-overlay';
     
-    // 2. 이미지(img) 태그를 제거하고 주소(address)를 추가
     contentNode.innerHTML = `
       <div class="detail-header">
         <span class="title">${place.name}</span>
@@ -53,7 +52,6 @@ export default function PlaceDetailOverlay({ place, map, onClose }: PlaceDetailO
     const body = contentNode.querySelector('.detail-body');
 
     const handleClose = () => onClose();
-    // 상세 페이지 이동 클릭 이벤트
     const handleDetailClick = () => router.push(`/stores/${place.id}`);
 
     if (closeBtn) closeBtn.addEventListener('click', handleClose);

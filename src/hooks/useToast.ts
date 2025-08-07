@@ -10,12 +10,3 @@ export const useToast = () => {
   }
   return context;
 };
-
-
-
-  // const { showToast } = useToast();
-
-  // const handleNotificationClick = () => {
-  //   // 메시지와 함께 리다이렉트할 경로를 전달합니다.
-  //   showToast('알림 내용', '/appointments/123');
-  // };

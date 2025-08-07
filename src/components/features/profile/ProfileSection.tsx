@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { getMyProfile, MemberResponse } from '@/lib/apis/member.api';
-import { getMyStore, StoreResponse } from '@/lib/apis/store.api'; // getMyStore API 임포트
-import Link from 'next/link'; // Next.js의 Link 컴포넌트 임포트
+import { getMyStore, StoreResponse } from '@/lib/apis/store.api';
+import Link from 'next/link';
 
-// 역할(role) 값을 한글로 매핑하는 객체
 const roleMapping = {
   'USER': '일반 사용자',
   'ADMIN': '관리자',
@@ -24,14 +23,11 @@ export default function ProfileSection() {
         const profileData = await getMyProfile();
         setUser(profileData);
 
-        // 사용자의 역할이 사장님(OWNER)일 경우에만 본인의 가게 정보 조회
         if (profileData.role === 'OWNER') {
           try {
             const storeData = await getMyStore();
             setStore(storeData);
           } catch {
-            // 가게 정보가 없는 경우 500 에러가 반환될 수 있으므로,
-            // 이 경우 store 상태를 null로 유지하고 별도 에러 처리는 하지 않음.
             console.warn("사장님의 가게 정보가 없습니다.");
           }
         }
@@ -88,7 +84,6 @@ export default function ProfileSection() {
         </p>
       </div>
 
-      {/* 사장님(OWNER)이면서 가게 정보가 있을 때만 가게 관리 링크를 표시 */}
       {user.role === 'OWNER' && store && (
         <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
           <Link href={`/stores/${store.id}/manage`} passHref>

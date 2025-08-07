@@ -23,20 +23,17 @@ export default function CreatePostPage() {
             setImages(fileArray);
 
             const previewArray = fileArray.map(file => URL.createObjectURL(file));
-            // 이전 미리보기가 있다면 메모리 누수 방지를 위해 해제
             imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
             setImagePreviews(previewArray);
         }
     };
 
-    // 컴포넌트가 언마운트될 때 생성된 Object URL을 해제하여 메모리 누수를 방지합니다.
     useEffect(() => {
         return () => {
             imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
         };
     }, [imagePreviews]);
 
-    // 폼 제출 핸들러
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!title || !content || !storeId || images.length === 0) {
@@ -57,7 +54,6 @@ export default function CreatePostPage() {
 
             await createPost(postCreateRequest, images);
             alert('게시글이 성공적으로 등록되었습니다.');
-            // 성공 시 생성된 게시글 상세 페이지나 목록 페이지로 이동합니다.
             router.push(`/community`);
         } catch (err) {
             setError('게시글 등록에 실패했습니다. 다시 시도해주세요.');
@@ -105,7 +101,6 @@ export default function CreatePostPage() {
                 </div>
                 <div>
                     <label htmlFor="storeId">가게 ID</label>
-                    {/* 실제로는 검색이나 다른 방식으로 storeId를 가져오는 것이 좋습니다. */}
                     <input
                         id="storeId"
                         type="number"
@@ -127,7 +122,6 @@ export default function CreatePostPage() {
                         style={inputStyle}
                     />
                 </div>
-                {/* 이미지 미리보기 */}
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {imagePreviews.map((preview, index) => (
                         <Image key={index} src={preview} alt="preview" width={100} height={100} style={{ objectFit: 'cover' }} />
@@ -144,7 +138,6 @@ export default function CreatePostPage() {
     );
 }
 
-// 간단한 스타일 객체
 const inputStyle = {
     width: '100%',
     padding: '8px',

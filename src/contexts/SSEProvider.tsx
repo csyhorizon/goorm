@@ -15,7 +15,6 @@ export function SSEProvider({ children }: { children: React.ReactNode }) {
     if (isLoggedIn && user) {
       eventSource = subscribeToAlarms();
 
-      // 'alarm'이라는 이름의 이벤트를 수신
       eventSource.addEventListener('alarm', (event) => {
         try {
           const newAlarm: AlarmResponse = JSON.parse(event.data);

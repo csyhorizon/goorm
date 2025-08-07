@@ -7,10 +7,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { username, email, password, confirmPassword, role } = body;
 
-    // 1. 회원가입 API 호출만 처리
     const registerResponse = await register({ username, email, password, confirmPassword, role });
     
-    // 2. 성공 시 응답 반환
     return NextResponse.json({ success: true, message: registerResponse.message || '회원가입에 성공했습니다.' });
 
   } catch (error: unknown) {

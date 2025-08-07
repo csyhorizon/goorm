@@ -67,7 +67,9 @@ apiV1Client.interceptors.response.use(
       } catch (refreshError) {
         // 토큰 갱신 실패 시 로그인 페이지로 리디렉션
         console.error("토큰 갱신 실패: ", refreshError);
-        window.location.href = '/auth/login';
+        if (window.location.pathname !== '/') {
+          window.location.href = '/auth/login';
+        }
         
         // 리디렉션 후에는 더 이상 에러를 전파하지 않음
         return Promise.reject(refreshError);

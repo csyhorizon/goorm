@@ -7,7 +7,6 @@ import { register, login } from '@/lib/apis/auth.api';
 import { isAxiosError } from 'axios';
 import { createStoreLocation } from '@/lib/apis/store.api';
 
-// TypeScript 타입 정의
 interface PostcodeData {
   userSelectedType: string;
   roadAddress: string;

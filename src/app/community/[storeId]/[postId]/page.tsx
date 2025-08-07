@@ -18,20 +18,18 @@ export default function PostDetailPage() {
       const fetchPostData = async () => {
         setIsLoading(true);
         try {
-          // [수정] 두 ID를 모두 사용하여 API를 호출합니다.
           const apiData: PostResponse = await getPostDetail(Number(storeId), Number(postId));
 
-          // API 응답(PostResponse)을 UI 컴포넌트(PostDetail)가 원하는 형태로 변환
           const transformedData: PostDetailData = {
             id: apiData.id,
             title: apiData.title,
             content: apiData.content,
-            mediaUrls: apiData.mediaUrls || [], // imageUrl -> mediaUrls로 변경
+            mediaUrls: apiData.mediaUrls || [],
             author: {
               nickname: apiData.memberName,
               storeId: apiData.storeId,
             },
-            createdAt: new Date().toLocaleString(), // API에 없으므로 임시 처리
+            createdAt: new Date().toLocaleString(),
           };
           setPost(transformedData);
         } catch (e) {

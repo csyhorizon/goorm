@@ -18,7 +18,6 @@ const HeartIcon = ({ isLiked }: { isLiked: boolean }) => (
   </svg>
 );
 
-// [수정] Props에 storeId와 initialIsLiked 추가
 interface StoreHeaderProps {
   storeId: number;
   name: string;
@@ -27,7 +26,6 @@ interface StoreHeaderProps {
 }
 
 export default function StoreHeader({ storeId, name, category, initialIsLiked }: StoreHeaderProps) {
-  // [추가] 좋아요 상태 관리 로직
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +33,6 @@ export default function StoreHeader({ storeId, name, category, initialIsLiked }:
     setIsLoading(true);
     try {
       const response = await toggleStoreLike({ storeId });
-      // API 응답(becomeLike)에 따라 상태를 업데이트합니다.
       setIsLiked(response.becomeLike);
     } catch (error) {
       console.error("좋아요 처리 실패:", error);

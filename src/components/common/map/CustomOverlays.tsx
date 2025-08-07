@@ -20,15 +20,12 @@ export default function CustomOverlays({ map, places, selectedCategory, onSelect
     const newMarkers: any[] = [];
     const newOverlays: any[] = [];
 
-    // '전체' 카테고리이거나 선택된 카테고리와 일치하는 장소만 필터링합니다.
     const placesToShow =
       selectedCategory === '전체'
         ? places
         : places.filter((p) => p.category === selectedCategory);
 
     placesToShow.forEach((place) => {
-      // 3. place 객체는 이제 CustomPlace가 아닌 Store 타입입니다.
-      //    lat, lng 속성을 사용하므로 기존 로직은 그대로 동작합니다.
       const position = new window.kakao.maps.LatLng(place.lat, place.lng);
 
       const marker = new window.kakao.maps.Marker({ position });
@@ -38,7 +35,7 @@ export default function CustomOverlays({ map, places, selectedCategory, onSelect
       newMarkers.push(marker);
 
       const content = document.createElement('div');
-      content.className = 'custom-overlay'; // CSS 스타일링을 위한 클래스
+      content.className = 'custom-overlay';
       content.innerText = place.name;
       content.onclick = () => onSelect(place);
 
@@ -55,7 +52,6 @@ export default function CustomOverlays({ map, places, selectedCategory, onSelect
 
   }, [map, places, selectedCategory, onSelect]);
 
-  // 마커 클러스터링 및 줌 레벨에 따른 오버레이 표시 로직 (변경 없음)
   useEffect(() => {
     if (!map) return;
 

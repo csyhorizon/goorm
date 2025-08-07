@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { getAlarms, getUnreadAlarmCount, readAllAlarms, deleteAlarm, AlarmResponse } from '@/lib/apis/alarm.api';
 
-// --- Helper Functions ---
+
 const formatDate = (dateInput: any) => {
     if (!dateInput) return '';
     if (Array.isArray(dateInput)) {
@@ -26,11 +26,9 @@ const parseRedirectUrl = (targetUrl?: string): string | null => {
     if (eventMatch && eventMatch[1]) {
         return `/events/${eventMatch[1]}`;
     }
-    // TODO: 다른 종류의 알림 URL 파싱 규칙 추가 (예: 게시글)
     return null;
 };
 
-// --- UI Components ---
 const BellIcon = ({ hasNew }: { hasNew: boolean }) => (
   <div style={{ position: 'relative', cursor: 'pointer' }}>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,7 +46,6 @@ export default function NotificationBell() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // 주기적으로 안 읽은 알림 개수 확인
   useEffect(() => {
     if (!isLoggedIn) return;
     const checkUnread = async () => {
@@ -60,7 +57,7 @@ export default function NotificationBell() {
         }
     };
     checkUnread();
-    const interval = setInterval(checkUnread, 60000); // 1분마다 확인
+    const interval = setInterval(checkUnread, 60000);
     return () => clearInterval(interval);
   }, [isLoggedIn, setHasNew]);
 

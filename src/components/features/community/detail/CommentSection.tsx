@@ -8,17 +8,16 @@ import {
   deleteComment,
   CommentResponse,
   Page,
-} from '@/lib/apis/comment.api'; // API 함수 및 타입 경로
+} from '@/lib/apis/comment.api';
 
-// --- 페이지네이션 UI 컴포넌트 ---
 interface PaginationProps {
-  currentPage: number; // 현재 페이지 (0부터 시작)
-  totalPages: number;  // 전체 페이지 수
+  currentPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 }
 
 const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) => {
-  if (totalPages <= 1) return null; // 페이지가 1개 이하면 페이지네이션을 보여주지 않음
+  if (totalPages <= 1) return null;
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i);
 
@@ -46,7 +45,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
 };
 
 
-// --- 댓글 하나를 표시하는 아이템 컴포넌트 ---
 interface CommentItemProps {
   comment: CommentResponse;
   isEditing: boolean;
@@ -80,22 +78,17 @@ const CommentItem = ({
     onUpdate(comment.id, editedContent);
   };
 
-  const isAuthor = true; // 임시로 모든 댓글에 수정/삭제가 가능하도록 설정
+  const isAuthor = true;
 
-  // [수정] 날짜 포맷팅 함수 (더욱 안정적으로 변경)
   const formatDate = (dateInput: number[] | string | Date) => {
     if (Array.isArray(dateInput) && dateInput.length >= 6) {
-      // 2. 배열의 각 요소를 사용하여 Date 객체를 생성합니다.
-      // 자바스크립트의 월(month)은 0부터 시작하므로, 서버에서 받은 월(1~12)에서 1을 빼줍니다.
       const [year, month, day, hours, minutes, seconds] = dateInput;
       const date = new Date(year, month - 1, day, hours, minutes, seconds);
 
-      // 3. 유효한 날짜인지 확인합니다.
       if (isNaN(date.getTime())) {
         return '잘못된 날짜 형식';
       }
 
-      // 4. 'YYYY.MM.DD HH:mm' 형식으로 변환합니다.
       const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
       const formattedDay = String(date.getDate()).padStart(2, '0');
       const formattedHours = String(date.getHours()).padStart(2, '0');
@@ -104,7 +97,6 @@ const CommentItem = ({
       return `${date.getFullYear()}.${formattedMonth}.${formattedDay} ${formattedHours}:${formattedMinutes}`;
     }
 
-    // 배열이 아닌 다른 형식의 데이터가 들어올 경우를 대비한 방어 코드
     if (typeof dateInput === 'string') {
       const date = new Date(dateInput.replace(" ", "T"));
       if (!isNaN(date.getTime())) {
@@ -117,7 +109,6 @@ const CommentItem = ({
       }
     }
 
-    // 모든 경우에 해당하지 않으면 기본값을 반환합니다.
     return '날짜 정보 없음';
   };
 
@@ -127,7 +118,6 @@ const CommentItem = ({
         <p style={{ margin: 0, fontWeight: 'bold', fontSize: '0.9rem' }}>{comment.username}</p>
 
         {isEditing ? (
-          // --- 수정 모드 ---
           <div>
             <textarea
               value={editedContent}
@@ -140,7 +130,6 @@ const CommentItem = ({
             </div>
           </div>
         ) : (
-          // --- 일반 모드 ---
           <div>
             <p style={{ margin: '4px 0 0', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>{comment.content}</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -214,7 +203,6 @@ export default function CommentSection({ postId }: { postId: number }) {
     if (window.confirm("정말로 댓글을 삭제하시겠습니까?")) {
       try {
         await deleteComment(postId, commentId);
-        // 댓글 삭제 후 현재 페이지를 다시 로드하여 목록을 갱신합니다.
         loadComments(currentPage);
       } catch (error) {
         console.error("댓글 삭제 실패:", error);
@@ -227,7 +215,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     try {
       const updated = await updateComment(postId, commentId, { content });
       setComments(prev => prev.map(c => (c.id === commentId ? updated : c)));
-      setEditingCommentId(null); // 수정 모드 종료
+      setEditingCommentId(null);
     } catch (error) {
       console.error("댓글 수정 실패:", error);
       alert("댓글 수정에 실패했습니다.");
