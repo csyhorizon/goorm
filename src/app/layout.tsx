@@ -6,6 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import { ToastProvider } from "@/contexts/ToastContext";
 import NotificationBell from "@/components/layout/NotificationBell";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SSEProvider } from "@/contexts/SSEProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,29 +34,29 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <ToastProvider>
-            <header style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              padding: '10px 20px',
-              zIndex: 1000,
-              pointerEvents: 'none',
-            }}>
-              <div style={{ pointerEvents: 'auto' }}>
-                <NotificationBell />
-              </div>
-            </header>
-
-
-            <main style={{ paddingBottom: '60px' }}>
-              {children}
-            </main>
-            <BottomNav />
-          </ToastProvider>
+          <SSEProvider>
+            <ToastProvider>
+              <header style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '10px 20px',
+                zIndex: 1000,
+                pointerEvents: 'none',
+              }}>
+                <div style={{ pointerEvents: 'auto' }}>
+                  <NotificationBell />
+                </div>
+              </header>
+              <main style={{ paddingBottom: '60px' }}>
+                {children}
+              </main>
+              <BottomNav />
+            </ToastProvider>
+          </SSEProvider>
         </AuthProvider>
 
         <Script
