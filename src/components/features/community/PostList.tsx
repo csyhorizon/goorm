@@ -1,68 +1,32 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useInView } from 'react-intersection-observer';
-import axios, { AxiosError } from 'axios';
-import { PostResponse, Page, getAllPosts } from '@/lib/apis/post.api';
+import { useState, useEffect } from 'react';
+import { getAllPosts, PostResponse, Page } from '@/lib/apis/post.api';
 import PostItem from './PostItem';
 import FloatingWriteButton from './FloatingWriteButton';
 
-const Loader = () => <div style={{ textAlign: 'center', padding: '20px' }}>불러오는 중...</div>;
-
 export default function PostList() {
   const [posts, setPosts] = useState<PostResponse[]>([]);
-  const [page, setPage] = useState<number>(0);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(0); // 현재 페이지 번호 (0부터 시작)
+  const [totalPages, setTotalPages] = useState<number>(1);
 
-  const { ref, inView } = useInView({
-    threshold: 0,
-  });
-
-  const loadMorePosts = useCallback(async (isInitialLoad = false) => {
-    if (!isInitialLoad && (isLoading || !hasMore)) return;
-
-    setIsLoading(true);
-    try {
-      const data: Page<PostResponse> = await getAllPosts({ page, size: 10 });
-
-      setPosts(prevPosts => [...prevPosts, ...data.content]);
-      setPage(prevPage => prevPage + 1);
-      setHasMore(!data.last);
-
-    } catch (error) {
-      console.error("게시글을 불러오는 데 실패했습니다:", error);
-
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError;
-
-        if (axiosError.response && (axiosError.response.status === 401 || axiosError.response.status === 419)) {
-          console.log("인증 실패, 로그인 페이지로 이동합니다.");
-          setHasMore(false);
-          window.location.href = '/auth/login';
-        }
-      } else {
-        console.error("알 수 없는 오류가 발생했습니다:", error);
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const data: Page<PostResponse> = await getAllPosts({ page, size: 10 });
+        setPosts(data.content);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error("게시글 불러오기 실패", error);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, isLoading, hasMore]);
+    };
 
-  useEffect(() => {
-    setPosts([]);
-    setPage(0);
-    setHasMore(true);
-    setIsLoading(false);
-    loadMorePosts(true); // 초기 로딩임을 명시
-  }, []);
+    fetchPosts();
+  }, [page]);
 
-  // 'inView' 상태가 변경될 때마다 추가 게시글을 불러옵니다.
-  useEffect(() => {
-    if (inView && hasMore && !isLoading) {
-      loadMorePosts();
-    }
-  }, [inView, hasMore, isLoading]);
+  const handlePageClick = (pageNumber: number) => {
+    setPage(pageNumber);
+  };
 
   return (
     <div>
@@ -70,13 +34,25 @@ export default function PostList() {
         <PostItem key={post.id} post={post} />
       ))}
 
-      <div ref={ref} style={{ height: '50px' }}>
-        {isLoading && <Loader />}
-        {!hasMore && posts.length > 0 &&
-          <div style={{ textAlign: 'center', padding: '20px', color: '#868e96' }}>
-            모든 게시글을 불러왔습니다.
-          </div>
-        }
+      {/* 페이지네이션 */}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageClick(i)}
+            style={{
+              margin: '0 5px',
+              padding: '5px 10px',
+              backgroundColor: page === i ? '#333' : '#eee',
+              color: page === i ? '#fff' : '#000',
+              borderRadius: '5px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {i + 1}
+          </button>
+        ))}
       </div>
 
       <FloatingWriteButton />
